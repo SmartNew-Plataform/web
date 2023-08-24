@@ -5,15 +5,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 interface ModuleButtonProps {
   icon: keyof typeof dynamicIconImports
   name: string
+  id: number
 }
 
-export function ModuleButton({ icon, name }: ModuleButtonProps) {
+export function ModuleButton({ icon, name, id }: ModuleButtonProps) {
   const Icon = dynamic(dynamicIconImports[icon])
   return (
     <Tooltip delayDuration={0.5} disableHoverableContent>
       <TooltipTrigger asChild>
         <a
-          href="#"
+          href={`https://smartnewsystem.com.br/erp/Menu-v2/?usr_modulo=${id}`}
           className="rounded p-4  text-white transition hover:bg-white hover:text-violet-500"
         >
           <Icon className="h-5 w-5" />

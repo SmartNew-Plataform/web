@@ -1,3 +1,5 @@
+'use client'
+
 import { Header } from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import {
@@ -6,26 +8,45 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { api } from '@/lib/api'
+import { useUserStore } from '@/store/user-store'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 export default function LayoutChecklist({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { fetchUserData } = useUserStore(({ fetchUserData }) => ({
+    fetchUserData,
+  }))
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+
+    if (searchParams.has('token')) {
+      api.defaults.headers.common.Authorization = `Bearer ${searchParams.get(
+        'token',
+      )}`
+
+      fetchUserData()
+    }
+  }, [])
+
   return (
-    <div className="flex h-full flex-1 flex-col">
-      <Header>
+    <div className="flex h-screen flex-col">
+      <Header className="sticky top-0 z-30">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary">Cadastro</Button>
+            <Button variant="ghost">Cadastro</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem asChild>
               <Link href="/checklist/task">Task</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/checklist/family">Familia</Link>
+              <Link href="/checklist/family">Checklist</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/checklist/bound">Vinculos</Link>
@@ -33,7 +54,7 @@ export default function LayoutChecklist({
           </DropdownMenuContent>
         </DropdownMenu>
       </Header>
-      <div className="h-full flex-1">{children}</div>
+      <div className="flex h-full flex-col overflow-auto">{children}</div>
     </div>
   )
 }

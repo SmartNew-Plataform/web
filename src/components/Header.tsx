@@ -1,12 +1,19 @@
-import { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
+import { HTMLAttributes, ReactNode } from 'react'
 
-interface HeaderProps {
+interface HeaderProps extends HTMLAttributes<HTMLHeadingElement> {
   children?: ReactNode
 }
 
-export function Header({ children }: HeaderProps) {
+export function Header({ children, ...props }: HeaderProps) {
   return (
-    <header className="flex h-20 items-center justify-between bg-white px-6 shadow-lg shadow-zinc-300/40 ">
+    <header
+      {...props}
+      className={cn(
+        'flex h-20 items-center justify-between bg-white px-6 shadow-lg shadow-zinc-300/40 ',
+        props.className,
+      )}
+    >
       {children || <span />}
 
       <div className="flex items-center gap-2 rounded p-2 transition hover:bg-zinc-100">
