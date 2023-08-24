@@ -37,22 +37,27 @@ export default function LayoutChecklist({
   return (
     <div className="flex h-screen flex-col">
       <Header className="sticky top-0 z-30">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost">Cadastro</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem asChild>
-              <Link href="/checklist/task">Task</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/checklist/family">Checklist</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/checklist/bound">Vinculos</Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex gap-6">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost">+ Cadastro</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link href="/checklist/register/task">Task</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/checklist/register/family">Checklist</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/checklist/register/bound">Vinculos</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="secondary">
+            <Link href="/checklist/web">Checklist Web</Link>
+          </Button>
+        </div>
       </Header>
       <div className="flex h-full flex-col overflow-auto">{children}</div>
     </div>
