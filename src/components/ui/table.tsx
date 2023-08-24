@@ -82,26 +82,19 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-<<<<<<< HEAD
-      'h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
-=======
       'h-12 px-6 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0  ',
->>>>>>> ca65ddc3a56314dd8b57eae65eb21b0cf0e54727
       className,
     )}
     {...props}
   />
 ))
 TableHead.displayName = 'TableHead'
-<<<<<<< HEAD
-=======
 
 const TableHeadWithIcon = ({ ...props }) => (
   <TableHead>
     <div className="flex items-center gap-2" {...props} />
   </TableHead>
 )
->>>>>>> ca65ddc3a56314dd8b57eae65eb21b0cf0e54727
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
@@ -109,14 +102,10 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-<<<<<<< HEAD
-    className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
-=======
     className={cn(
       'p-4 px-6 align-middle [&:has([role=checkbox])]:pr-0',
       className,
     )}
->>>>>>> ca65ddc3a56314dd8b57eae65eb21b0cf0e54727
     {...props}
   />
 ))
@@ -141,10 +130,7 @@ export {
   TableCell,
   TableFooter,
   TableHead,
-<<<<<<< HEAD
-=======
   TableHeadWithIcon,
->>>>>>> ca65ddc3a56314dd8b57eae65eb21b0cf0e54727
   TableHeader,
   TableRow
 }
