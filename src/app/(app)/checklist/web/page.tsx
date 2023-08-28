@@ -1,21 +1,6 @@
-import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeadWithIcon,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  Calendar,
-  HelpCircle,
-  Lock,
-  MoreVertical,
-  Text,
-  User,
-} from 'lucide-react'
+import { MoreVertical } from 'lucide-react'
+import { columns } from './columns'
+import { DataTable } from './data-table'
 
 function MoreOptionsButton() {
   return (
@@ -27,8 +12,9 @@ function MoreOptionsButton() {
 
 export default function Web() {
   return (
-    <div className="flex h-full w-full flex-col p-4">
-      <Table className="bg-white text-lg">
+    <div className="flex max-h-full flex-col gap-4 p-4">
+      <DataTable columns={columns} data={[]} globalFilter={''} />
+      {/* <Table className="bg-white text-lg">
         <TableHeader>
           <TableRow>
             <TableHead>
@@ -86,7 +72,7 @@ export default function Web() {
             </TableCell>
           </TableRow>
         </TableBody>
-      </Table>
+      </Table> */}
     </div>
   )
 }
