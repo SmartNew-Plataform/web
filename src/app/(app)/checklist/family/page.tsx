@@ -1,4 +1,5 @@
 'use client'
+import { DataTable } from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -6,7 +7,6 @@ import { useCoreScreensStore } from '@/store/core-screens-store'
 import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { columns } from './columns'
-import { DataTable } from './data-table'
 
 export default function FamilyPage() {
   const [filter, setFilter] = useState('')
