@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { ColumnDef } from '@tanstack/react-table'
+import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
@@ -58,6 +59,11 @@ export const columns: ColumnDef<InfoData>[] = [
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
       )
+    },
+    cell: ({ row }) => {
+      const date: string = row.getValue('startDate')
+
+      return date ? dayjs(date).format('DD/MM/YYYY, HH:mm') : 'Sem registro'
     },
   },
   {

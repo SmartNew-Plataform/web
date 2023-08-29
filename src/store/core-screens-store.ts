@@ -76,6 +76,7 @@ export const useCoreScreensStore = create<CareScreensData>((set) => {
     },
 
     loadChecklistAsks: async (productionId) => {
+      set({ checklistAsksScreen: null })
       const asks = await api
         .get('smart-list/check-list/findById', {
           params: {
