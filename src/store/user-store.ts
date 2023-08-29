@@ -25,7 +25,7 @@ export const useUserStore = create<UserStoreData>((set) => {
         .then((res) => res.data)
         .catch((err) => console.error(err))
 
-      const modules = data.modules.sort((a: ModuleData, b: ModuleData) => {
+      const modules = data?.modules.sort((a: ModuleData, b: ModuleData) => {
         return a.order > b.order ? 1 : -1
       })
 

@@ -19,15 +19,30 @@ interface CareScreensData {
   infoScreen: {
     table: Array<InfoData>
   } | null
+  checklistAsksScreen: {
+    table: Array<{
+      description: string
+      id: number
+      img: Array<string>
+      answer: {
+        color: string
+        description: string
+        icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
+        id: number
+      }
+    }>
+  } | null
 
   loadFamily: () => Promise<void>
   loadInfo: () => Promise<void>
+  loadChecklistAsks: (productionId: string) => Promise<void>
 }
 
 export const useCoreScreensStore = create<CareScreensData>((set) => {
   return {
     familyScreen: null,
     infoScreen: null,
+    checklistAsksScreen: null,
 
     loadFamily: async () => {
       const response: Array<FamilyData> | null = await api
@@ -49,6 +64,22 @@ export const useCoreScreensStore = create<CareScreensData>((set) => {
       set({
         infoScreen: {
           table: response || [],
+        },
+      })
+    },
+
+    loadChecklistAsks: async (productionId) => {
+      const asks = await api
+        .get('smart-list/check-list/findById', {
+          params: {
+            productionId,
+          },
+        })
+        .then((res) => res.data.response)
+
+      set({
+        checklistAsksScreen: {
+          table: asks.tasks,
         },
       })
     },
