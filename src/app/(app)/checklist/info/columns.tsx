@@ -9,9 +9,9 @@ export type InfoData = {
   id: number
   status: string
   startDate: string | null
-  endStart: string | null
   equipment: string
   user: string
+  period: string
 }
 
 export const columns: ColumnDef<InfoData>[] = [
@@ -45,20 +45,7 @@ export const columns: ColumnDef<InfoData>[] = [
       )
     },
   },
-  {
-    accessorKey: 'status',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Status
-          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
+
   {
     accessorKey: 'startDate',
     header: ({ column }) => {
@@ -67,21 +54,21 @@ export const columns: ColumnDef<InfoData>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Data Inicial
+          Data de abertura
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
       )
     },
   },
   {
-    accessorKey: 'endDate',
+    accessorKey: 'period',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Data Final
+          Turno
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -110,6 +97,22 @@ export const columns: ColumnDef<InfoData>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Usuario
+          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: 'status',
+    cell: ({ row }) =>
+      row.getValue('status') === 'open' ? 'Aberto' : 'Fechado ',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Status
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
       )
