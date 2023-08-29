@@ -45,7 +45,7 @@ export default function LayoutChecklist({
         <div className="flex gap-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost">
+              <Button variant="ghost" disabled>
                 <Plus className="h-4 w-4" />
                 Cadastro
               </Button>
