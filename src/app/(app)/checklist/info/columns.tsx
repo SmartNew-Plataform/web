@@ -105,7 +105,7 @@ export const columns: ColumnDef<InfoData>[] = [
   {
     accessorKey: 'status',
     cell: ({ row }) =>
-      row.getValue('status') === 'open' ? 'Aberto' : 'Fechado ',
+      row.getValue('status') === 'open' ? 'Aberto' : 'Finalizado ',
     header: ({ column }) => {
       return (
         <Button
