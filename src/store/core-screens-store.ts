@@ -1,5 +1,6 @@
 import { InfoData } from '@/app/(app)/checklist/info/columns'
 import { api } from '@/lib/api'
+import dayjs from 'dayjs'
 import { create } from 'zustand'
 
 export type FamilyData = {
@@ -20,6 +21,12 @@ interface CareScreensData {
     table: Array<InfoData>
   } | null
   checklistAsksScreen: {
+    id: number
+    status: string
+    startDate: string
+    endDate: string
+    equipment: string
+    user: string
     table: Array<{
       description: string
       id: number
@@ -79,6 +86,9 @@ export const useCoreScreensStore = create<CareScreensData>((set) => {
 
       set({
         checklistAsksScreen: {
+          ...asks,
+          startDate: dayjs(asks.startDate).format('DD/MM/YYYY, HH:mm'),
+          status: asks.status === 'opene' ? 'Aberto' : 'Finalizado',
           table: asks.tasks,
         },
       })
