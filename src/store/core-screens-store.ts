@@ -36,6 +36,10 @@ interface CareScreensData {
         description: string
         icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
         id: number
+        children: {
+          id: number
+          description: string
+        }
       }
     }>
   } | null

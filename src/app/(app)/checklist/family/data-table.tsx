@@ -29,6 +29,10 @@ interface DataTableProps<TData, TValue> {
   globalFilter?: string
 }
 
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = true
+
 export function DataTable<TData, TValue>({
   columns,
   data,

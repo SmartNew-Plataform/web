@@ -14,6 +14,10 @@ import { AreaChart, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = true
+
 export default function LayoutChecklist({
   children,
 }: {

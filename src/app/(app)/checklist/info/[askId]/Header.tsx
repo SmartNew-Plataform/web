@@ -22,14 +22,11 @@ export function Header() {
   if (!checklistAsksScreen)
     return <Skeleton className="h-32 w-full rounded-sm" />
 
-  const hash = AES.encrypt(
-    String(checklistAsksScreen?.id),
-    'checklist-km034hq3',
-  )
+  const hash = AES.encrypt(String(checklistAsksScreen?.id), 'ask-checklist')
 
   function handleOpenChecklistPDF() {
     window.open(
-      `https://pdf.smartnewsistemas.com.br/generator/checklist/asks/?askId=${hash}`,
+      `https://pdf.smartnewsistemas.com.br/generator/checklist/asks/?id=${hash}`,
     )
   }
 

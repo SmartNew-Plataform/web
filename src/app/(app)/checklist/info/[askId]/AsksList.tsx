@@ -167,6 +167,14 @@ export function AsksList({ productionId }: AsksListProps) {
                 {answer?.description || 'Não respondido'}
               </span>
             </div>
+            {answer?.children && (
+              <div className="flex flex-col gap-1">
+                <div className="h-px w-full bg-slate-200" />
+                <span className="text-zinc-400">
+                  {answer.children.description}
+                </span>
+              </div>
+            )}
           </Card>
         )
       })}

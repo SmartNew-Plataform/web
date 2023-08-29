@@ -11,6 +11,10 @@ export type TaskData = {
   description: string
 }
 
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = true
+
 export default function TaskPage() {
   const [tasks, setTasks] = useState<Array<TaskData>>([])
 

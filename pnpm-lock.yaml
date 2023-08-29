@@ -9,8 +9,8 @@ dependencies:
     specifier: ^3.8.1
     version: 3.8.1(graphql@16.8.0)(react-dom@18.2.0)(react@18.2.0)
   '@hookform/resolvers':
-    specifier: ^3.2.0
-    version: 3.2.0(react-hook-form@7.45.4)
+    specifier: 3.1.1
+    version: 3.1.1(react-hook-form@7.45.4)
   '@radix-ui/react-alert-dialog':
     specifier: ^1.0.4
     version: 1.0.4(@types/react-dom@18.2.7)(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)
@@ -117,8 +117,8 @@ dependencies:
     specifier: ^0.3.0
     version: 0.3.0(react@18.2.0)
   zod:
-    specifier: ^3.22.1
-    version: 3.22.1
+    specifier: 3.21.4
+    version: 3.21.4
   zustand:
     specifier: ^4.4.1
     version: 4.4.1(@types/react@18.2.20)(react@18.2.0)
@@ -262,8 +262,8 @@ packages:
       graphql: 16.8.0
     dev: false
 
-  /@hookform/resolvers@3.2.0(react-hook-form@7.45.4):
-    resolution: {integrity: sha512-skXQHhLxq0Sz2xDwCyv5dygBCtXJe1GmWwxDzfdtl0X6agD6qcyTG8HrZWkjJoy8AkiLARqYvSYJ8z7+Nwmi7w==}
+  /@hookform/resolvers@3.1.1(react-hook-form@7.45.4):
+    resolution: {integrity: sha512-tS16bAUkqjITNSvbJuO1x7MXbn7Oe8ZziDTJdA9mMvsoYthnOOiznOTGBYwbdlYBgU+tgpI/BtTU3paRbCuSlg==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
@@ -5069,10 +5069,6 @@ packages:
 
   /zod@3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
-    dev: false
-
-  /zod@3.22.1:
-    resolution: {integrity: sha512-+qUhAMl414+Elh+fRNtpU+byrwjDFOS1N7NioLY+tSlcADTx4TkCUua/hxJvxwDXcV4397/nZ420jy4n4+3WUg==}
     dev: false
 
   /zustand@4.4.1(@types/react@18.2.20)(react@18.2.0):
