@@ -1,23 +1,34 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
+import { MultiSelect } from '@/components/MultiSelect'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { AES } from 'crypto-js'
 import { FileUp } from 'lucide-react'
+import { useEffect } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 
 export function Header() {
-  const { checklistAsksScreen } = useCoreScreensStore(
-    ({ checklistAsksScreen }) => ({ checklistAsksScreen }),
+  const filterForm = useForm<{ status: string[] }>({
+    defaultValues: { status: [] },
+  })
+  const { checklistAsksScreen, changeChecklistAsksTable } = useCoreScreensStore(
+    ({ checklistAsksScreen, changeChecklistAsksTable }) => ({
+      checklistAsksScreen,
+      changeChecklistAsksTable,
+    }),
   )
+
+  const statusFilter = filterForm.watch('status')
+  console.log(statusFilter)
+
+  useEffect(() => {
+    changeChecklistAsksTable(statusFilter)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter])
 
   if (!checklistAsksScreen)
     return <Skeleton className="h-32 w-full rounded-sm" />
@@ -33,17 +44,19 @@ export function Header() {
   return (
     <Card className="flex items-center justify-between rounded-md p-4">
       <div className="flex items-center gap-3 divide-x divide-slate-300">
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtro" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="no-ok">Não conforme</SelectItem>
-            <SelectItem value="all" defaultChecked>
-              Todos
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <FormProvider {...filterForm}>
+          <form>
+            <MultiSelect
+              name="status"
+              options={checklistAsksScreen.allStatus.map(
+                ({ id, description }) => ({
+                  value: String(id),
+                  label: description,
+                }),
+              )}
+            />
+          </form>
+        </FormProvider>
 
         <div className="flex flex-col gap-1 pl-2">
           <strong className="uppercase text-slate-700">Id:</strong>

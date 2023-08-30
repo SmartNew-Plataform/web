@@ -29,7 +29,11 @@ interface CareScreensData {
     endDate: string
     equipment: string
     user: string
-    table: Array<{
+    allStatus: Array<{
+      id: number
+      description: string
+    }>
+    allDataTable: Array<{
       description: string
       id: number
       img: Array<string>
@@ -44,9 +48,25 @@ interface CareScreensData {
         }
       }
     }>
+    table: Array<{
+      description: string
+      id: number
+      img: Array<string>
+      answer: {
+        color: string
+        description: string
+        icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
+        id: number
+        children: {
+          id: number
+          description: string
+        }
+      }
+    }> | null
   } | null
 
   changeFilterText: (text: string) => void
+  changeChecklistAsksTable: (status: string[]) => void
 
   loadFamily: () => Promise<void>
   loadInfo: () => Promise<void | Array<InfoData> | AxiosError | null>
@@ -66,6 +86,27 @@ export const useCoreScreensStore = create<CareScreensData>((set, get) => {
         infoScreen: {
           filterText: text,
           table: restValue.infoScreen?.table || [],
+        },
+      })
+    },
+
+    changeChecklistAsksTable: (status) => {
+      const allData = get()
+      const oldTable = get().checklistAsksScreen?.allDataTable
+      const filteredTable =
+        status.length === 0
+          ? oldTable
+          : oldTable?.filter(({ answer }) =>
+              answer?.id ? status.includes(String(answer.id)) : false,
+            )
+
+      if (!allData.checklistAsksScreen) return
+
+      set({
+        ...allData,
+        checklistAsksScreen: {
+          ...allData.checklistAsksScreen,
+          table: filteredTable || null,
         },
       })
     },
@@ -107,12 +148,23 @@ export const useCoreScreensStore = create<CareScreensData>((set, get) => {
         })
         .then((res) => res.data.response)
 
+      const status = await api
+        .get('/smart-list/check-list/list-status')
+        .then((res) => res.data)
+
       set({
         checklistAsksScreen: {
           ...asks,
+          allStatus: status.map(
+            ({ id, descricao }: { id: number; descricao: string }) => ({
+              id,
+              description: descricao,
+            }),
+          ),
           startDate: dayjs(asks.startDate).format('DD/MM/YYYY, HH:mm'),
           status: asks.status === 'opene' ? 'Aberto' : 'Finalizado',
           table: asks.tasks,
+          allDataTable: asks.tasks,
         },
       })
     },

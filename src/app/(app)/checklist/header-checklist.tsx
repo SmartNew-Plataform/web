@@ -40,6 +40,7 @@ export function HeaderChecklist() {
         title: err.message,
         description: err.response?.data.message,
         variant: 'destructive',
+        duration: 1000 * 120,
       })
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
