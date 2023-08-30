@@ -8,13 +8,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useUserStore } from '@/store/user-store'
+import { AxiosError } from 'axios'
 import { AreaChart, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
 export function HeaderChecklist() {
+  const { toast } = useToast()
   const searchParams = new URLSearchParams(window.location.search)
   const { fetchUserData, modules } = useUserStore(
     ({ fetchUserData, modules }) => ({
@@ -28,9 +31,17 @@ export function HeaderChecklist() {
       api.defaults.headers.common.Authorization = `Bearer ${searchParams.get(
         'token',
       )}`
-
-      fetchUserData()
     }
+
+    fetchUserData().catch((err: AxiosError<{ message: string }>) => {
+      console.log(err)
+
+      toast({
+        title: err.message,
+        description: err.response?.data.message,
+        variant: 'destructive',
+      })
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

@@ -2,17 +2,26 @@
 
 import { DataTable } from '@/components/DataTable'
 import { LoadingPage } from '@/components/LoadingPage'
+import { useToast } from '@/components/ui/use-toast'
 import { useCoreScreensStore } from '@/store/core-screens-store'
+import { AxiosError } from 'axios'
 import { useEffect } from 'react'
 import { columns } from './columns'
 
 export function TableInfo() {
+  const { toast } = useToast()
   const { loadInfo, infoScreen } = useCoreScreensStore(
     ({ loadInfo, infoScreen }) => ({ loadInfo, infoScreen }),
   )
 
   useEffect(() => {
-    loadInfo()
+    loadInfo().catch((err: AxiosError<{ message: string }>) => {
+      toast({
+        title: err.message,
+        description: err.response?.data.message,
+        variant: 'destructive',
+      })
+    })
   }, [])
 
   if (!infoScreen?.table) {

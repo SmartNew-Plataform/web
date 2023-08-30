@@ -1,5 +1,6 @@
 import { InfoData } from '@/app/(app)/checklist/info/columns'
 import { api } from '@/lib/api'
+import { AxiosError } from 'axios'
 import dayjs from 'dayjs'
 import { create } from 'zustand'
 
@@ -48,7 +49,7 @@ interface CareScreensData {
   changeFilterText: (text: string) => void
 
   loadFamily: () => Promise<void>
-  loadInfo: () => Promise<void>
+  loadInfo: () => Promise<void | Array<InfoData> | AxiosError | null>
   loadChecklistAsks: (productionId: string) => Promise<void>
 }
 
@@ -92,6 +93,8 @@ export const useCoreScreensStore = create<CareScreensData>((set, get) => {
           table: response || [],
         },
       })
+
+      return response
     },
 
     loadChecklistAsks: async (productionId) => {
