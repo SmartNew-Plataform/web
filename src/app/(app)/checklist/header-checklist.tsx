@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { api } from '@/lib/api'
 import { useUserStore } from '@/store/user-store'
-import { AreaChart, Link, Plus } from 'lucide-react'
+import { AreaChart, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect } from 'react'
 
 export function HeaderChecklist() {
