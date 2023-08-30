@@ -1,9 +1,10 @@
 'use client'
 
 import { DataTable } from '@/components/DataTable'
-import { columns } from './columns'
+import { LoadingPage } from '@/components/LoadingPage'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { useEffect } from 'react'
+import { columns } from './columns'
 
 export function TableInfo() {
   const { loadInfo, infoScreen } = useCoreScreensStore(
@@ -16,9 +17,7 @@ export function TableInfo() {
 
   if (!infoScreen?.table) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4">
-        <strong>Carregando tabela...Pode demorar um minuto!</strong>
-      </div>
+      <LoadingPage message="Carregando tabela...Isso pode demorar um pouco!" />
     )
   }
 

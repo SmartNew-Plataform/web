@@ -1,16 +1,14 @@
-'use client'
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-export function Providers({ children }: { children: React.ReactNode }) {
-  const queryClient = new QueryClient()
+import { QueryProvider } from '@/contexts/query-provider'
 
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryProvider>
       <TooltipProvider>
         <Toaster />
         {children}
       </TooltipProvider>
-    </QueryClientProvider>
+    </QueryProvider>
   )
 }

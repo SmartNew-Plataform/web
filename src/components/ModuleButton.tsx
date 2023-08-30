@@ -16,11 +16,12 @@ export function ModuleButton({ icon, name, id }: ModuleButtonProps) {
         <a
           href={`https://smartnewsystem.com.br/erp/Menu-v2/?usr_modulo=${id}`}
           className="rounded p-4  text-white transition hover:bg-white hover:text-violet-500"
+          target="_blank"
         >
           <Icon className="h-5 w-5" />
         </a>
       </TooltipTrigger>
-      <TooltipContent sideOffset={8} side="right">
+      <TooltipContent sideOffset={8} side="right" className="z-[99999]">
         <span>{name}</span>
       </TooltipContent>
     </Tooltip>
