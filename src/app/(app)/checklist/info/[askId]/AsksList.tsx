@@ -14,6 +14,7 @@ import {
 import { Image } from 'lucide-react'
 import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import dynamic from 'next/dynamic'
+import ImageNext from 'next/image'
 import { MutableRefObject, useEffect } from 'react'
 
 interface AsksListProps {
@@ -134,7 +135,13 @@ export function AsksList({ productionId }: AsksListProps) {
                       {img.map((image) => (
                         <div key={image} className="keen-slider__slide">
                           {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                          <img src={image} className="rounded" />
+                          <ImageNext
+                            alt="Checklist image"
+                            width={510}
+                            height={680}
+                            src={image}
+                            className="rounded"
+                          />
                         </div>
                       ))}
                     </div>
@@ -146,7 +153,10 @@ export function AsksList({ productionId }: AsksListProps) {
                       {img.map((image) => (
                         <div key={image} className="keen-slider__slide">
                           {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                          <img
+                          <ImageNext
+                            alt="preview image"
+                            width={120}
+                            height={120}
                             src={image}
                             className="h-[120px] w-[120px] rounded object-cover"
                           />

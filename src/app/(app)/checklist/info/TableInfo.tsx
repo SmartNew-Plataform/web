@@ -22,6 +22,7 @@ export function TableInfo() {
         variant: 'destructive',
       })
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (!infoScreen?.table) {
