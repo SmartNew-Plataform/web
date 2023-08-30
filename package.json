@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 3032",
+    "start": "next start -p 3033",
     "lint": "next lint",
     "start:server": "json-server --watch db.json --port 3004"
   },
@@ -43,6 +43,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.4",
+    "sharp": "^0.32.5",
     "tailwind-merge": "^1.14.0",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.6",
