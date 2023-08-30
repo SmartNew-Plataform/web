@@ -18,6 +18,7 @@ interface CareScreensData {
     table: Array<FamilyData>
   } | null
   infoScreen: {
+    filterText: string | null
     table: Array<InfoData>
   } | null
   checklistAsksScreen: {
@@ -44,16 +45,29 @@ interface CareScreensData {
     }>
   } | null
 
+  changeFilterText: (text: string) => void
+
   loadFamily: () => Promise<void>
   loadInfo: () => Promise<void>
   loadChecklistAsks: (productionId: string) => Promise<void>
 }
 
-export const useCoreScreensStore = create<CareScreensData>((set) => {
+export const useCoreScreensStore = create<CareScreensData>((set, get) => {
   return {
     familyScreen: null,
     infoScreen: null,
     checklistAsksScreen: null,
+
+    changeFilterText: (text) => {
+      const restValue = get()
+      set({
+        ...restValue,
+        infoScreen: {
+          filterText: text,
+          table: restValue.infoScreen?.table || [],
+        },
+      })
+    },
 
     loadFamily: async () => {
       const response: Array<FamilyData> | null = await api
@@ -74,6 +88,7 @@ export const useCoreScreensStore = create<CareScreensData>((set) => {
 
       set({
         infoScreen: {
+          filterText: '',
           table: response || [],
         },
       })
