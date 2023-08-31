@@ -42,6 +42,7 @@ interface StoreState {
   }> | null
 
   load: (login: string) => Promise<void>
+  loadingDashboard: boolean
   searchData: (data: {
     login: string
     period?:
@@ -64,6 +65,7 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
     branch: null,
     equipment: null,
     allEquipment: null,
+    loadingDashboard: false,
 
     load: async (login: string) => {
       const [branch, equipment]: [
@@ -98,6 +100,7 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
       })
     },
     searchData: async (data) => {
+      set({ loadingDashboard: true })
       const response = await api
         .get(
           'https://checklist-api.smartnewservices.com.br/public/checkList/dashForFilter',
@@ -129,6 +132,7 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
         status,
         family: equipments,
         summaryCards: response.summaryCards,
+        loadingDashboard: false,
       })
     },
     fillEquipmentsByBranch: async (equipmentsIds) => {
