@@ -22,6 +22,22 @@ type FilterInfoChecklist = {
   }
 }
 
+export type AskType = {
+  description: string
+  id: number
+  img: Array<string>
+  answer: {
+    color: string
+    description: string
+    icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
+    id: number
+    children: {
+      id: number
+      description: string
+    }
+  }
+}
+
 interface CoreScreensData {
   familyScreen: {
     table: Array<FamilyData>
@@ -41,40 +57,14 @@ interface CoreScreensData {
       id: number
       description: string
     }>
-    allDataTable: Array<{
-      description: string
-      id: number
-      img: Array<string>
-      answer: {
-        color: string
-        description: string
-        icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
-        id: number
-        children: {
-          id: number
-          description: string
-        }
-      }
-    }>
-    table: Array<{
-      description: string
-      id: number
-      img: Array<string>
-      answer: {
-        color: string
-        description: string
-        icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
-        id: number
-        children: {
-          id: number
-          description: string
-        }
-      }
-    }> | null
+    editingAsk?: AskType | null
+    allDataTable: Array<AskType>
+    table: Array<AskType> | null
   } | null
 
   changeFilter: (params: FilterInfoChecklist) => void
   changeChecklistAsksTable: (status: string[]) => void
+  changeAskEditing: (ask: AskType) => void
 
   loadFamily: () => Promise<void>
   loadInfo: () => Promise<void | Array<InfoData> | AxiosError | null>
@@ -115,6 +105,19 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
         checklistAsksScreen: {
           ...allData.checklistAsksScreen,
           table: filteredTable || null,
+        },
+      })
+    },
+    changeAskEditing: (ask) => {
+      const restStore = get()
+
+      if (!restStore.checklistAsksScreen) return
+
+      set({
+        ...restStore,
+        checklistAsksScreen: {
+          ...restStore.checklistAsksScreen,
+          editingAsk: ask,
         },
       })
     },

@@ -1,5 +1,5 @@
-import { TableInfo } from './TableInfo'
-import { HeaderInfo } from './HeaderInfo'
+import { HeaderInfo } from './header-info'
+import { TableInfo } from './table-info'
 
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true

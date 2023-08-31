@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Modules } from './Modules'
+import { Modules } from './modules'
 
 export default function LayoutApp({ children }: { children: React.ReactNode }) {
   return (

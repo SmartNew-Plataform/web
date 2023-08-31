@@ -1,9 +1,5 @@
 import { HeaderChecklist } from './header-checklist'
 
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
-export const revalidate = true
-
 export default function LayoutChecklist({
   children,
 }: {

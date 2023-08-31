@@ -1,5 +1,5 @@
-import { AsksList } from './AsksList'
-import { Header } from './Header'
+import { AsksList } from './asks-list'
+import { Header } from './header'
 
 export default function Asks({ params }: { params: { askId: string } }) {
   return (

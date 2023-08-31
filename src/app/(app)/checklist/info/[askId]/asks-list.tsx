@@ -2,20 +2,27 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
-import { useCoreScreensStore } from '@/store/core-screens-store'
+import { AskType, useCoreScreensStore } from '@/store/core-screens-store'
 import 'keen-slider/keen-slider.min.css'
 import {
   KeenSliderInstance,
   KeenSliderPlugin,
   useKeenSlider,
 } from 'keen-slider/react'
-import { Image } from 'lucide-react'
+import { Image, PenSquare } from 'lucide-react'
 import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import dynamic from 'next/dynamic'
 import ImageNext from 'next/image'
-import { MutableRefObject, useEffect } from 'react'
+import { MutableRefObject, useEffect, useState } from 'react'
 
 interface AsksListProps {
   productionId: string
@@ -57,12 +64,15 @@ function ThumbnailPlugin(
 }
 
 export function AsksList({ productionId }: AsksListProps) {
-  const { checklistAsksScreen, loadChecklistAsks } = useCoreScreensStore(
-    ({ checklistAsksScreen, loadChecklistAsks }) => ({
-      checklistAsksScreen,
-      loadChecklistAsks,
-    }),
-  )
+  const [sheetEditIsOpen, setSheetEditIsOpen] = useState<boolean>(false)
+  const { checklistAsksScreen, loadChecklistAsks, changeAskEditing } =
+    useCoreScreensStore(
+      ({ checklistAsksScreen, loadChecklistAsks, changeAskEditing }) => ({
+        checklistAsksScreen,
+        loadChecklistAsks,
+        changeAskEditing,
+      }),
+    )
 
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
     initial: 0,
@@ -83,7 +93,10 @@ export function AsksList({ productionId }: AsksListProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  console.log(checklistAsksScreen)
+  function handleEditAsk(ask: AskType) {
+    changeAskEditing(ask)
+    setSheetEditIsOpen(true)
+  }
 
   if (!checklistAsksScreen?.table)
     return (
@@ -117,56 +130,62 @@ export function AsksList({ productionId }: AsksListProps) {
               'border-slate-400': !answer,
             })}
           >
-            {img.length > 0 && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    className="absolute right-1 top-1"
-                  >
-                    {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                    <Image className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="overflow-hidden p-0">
-                  <div>
-                    <div ref={sliderRef} className="keen-slider">
-                      {img.map((image) => (
-                        <div key={image} className="keen-slider__slide">
-                          {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                          <ImageNext
-                            alt="Checklist image"
-                            width={510}
-                            height={680}
-                            src={image}
-                            className="rounded"
-                          />
-                        </div>
-                      ))}
-                    </div>
+            <div className="absolute right-1 top-1">
+              <Button
+                className="hidden"
+                size="icon-sm"
+                variant="ghost"
+                onClick={() => handleEditAsk({ id, description, img, answer })}
+              >
+                <PenSquare className="h-4 w-4" />
+              </Button>
+              {img.length > 0 && (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button size="icon-sm" variant="ghost">
+                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                      <Image className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="overflow-hidden p-0">
+                    <div>
+                      <div ref={sliderRef} className="keen-slider">
+                        {img.map((image) => (
+                          <div key={image} className="keen-slider__slide">
+                            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                            <ImageNext
+                              alt="Checklist image"
+                              width={510}
+                              height={680}
+                              src={image}
+                              className="rounded"
+                            />
+                          </div>
+                        ))}
+                      </div>
 
-                    <div
-                      ref={thumbnailRef}
-                      className="keen-slider thumbnail mt-4 px-2 pb-2"
-                    >
-                      {img.map((image) => (
-                        <div key={image} className="keen-slider__slide">
-                          {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                          <ImageNext
-                            alt="preview image"
-                            width={120}
-                            height={120}
-                            src={image}
-                            className="h-[120px] w-[120px] rounded object-cover"
-                          />
-                        </div>
-                      ))}
+                      <div
+                        ref={thumbnailRef}
+                        className="keen-slider thumbnail mt-4 px-2 pb-2"
+                      >
+                        {img.map((image) => (
+                          <div key={image} className="keen-slider__slide">
+                            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                            <ImageNext
+                              alt="preview image"
+                              width={120}
+                              height={120}
+                              src={image}
+                              className="h-[120px] w-[120px] rounded object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            )}
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
             <h4 className="text-xl font-semibold text-slate-700">
               {description}
             </h4>
@@ -188,6 +207,20 @@ export function AsksList({ productionId }: AsksListProps) {
           </Card>
         )
       })}
+
+      <Sheet open={sheetEditIsOpen} onOpenChange={setSheetEditIsOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>
+              {checklistAsksScreen.editingAsk?.description}
+            </SheetTitle>
+            <SheetDescription>
+              {checklistAsksScreen.editingAsk?.answer?.description}
+              {checklistAsksScreen.editingAsk?.answer?.children?.description}
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
     </>
   )
 }

@@ -10,8 +10,18 @@ type ModuleData = {
   order: number
 }
 
+type UserData = {
+  login: string
+  clientId: string
+  group: {
+    description: string
+    id: number
+  }
+}
+
 interface UserStoreData {
   modules: Array<ModuleData> | null
+  user: UserData | null
 
   fetchUserData: () => Promise<void | AxiosError>
 }
@@ -19,6 +29,7 @@ interface UserStoreData {
 export const useUserStore = create<UserStoreData>((set) => {
   return {
     modules: null,
+    user: null,
 
     fetchUserData: async () => {
       const data = await api.get('/profile').then((res) => res.data)
@@ -27,7 +38,7 @@ export const useUserStore = create<UserStoreData>((set) => {
         return a.order > b.order ? 1 : -1
       })
 
-      set({ modules })
+      set({ modules, user: data.user })
 
       return data
     },
