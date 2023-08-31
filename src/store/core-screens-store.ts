@@ -14,12 +14,20 @@ export type FamilyData = {
   }
 }
 
-interface CareScreensData {
+type FilterInfoChecklist = {
+  filterText?: string
+  period?: {
+    from?: Date
+    to?: Date
+  }
+}
+
+interface CoreScreensData {
   familyScreen: {
     table: Array<FamilyData>
   } | null
   infoScreen: {
-    filterText: string | null
+    filter?: FilterInfoChecklist
     table: Array<InfoData>
   } | null
   checklistAsksScreen: {
@@ -65,7 +73,7 @@ interface CareScreensData {
     }> | null
   } | null
 
-  changeFilterText: (text: string) => void
+  changeFilter: (params: FilterInfoChecklist) => void
   changeChecklistAsksTable: (status: string[]) => void
 
   loadFamily: () => Promise<void>
@@ -73,18 +81,18 @@ interface CareScreensData {
   loadChecklistAsks: (productionId: string) => Promise<void>
 }
 
-export const useCoreScreensStore = create<CareScreensData>((set, get) => {
+export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
   return {
     familyScreen: null,
     infoScreen: null,
     checklistAsksScreen: null,
 
-    changeFilterText: (text) => {
+    changeFilter: (params) => {
       const restValue = get()
       set({
         ...restValue,
         infoScreen: {
-          filterText: text,
+          filter: params,
           table: restValue.infoScreen?.table || [],
         },
       })
@@ -130,7 +138,7 @@ export const useCoreScreensStore = create<CareScreensData>((set, get) => {
 
       set({
         infoScreen: {
-          filterText: '',
+          filter: undefined,
           table: response || [],
         },
       })
@@ -141,7 +149,7 @@ export const useCoreScreensStore = create<CareScreensData>((set, get) => {
     loadChecklistAsks: async (productionId) => {
       set({ checklistAsksScreen: null })
       const asks = await api
-        .get('smart-list/check-list/findById', {
+        .get('smart-list/check-list/find-by-id', {
           params: {
             productionId,
           },

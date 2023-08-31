@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
-import { MultiSelect } from '@/components/MultiSelect'
+import { Form } from '@/components/Form'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -46,7 +46,7 @@ export function Header() {
       <div className="flex items-center gap-3 divide-x divide-slate-300">
         <FormProvider {...filterForm}>
           <form>
-            <MultiSelect
+            <Form.MultiSelect
               name="status"
               options={checklistAsksScreen.allStatus.map(
                 ({ id, description }) => ({

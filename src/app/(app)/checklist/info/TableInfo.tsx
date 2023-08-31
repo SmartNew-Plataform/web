@@ -6,19 +6,23 @@ import { useCoreScreensStore } from '@/store/core-screens-store'
 import { columns } from './columns'
 
 export function TableInfo() {
-  const { infoScreen } = useCoreScreensStore(({ infoScreen }) => ({
-    infoScreen,
-  }))
+  const { infoScreen } = useCoreScreensStore()
 
   async function fetchDataTable(params: { index: number; perPage: number }) {
-    return api.get('/smart-list/check-list', { params }).then((res) => res.data)
+    return api
+      .get('/smart-list/check-list', {
+        params,
+      })
+      .then((res) => res.data)
   }
 
   return (
     <DataTableServerPagination
       columns={columns}
       fetchData={fetchDataTable}
-      globalFilter={infoScreen?.filterText || ''}
+      filterText={infoScreen?.filter?.filterText}
+      dateFrom={infoScreen?.filter?.period?.from}
+      dateTo={infoScreen?.filter?.period?.to}
     />
   )
 }

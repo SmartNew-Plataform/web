@@ -24,21 +24,33 @@ import {
 } from '@/components/ui/table'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+
+type FeactDataParamsType = {
+  index: number
+  perPage: number
+  filterText?: string
+  dateFrom?: Date
+  dateTo?: Date
+}
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  fetchData: (params: { index: number; perPage: number }) => Promise<{
+  fetchData: (params: FeactDataParamsType) => Promise<{
     rows: TData[]
     pageCount: number
   }>
-  globalFilter?: string
+  filterText?: string
+  dateFrom?: Date
+  dateTo?: Date
 }
 
 export function DataTableServerPagination<TData, TValue>({
   columns,
   fetchData,
-  globalFilter = '',
+  filterText = '',
+  dateFrom,
+  dateTo,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -50,6 +62,9 @@ export function DataTableServerPagination<TData, TValue>({
   const fetchDataOptions = {
     index: pageIndex,
     perPage: pageSize,
+    filterText,
+    dateFrom,
+    dateTo,
   }
 
   const { data, isFetching } = useQuery(
@@ -59,8 +74,6 @@ export function DataTableServerPagination<TData, TValue>({
       keepPreviousData: true,
     },
   )
-
-  console.log(data)
 
   const defaultData = useMemo(() => [], []) as TData[]
 
@@ -90,13 +103,6 @@ export function DataTableServerPagination<TData, TValue>({
       pagination,
     },
   })
-
-  useEffect(() => {
-    table.setGlobalFilter(globalFilter)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalFilter])
-
-  console.log(isFetching)
 
   return (
     <div className="relative flex h-full flex-col gap-4 overflow-auto">
