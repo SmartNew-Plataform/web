@@ -22,25 +22,28 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
-interface DataTableProps<TData, TValue> {
+export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  fetchData: (params: { index: number; perPage: number }) => Promise<{
+    rows: TData[]
+    pageCount: number
+  }>
   globalFilter?: string
 }
 
 export function DataTableServerPagination<TData, TValue>({
   columns,
+  fetchData,
   globalFilter = '',
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
-    pageIndex: 1,
+    pageIndex: 0,
     pageSize: 10,
   })
 
@@ -51,14 +54,15 @@ export function DataTableServerPagination<TData, TValue>({
 
   const { data, isFetching } = useQuery(
     ['data', fetchDataOptions],
-    () =>
-      api
-        .get('/smart-list/check-list', { params: fetchDataOptions })
-        .then((res) => res.data.data),
-    { keepPreviousData: true },
+    () => fetchData(fetchDataOptions),
+    {
+      keepPreviousData: true,
+    },
   )
 
-  const defaultData = useMemo(() => [], [])
+  console.log(data)
+
+  const defaultData = useMemo(() => [], []) as TData[]
 
   const pagination = useMemo(
     () => ({
@@ -69,7 +73,7 @@ export function DataTableServerPagination<TData, TValue>({
   )
 
   const table = useReactTable({
-    data: data ?? defaultData,
+    data: data?.rows ?? defaultData,
     columns,
     pageCount: data?.pageCount ?? -1,
     getCoreRowModel: getCoreRowModel(),
