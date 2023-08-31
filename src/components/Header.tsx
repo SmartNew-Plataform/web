@@ -20,7 +20,7 @@ export function Header({ children, ...props }: HeaderProps) {
       {children || <span />}
 
       <div className="flex items-center gap-2 rounded p-2 transition hover:bg-zinc-100">
-        <span className="text-xs text-zinc-600">{user?.login}</span>
+        <span className="text-xs text-zinc-600">{user?.name}</span>
 
         <div className="flex h-[35px] w-[35px] items-center justify-center rounded bg-violet-200 text-violet-600">
           <span className="uppercase">{user?.login.split('')[0]}</span>

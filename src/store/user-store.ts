@@ -12,6 +12,7 @@ type ModuleData = {
 
 type UserData = {
   login: string
+  name: string
   clientId: string
   group: {
     description: string
