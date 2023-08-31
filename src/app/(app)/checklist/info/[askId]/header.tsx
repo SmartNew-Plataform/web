@@ -44,7 +44,7 @@ export function Header() {
   return (
     <Card className="flex items-center justify-between rounded-md p-4">
       <div className="flex items-center gap-2">
-        <Button size="icon" variant="ghost" onClick={router.back}>
+        <Button size="icon" variant="secondary" onClick={router.back}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div className="flex items-center gap-3 divide-x divide-slate-300">
