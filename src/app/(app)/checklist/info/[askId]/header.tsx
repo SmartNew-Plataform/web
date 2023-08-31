@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
 import { Form } from '@/components/Form'
@@ -7,7 +6,8 @@ import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { AES } from 'crypto-js'
-import { FileUp } from 'lucide-react'
+import { ChevronLeft, FileUp } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
@@ -21,9 +21,9 @@ export function Header() {
       changeChecklistAsksTable,
     }),
   )
+  const router = useRouter()
 
   const statusFilter = filterForm.watch('status')
-  console.log(statusFilter)
 
   useEffect(() => {
     changeChecklistAsksTable(statusFilter)
@@ -43,46 +43,51 @@ export function Header() {
 
   return (
     <Card className="flex items-center justify-between rounded-md p-4">
-      <div className="flex items-center gap-3 divide-x divide-slate-300">
-        <FormProvider {...filterForm}>
-          <form>
-            <Form.MultiSelect
-              name="status"
-              options={checklistAsksScreen.allStatus.map(
-                ({ id, description }) => ({
-                  value: String(id),
-                  label: description,
-                }),
-              )}
-            />
-          </form>
-        </FormProvider>
+      <div className="flex items-center gap-2">
+        <Button size="icon" variant="ghost" onClick={router.back}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <div className="flex items-center gap-3 divide-x divide-slate-300">
+          <FormProvider {...filterForm}>
+            <form>
+              <Form.MultiSelect
+                name="status"
+                options={checklistAsksScreen.allStatus.map(
+                  ({ id, description }) => ({
+                    value: String(id),
+                    label: description,
+                  }),
+                )}
+              />
+            </form>
+          </FormProvider>
 
-        <div className="flex flex-col gap-1 pl-2">
-          <strong className="uppercase text-slate-700">Id:</strong>
-          <span className="text-slate-800">{checklistAsksScreen.id}</span>
-        </div>
-        <div className="flex flex-col gap-1 pl-2">
-          <strong className="uppercase text-slate-700">Equipamento:</strong>
-          <span className="text-slate-800">
-            {checklistAsksScreen.equipment}
-          </span>
-        </div>
-        <div className="flex flex-col gap-1 pl-2">
-          <strong className="uppercase text-slate-700">
-            Data de abertura:
-          </strong>
-          <span className="text-slate-800">
-            {checklistAsksScreen.startDate}
-          </span>
-        </div>
-        <div className="flex flex-col gap-1 pl-2">
-          <strong className="uppercase text-slate-700">Status:</strong>
-          <span className="text-slate-800">{checklistAsksScreen.status}</span>
-        </div>
-        <div className="flex flex-col gap-1 pl-2">
-          <strong className="uppercase text-slate-700">Condutor:</strong>
-          <span className="text-slate-800">{checklistAsksScreen.user}</span>
+          <div className="flex flex-col gap-1 pl-2">
+            <strong className="uppercase text-slate-700">Id:</strong>
+            <span className="text-slate-800">{checklistAsksScreen.id}</span>
+          </div>
+          <div className="flex flex-col gap-1 pl-2">
+            <strong className="uppercase text-slate-700">Equipamento:</strong>
+            <span className="text-slate-800">
+              {checklistAsksScreen.equipment}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 pl-2">
+            <strong className="uppercase text-slate-700">
+              Data de abertura:
+            </strong>
+            <span className="text-slate-800">
+              {checklistAsksScreen.startDate}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1 pl-2">
+            <strong className="uppercase text-slate-700">Status:</strong>
+            <span className="text-slate-800">{checklistAsksScreen.status}</span>
+          </div>
+          <div className="flex flex-col gap-1 pl-2">
+            <strong className="uppercase text-slate-700">Condutor:</strong>
+            <span className="text-slate-800">{checklistAsksScreen.user}</span>
+          </div>
         </div>
       </div>
 
