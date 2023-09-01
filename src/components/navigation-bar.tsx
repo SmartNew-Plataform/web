@@ -18,7 +18,7 @@ export function NavigationBar() {
       {listPaths.map((path, index) => {
         const isHome = index === 0 && path.length === 0
         const namePath = isHome ? 'Home' : path
-        const currentPath = `${listPaths
+        const currentPath = `/${listPaths
           .slice(0, index + 1)
           .join('/')}?${searchParams.toString()}`
 
