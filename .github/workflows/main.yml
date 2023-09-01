@@ -1,28 +1,20 @@
-name: Deploy to DigitalOcean (TEST)
+name: Build & Deploy app
 
 on:
   push:
     branches:
-      - main
+      - build
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Install doctl
-        run: |
-          curl -sL https://github.com/digitalocean/doctl/releases/download/v1.64.0/doctl-1.64.0-linux-amd64.tar.gz | tar -xzv
-          sudo mv doctl /usr/local/bin/
-          doctl version
-        env:
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: SSH into Droplet and Run Commands
-        run: ssh -i /home/davi/.ssh/id_rsa root@64.225.6.102 "touch test-conn.txt"
-        env:
-          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          DROPLET_IP: 64.225.6.102
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          
+      - run: doctl droplet ssh --droplet-id ${{ secrets.DIGITALOCEAN_DROPLET_ID }} --command "cd /var/www && touch connection.txt"
