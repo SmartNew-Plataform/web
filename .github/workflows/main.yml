@@ -12,9 +12,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Connect with DigitalOcean
-        uses: digitalocean/doctl@v2.0.0
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
+          
       - run: doctl droplet ssh --droplet-id ${{ secrets.DIGITALOCEAN_DROPLET_ID }} --command "cd /var/www && touch connection.txt"
