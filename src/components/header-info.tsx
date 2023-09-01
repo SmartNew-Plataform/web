@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/tooltip'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Info, ListFilter, Search } from 'lucide-react'
+import { Eraser, Info, ListFilter, Search } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -40,10 +40,15 @@ export function HeaderInfo() {
     changeFilter,
   }))
 
-  const { handleSubmit } = formFilter
+  const { handleSubmit, reset } = formFilter
 
   function handleFilter(data: FilterFormData) {
     changeFilter(data)
+  }
+
+  function handleResetFilters() {
+    changeFilter({})
+    reset({ filterText: '', period: undefined })
   }
 
   return (
@@ -92,6 +97,11 @@ export function HeaderInfo() {
               <Button type="submit" variant="secondary">
                 <Search className="h-4 w-4" />
                 Buscar
+              </Button>
+
+              <Button variant="ghost" type="reset" onClick={handleResetFilters}>
+                <Eraser className="h-4 w-4" />
+                Limpar filtros
               </Button>
             </form>
           </FormProvider>
