@@ -19,7 +19,7 @@ jobs:
           
       - name: SSH into Droplet and Run Commands
         run: |
-          ssh -i /path/to/your/private/key root@64.225.6.102 "touch test-conn.txt"
+          ssh -i /home/davi/.ssh/id_rsa root@64.225.6.102 "touch test-conn.txt"
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           DROPLET_IP: 64.225.6.102
