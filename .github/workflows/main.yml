@@ -17,4 +17,9 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           
-      - run: doctl droplet ssh --droplet-id ${{ secrets.DIGITALOCEAN_DROPLET_ID }} --command "cd /var/www && touch connection.txt"
+      - name: SSH into Droplet and Run Commands
+        run: |
+          ssh -i /path/to/your/private/key root@64.225.6.102 "touch test-conn.txt"
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          DROPLET_IP: 64.225.6.102
