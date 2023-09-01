@@ -1,0 +1,20 @@
+name: Build & Deploy app
+
+on:
+  push:
+    branches:
+      - build
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Connect with DigitalOcean
+        uses: digitalocean/doctl@v2.0.0
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - run: doctl droplet ssh --droplet-id ${{ secrets.DIGITALOCEAN_DROPLET_ID }} --command "cd /var/www && touch connection.txt"
