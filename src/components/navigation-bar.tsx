@@ -9,7 +9,12 @@ export function NavigationBar() {
   const router = useRouter()
   const listPaths = pathname.split('/')
 
-  function handleNavigationToPath(path: string) {
+  function handleNavigationToPath(path: string, isHome: boolean) {
+    if (isHome) {
+      router.push(`/${path}`)
+      return
+    }
+
     router.push(path)
   }
 
@@ -18,7 +23,7 @@ export function NavigationBar() {
       {listPaths.map((path, index) => {
         const isHome = index === 0 && path.length === 0
         const namePath = isHome ? 'Home' : path
-        const currentPath = `/${listPaths
+        const currentPath = `${listPaths
           .slice(0, index + 1)
           .join('/')}?${searchParams.toString()}`
 
@@ -27,7 +32,7 @@ export function NavigationBar() {
             <Button
               className="capitalize text-slate-700 hover:text-violet-600"
               variant="link"
-              onClick={() => handleNavigationToPath(currentPath)}
+              onClick={() => handleNavigationToPath(currentPath, isHome)}
             >
               {isHome && <Home className="h-3 w-3" />}
               {namePath}
