@@ -76,9 +76,9 @@ export function HeaderChecklist() {
           </DropdownMenuContent>
         </DropdownMenu>
         <Button asChild variant="ghost">
-          <Link href={`/checklist/info?token=${token}`}>
+          <Link href={`/checklist/grid?token=${token}`}>
             <AreaChart className="h-4 w-4" />
-            Checklist Web
+            Checklist Grid
           </Link>
         </Button>
       </div>

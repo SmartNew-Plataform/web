@@ -20,12 +20,13 @@ export const columns: ColumnDef<InfoData>[] = [
     header: () => <span />,
     accessorKey: 'id',
     cell: ({ row }) => {
+      if (!window) return
       const searchParams = new URLSearchParams(window.location.search)
       const token = searchParams.get('token')
       const id = row.getValue('id')
       return (
         <Button variant="secondary" size="icon-xs" asChild>
-          <Link href={`/checklist/info/${id}?token=${token}`}>
+          <Link href={`/checklist/grid/${id}?token=${token}`}>
             <ExternalLink className="h-3 w-3" />
           </Link>
         </Button>

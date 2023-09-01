@@ -1,5 +1,5 @@
 'use client'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Home } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Button } from './ui/button'
 
@@ -8,29 +8,28 @@ export function NavigationBar() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const listPaths = pathname.split('/')
-  console.log(listPaths)
 
   function handleNavigationToPath(path: string) {
-    console.log(path)
     router.push(path)
   }
 
   return (
     <div className="flex items-center gap-1">
       {listPaths.map((path, index) => {
-        const namePath = index === 0 && path.length === 0 ? 'Home' : path
+        const isHome = index === 0 && path.length === 0
+        const namePath = isHome ? 'Home' : path
         const currentPath = `${listPaths
           .slice(0, index + 1)
           .join('/')}?${searchParams.toString()}`
 
-        // console.log(currentPath)
-
         return (
           <>
             <Button
+              className="capitalize text-slate-700 hover:text-violet-600"
               variant="link"
               onClick={() => handleNavigationToPath(currentPath)}
             >
+              {isHome && <Home className="h-3 w-3" />}
               {namePath}
             </Button>
             {index !== listPaths.length - 1 && (

@@ -9,7 +9,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { AskType, useCoreScreensStore } from '@/store/core-screens-store'
 import 'keen-slider/keen-slider.min.css'
@@ -23,6 +22,7 @@ import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import dynamic from 'next/dynamic'
 import ImageNext from 'next/image'
 import { MutableRefObject, useEffect, useState } from 'react'
+import { Skeleton } from './ui/skeleton'
 
 interface AsksListProps {
   productionId: string
@@ -212,11 +212,11 @@ export function AsksList({ productionId }: AsksListProps) {
         <SheetContent>
           <SheetHeader>
             <SheetTitle>
-              {checklistAsksScreen.editingAsk?.description}
+              {checklistAsksScreen?.editingAsk?.description}
             </SheetTitle>
             <SheetDescription>
-              {checklistAsksScreen.editingAsk?.answer?.description}
-              {checklistAsksScreen.editingAsk?.answer?.children?.description}
+              {checklistAsksScreen?.editingAsk?.answer?.description}
+              {checklistAsksScreen?.editingAsk?.answer?.children?.description}
             </SheetDescription>
           </SheetHeader>
         </SheetContent>
