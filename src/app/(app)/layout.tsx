@@ -15,6 +15,7 @@ export default function LayoutApp({ children }: { children: React.ReactNode }) {
       </menu>
 
       <div className="z-20 h-full w-full overflow-auto bg-zinc-200">
+        {/* <NavigationBar /> */}
         {children}
       </div>
     </div>
