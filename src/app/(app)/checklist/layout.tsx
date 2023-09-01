@@ -1,4 +1,4 @@
-import { HeaderChecklist } from './header-checklist'
+import { HeaderChecklist } from '@/components/header-checklist'
 
 export default function LayoutChecklist({
   children,

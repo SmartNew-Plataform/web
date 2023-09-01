@@ -1,6 +1,6 @@
 'use client'
 
-import { Form } from '@/components/Form'
+import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {

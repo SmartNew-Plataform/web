@@ -1,9 +1,9 @@
 'use client'
 
-import { CardStatus } from '@/components/CardStatus'
-import { Bar } from '@/components/Charts/Bar'
-import { Donut } from '@/components/Charts/Donut'
-import { LoadingPage } from '@/components/LoadingPage'
+import { CardStatus } from '@/components/card-status'
+import { Bar } from '@/components/charts/bar'
+import { Donut } from '@/components/charts/donut'
+import { LoadingPage } from '@/components/loading-page'
 import { Card, CardContent } from '@/components/ui/card'
 import { useDashboardChecklistStore } from '@/store/dashboard-checklist-store'
 

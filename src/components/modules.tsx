@@ -1,6 +1,6 @@
 'use client'
 
-import { ModuleButton } from '@/components/ModuleButton'
+import { ModuleButton } from '@/components/module-button'
 import { useUserStore } from '@/store/user-store'
 
 export function Modules() {

@@ -1,4 +1,4 @@
-import { InfoData } from '@/app/(app)/checklist/info/columns'
+import { InfoData } from '@/components/columns/columns-info'
 import { api } from '@/lib/api'
 import { AxiosError } from 'axios'
 import dayjs from 'dayjs'

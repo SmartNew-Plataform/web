@@ -1,9 +1,9 @@
 'use client'
 
-import { DataTableServerPagination } from '@/components/DataTableServerPagination'
+import { columns } from '@/components/columns/columns-info'
+import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { api } from '@/lib/api'
 import { useCoreScreensStore } from '@/store/core-screens-store'
-import { columns } from './columns'
 
 export function TableInfo() {
   const { infoScreen } = useCoreScreensStore()

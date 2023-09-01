@@ -1,5 +1,5 @@
-import { AsksList } from './asks-list'
-import { Header } from './header'
+import { AsksList } from '@/components/asks-list'
+import { Header } from '@/components/header-asks'
 
 export default function Asks({ params }: { params: { askId: string } }) {
   return (

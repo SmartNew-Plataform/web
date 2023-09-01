@@ -1,6 +1,6 @@
 'use client'
 
-import { Header } from '@/components/Header'
+import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -14,11 +14,17 @@ import { useUserStore } from '@/store/user-store'
 import { AxiosError } from 'axios'
 import { AreaChart, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = true
 
 export function HeaderChecklist() {
   const { toast } = useToast()
-  const searchParams = new URLSearchParams(window.location.search)
+  const searchParams = useSearchParams()
+  const [token, setToken] = useState<string>()
   const { fetchUserData, modules } = useUserStore(
     ({ fetchUserData, modules }) => ({
       fetchUserData,
@@ -28,9 +34,9 @@ export function HeaderChecklist() {
 
   useEffect(() => {
     if (searchParams.has('token')) {
-      api.defaults.headers.common.Authorization = `Bearer ${searchParams.get(
-        'token',
-      )}`
+      const urlToken = searchParams.get('token')
+      setToken(urlToken || '')
+      api.defaults.headers.common.Authorization = `Bearer ${urlToken}`
     }
 
     fetchUserData().catch((err: AxiosError<{ message: string }>) => {
@@ -70,7 +76,7 @@ export function HeaderChecklist() {
           </DropdownMenuContent>
         </DropdownMenu>
         <Button asChild variant="ghost">
-          <Link href={`/checklist/info?token=${searchParams.get('token')}`}>
+          <Link href={`/checklist/info?token=${token}`}>
             <AreaChart className="h-4 w-4" />
             Checklist Web
           </Link>

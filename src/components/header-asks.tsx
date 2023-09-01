@@ -1,12 +1,13 @@
 'use client'
 
-import { Form } from '@/components/Form'
+import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { AES } from 'crypto-js'
 import { ChevronLeft, FileUp } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -34,12 +35,6 @@ export function Header() {
     return <Skeleton className="h-32 w-full rounded-sm" />
 
   const hash = AES.encrypt(String(checklistAsksScreen?.id), 'ask-checklist')
-
-  function handleOpenChecklistPDF() {
-    window.open(
-      `https://pdf.smartnewsistemas.com.br/generator/checklist/asks/?id=${hash}`,
-    )
-  }
 
   return (
     <Card className="flex items-center justify-between rounded-md p-4">
@@ -91,9 +86,15 @@ export function Header() {
         </div>
       </div>
 
-      <Button onClick={handleOpenChecklistPDF}>
-        <FileUp className="h-4 w-4" />
-        PDF
+      <Button asChild>
+        <Link
+          href={`https://pdf.smartnewsistemas.com.br/generator/checklist/asks/?id=${hash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FileUp className="h-4 w-4" />
+          PDF
+        </Link>
       </Button>
     </Card>
   )

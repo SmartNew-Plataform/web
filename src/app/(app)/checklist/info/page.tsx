@@ -1,9 +1,9 @@
-import { HeaderInfo } from './header-info'
-import { TableInfo } from './table-info'
+import { HeaderInfo } from '@/components/header-info'
+import { TableInfo } from '@/components/table-info'
 
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
-export const revalidate = true
+// export const dynamic = 'force-dynamic'
+// export const dynamicParams = true
+// export const revalidate = true
 
 export default function Info() {
   return (
