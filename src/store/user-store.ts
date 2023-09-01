@@ -1,10 +1,9 @@
 import { api } from '@/lib/api'
 import { AxiosError } from 'axios'
-import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import { create } from 'zustand'
 
 type ModuleData = {
-  icon: keyof typeof dynamicIconImports
+  icon: string
   name: string
   id: number
   order: number

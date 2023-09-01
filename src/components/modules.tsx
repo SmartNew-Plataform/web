@@ -13,8 +13,10 @@ const moduleIcons = {
   'flaticon-coins': 'file-edit',
   // 'flaticon-coins': 'square',
   'flaticon-open-box': 'shopping-bag',
-  '': 'landmark',
-  'flaticon2-checklist': 'list-checks',
+  'flaticon-price-tag': 'landmark',
+  'flaticon2-list-3': 'list-checks',
+  'flaticon2-shopping-cart': 'shopping-cart',
+  'flaticon-interface-6': 'gantt-chart-square',
 }
 
 type IconNameType = keyof typeof moduleIcons
@@ -32,7 +34,15 @@ export function Modules() {
         const currentIcon = moduleIcons[
           iconIndex
         ] as keyof typeof dynamicIconImports
-        return <ModuleButton key={module.id} {...module} icon={currentIcon} />
+        return (
+          <ModuleButton
+            key={module.id}
+            {...module}
+            id={String(module.id)}
+            // disabled={module.icon === 'flaticon2-checklist'}
+            icon={currentIcon}
+          />
+        )
       })}
     </nav>
   )
