@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { AskType, useCoreScreensStore } from '@/store/core-screens-store'
+import { cva } from 'class-variance-authority'
 import 'keen-slider/keen-slider.min.css'
 import {
   KeenSliderInstance,
@@ -22,6 +23,8 @@ import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import dynamic from 'next/dynamic'
 import ImageNext from 'next/image'
 import { MutableRefObject, useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { Form } from './form'
 import { Skeleton } from './ui/skeleton'
 
 interface AsksListProps {
@@ -62,6 +65,21 @@ function ThumbnailPlugin(
     })
   }
 }
+const answerTagVariants = cva(
+  'flex items-center gap-2 rounded-full px-2 py-1 text-semibold w-max',
+  {
+    variants: {
+      variant: {
+        danger: 'bg-red-200 text-red-600',
+        success: 'bg-emerald-200 text-emerald-600',
+        dark: 'bg-slate-200 text-slate-600',
+        default: 'border-slate-300',
+      },
+    },
+
+    defaultVariants: { variant: 'default' },
+  },
+)
 
 export function AsksList({ productionId }: AsksListProps) {
   const [sheetEditIsOpen, setSheetEditIsOpen] = useState<boolean>(false)
@@ -73,6 +91,9 @@ export function AsksList({ productionId }: AsksListProps) {
         changeAskEditing,
       }),
     )
+
+  const editAskForm = useForm()
+  const { handleSubmit } = editAskForm
 
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
     initial: 0,
@@ -93,9 +114,13 @@ export function AsksList({ productionId }: AsksListProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function handleEditAsk(ask: AskType) {
+  function handleOpenEditAskSheet(ask: AskType) {
     changeAskEditing(ask)
     setSheetEditIsOpen(true)
+  }
+
+  async function handleEditAsk(data: any) {
+    console.log(data)
   }
 
   if (!checklistAsksScreen?.table)
@@ -135,7 +160,9 @@ export function AsksList({ productionId }: AsksListProps) {
                 className="hidden"
                 size="icon-sm"
                 variant="ghost"
-                onClick={() => handleEditAsk({ id, description, img, answer })}
+                onClick={() =>
+                  handleOpenEditAskSheet({ id, description, img, answer })
+                }
               >
                 <PenSquare className="h-4 w-4" />
               </Button>
@@ -189,12 +216,14 @@ export function AsksList({ productionId }: AsksListProps) {
             <h4 className="text-xl font-semibold text-slate-700">
               {description}
             </h4>
-            <div className="flex items-center gap-3">
+            <div
+              className={answerTagVariants({
+                variant: answer?.color || 'default',
+              })}
+            >
               {answer?.icon && <Icon className="h-4 w-4" />}
 
-              <span className="text-slate-600">
-                {answer?.description || 'Não respondido'}
-              </span>
+              <span>{answer?.description || 'Não respondido'}</span>
             </div>
             {answer?.children && (
               <div className="flex flex-col gap-1">
@@ -218,6 +247,14 @@ export function AsksList({ productionId }: AsksListProps) {
               {checklistAsksScreen?.editingAsk?.answer?.description}
               {checklistAsksScreen?.editingAsk?.answer?.children?.description}
             </SheetDescription>
+
+            <FormProvider {...editAskForm}>
+              <form onSubmit={handleSubmit(handleEditAsk)}>
+                <Form.Input name="images" type="file" />
+
+                <Button type="submit">Enviar</Button>
+              </form>
+            </FormProvider>
           </SheetHeader>
         </SheetContent>
       </Sheet>

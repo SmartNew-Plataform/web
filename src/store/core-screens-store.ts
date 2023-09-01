@@ -27,7 +27,7 @@ export type AskType = {
   id: number
   img: Array<string>
   answer: {
-    color: string
+    color: 'dark' | 'danger' | 'success'
     description: string
     icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
     id: number
@@ -64,7 +64,7 @@ interface CoreScreensData {
 
   changeFilter: (params: FilterInfoChecklist) => void
   changeChecklistAsksTable: (status: string[]) => void
-  changeAskEditing: (ask: AskType) => void
+  changeAskEditing: (ask: AskType) => Promise<void>
 
   loadFamily: () => Promise<void>
   loadInfo: () => Promise<void | Array<InfoData> | AxiosError | null>
@@ -108,8 +108,13 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
         },
       })
     },
-    changeAskEditing: (ask) => {
+    changeAskEditing: async (ask) => {
       const restStore = get()
+      const response = await api
+        .get('/smart-list/check-list/task-by-id', {
+          params: { taskId: ask.id },
+        })
+        .then((res) => res.data)
 
       if (!restStore.checklistAsksScreen) return
 
