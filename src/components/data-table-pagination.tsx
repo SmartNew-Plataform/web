@@ -4,6 +4,7 @@ import {
   ChevronRightIcon,
   ChevronsLeftIcon,
   ChevronsRightIcon,
+  Loader2,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -18,10 +19,12 @@ import { DataTableViewOptions } from './data-table-view-options'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
+  isLoading?: boolean
 }
 
 export function DataTablePagination<TData>({
   table,
+  isLoading = false,
 }: DataTablePaginationProps<TData>) {
   return (
     <div className="flex items-center justify-between px-2">
@@ -33,6 +36,14 @@ export function DataTablePagination<TData>({
         <DataTableViewOptions table={table} />
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
+        {isLoading && (
+          <div>
+            <Loader2
+              className="h-6 w-6 animate-spin text-blue-500"
+              strokeWidth="3"
+            />
+          </div>
+        )}
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Linhas por página</p>
           <Select

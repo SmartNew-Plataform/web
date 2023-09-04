@@ -67,13 +67,10 @@ export function DataTableServerPagination<TData, TValue>({
     dateTo,
   }
 
-  const { data, isFetching } = useQuery(
-    ['data', fetchDataOptions],
-    () => fetchData(fetchDataOptions),
-    {
+  const { data, isFetching, isLoading, isPlaceholderData, isRefetching } =
+    useQuery(['data', fetchDataOptions], () => fetchData(fetchDataOptions), {
       keepPreviousData: true,
-    },
-  )
+    })
 
   const defaultData = useMemo(() => [], []) as TData[]
 
@@ -106,7 +103,7 @@ export function DataTableServerPagination<TData, TValue>({
 
   return (
     <div className="relative flex h-full flex-col gap-4 overflow-auto">
-      {isFetching && (
+      {isLoading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-zinc-800/40">
           <div className="flex items-center gap-2">
             <Loader2
@@ -165,7 +162,7 @@ export function DataTableServerPagination<TData, TValue>({
         </Table>
       </div>
 
-      <DataTablePagination table={table} />
+      <DataTablePagination isLoading={isFetching} table={table} />
     </div>
   )
 }
