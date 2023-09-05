@@ -3,40 +3,12 @@ import { api } from '@/lib/api'
 import { AxiosError } from 'axios'
 import dayjs from 'dayjs'
 import { create } from 'zustand'
-
-export type FamilyData = {
-  id: string
-  family: string
-  description: string
-  task: {
-    id: string
-    description: string
-  }
-}
-
-type FilterInfoChecklist = {
-  filterText?: string
-  period?: {
-    from?: Date
-    to?: Date
-  }
-}
-
-export type AskType = {
-  description: string
-  id: number
-  img: Array<string>
-  answer: {
-    color: 'dark' | 'danger' | 'success'
-    description: string
-    icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
-    id: number
-    children: {
-      id: number
-      description: string
-    }
-  }
-}
+import {
+  AskType,
+  FamilyData,
+  FilterInfoChecklist,
+  SchemaAskType,
+} from './checklist-types'
 
 interface CoreScreensData {
   familyScreen: {
@@ -57,7 +29,7 @@ interface CoreScreensData {
       id: number
       description: string
     }>
-    editingAsk?: AskType | null
+    editingAsk: SchemaAskType | null
     allDataTable: Array<AskType>
     table: Array<AskType> | null
   } | null
@@ -110,19 +82,33 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
     },
     changeAskEditing: async (ask) => {
       const restStore = get()
-      const response = await api
-        .get('/smart-list/check-list/task-by-id', {
-          params: { taskId: ask.id },
-        })
-        .then((res) => res.data)
-
       if (!restStore.checklistAsksScreen) return
 
       set({
         ...restStore,
         checklistAsksScreen: {
           ...restStore.checklistAsksScreen,
-          editingAsk: ask,
+          editingAsk: null,
+        },
+      })
+
+      const response = await api
+        .get('/smart-list/check-list/task-by-id', {
+          params: { taskId: ask.id },
+        })
+        .then((res) => res.data)
+
+      console.log(response)
+
+      set({
+        ...restStore,
+        checklistAsksScreen: {
+          ...restStore.checklistAsksScreen,
+          editingAsk: {
+            description: ask.description,
+            isLoading: false,
+            ...response,
+          },
         },
       })
     },

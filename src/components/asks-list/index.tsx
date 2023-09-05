@@ -1,16 +1,8 @@
 'use client'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
-import { AskType, useCoreScreensStore } from '@/store/core-screens-store'
+import { AskType } from '@/store/checklist-types'
+import { useCoreScreensStore } from '@/store/core-screens-store'
 import { cva } from 'class-variance-authority'
 import 'keen-slider/keen-slider.min.css'
 import {
@@ -18,14 +10,11 @@ import {
   KeenSliderPlugin,
   useKeenSlider,
 } from 'keen-slider/react'
-import { Image, PenSquare } from 'lucide-react'
 import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import dynamic from 'next/dynamic'
-import ImageNext from 'next/image'
 import { MutableRefObject, useEffect, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { Form } from './form'
-import { Skeleton } from './ui/skeleton'
+import { Skeleton } from '../ui/skeleton'
+import { EditSheet } from './edit-sheet'
 
 interface AsksListProps {
   productionId: string
@@ -92,9 +81,6 @@ export function AsksList({ productionId }: AsksListProps) {
       }),
     )
 
-  const editAskForm = useForm()
-  const { handleSubmit } = editAskForm
-
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
     initial: 0,
   })
@@ -117,10 +103,6 @@ export function AsksList({ productionId }: AsksListProps) {
   function handleOpenEditAskSheet(ask: AskType) {
     changeAskEditing(ask)
     setSheetEditIsOpen(true)
-  }
-
-  async function handleEditAsk(data: any) {
-    console.log(data)
   }
 
   if (!checklistAsksScreen?.table)
@@ -149,70 +131,15 @@ export function AsksList({ productionId }: AsksListProps) {
         return (
           <Card
             key={id}
+            onClick={() =>
+              handleOpenEditAskSheet({ id, description, img, answer })
+            }
             className={cn('relative space-y-2 rounded-md p-4', {
               'border-2': !answer,
               'border-dashed': !answer,
               'border-slate-400': !answer,
             })}
           >
-            <div className="absolute right-1 top-1">
-              <Button
-                className="hidden"
-                size="icon-sm"
-                variant="ghost"
-                onClick={() =>
-                  handleOpenEditAskSheet({ id, description, img, answer })
-                }
-              >
-                <PenSquare className="h-4 w-4" />
-              </Button>
-              {img.length > 0 && (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button size="icon-sm" variant="ghost">
-                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                      <Image className="h-4 w-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="overflow-hidden p-0">
-                    <div>
-                      <div ref={sliderRef} className="keen-slider">
-                        {img.map((image) => (
-                          <div key={image} className="keen-slider__slide">
-                            {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                            <ImageNext
-                              alt="Checklist image"
-                              width={510}
-                              height={680}
-                              src={image}
-                              className="rounded"
-                            />
-                          </div>
-                        ))}
-                      </div>
-
-                      <div
-                        ref={thumbnailRef}
-                        className="keen-slider thumbnail mt-4 px-2 pb-2"
-                      >
-                        {img.map((image) => (
-                          <div key={image} className="keen-slider__slide">
-                            {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                            <ImageNext
-                              alt="preview image"
-                              width={120}
-                              height={120}
-                              src={image}
-                              className="h-[120px] w-[120px] rounded object-cover"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
-            </div>
             <h4 className="text-xl font-semibold text-slate-700">
               {description}
             </h4>
@@ -237,27 +164,70 @@ export function AsksList({ productionId }: AsksListProps) {
         )
       })}
 
-      <Sheet open={sheetEditIsOpen} onOpenChange={setSheetEditIsOpen}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>
-              {checklistAsksScreen?.editingAsk?.description}
-            </SheetTitle>
-            <SheetDescription>
-              {checklistAsksScreen?.editingAsk?.answer?.description}
-              {checklistAsksScreen?.editingAsk?.answer?.children?.description}
-            </SheetDescription>
-
-            <FormProvider {...editAskForm}>
-              <form onSubmit={handleSubmit(handleEditAsk)}>
-                <Form.Input name="images" type="file" />
-
-                <Button type="submit">Enviar</Button>
-              </form>
-            </FormProvider>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <EditSheet
+        setSheetOpen={setSheetEditIsOpen}
+        sheetOpen={sheetEditIsOpen}
+      />
     </>
   )
+}
+
+// eslint-disable-next-line no-lone-blocks
+{
+  /* <div className="absolute right-1 top-1">
+  <Button
+    className="hidden"
+    size="icon-sm"
+    variant="ghost"
+    onClick={() =>
+      handleOpenEditAskSheet({ id, description, img, answer })
+    }
+  >
+    <PenSquare className="h-4 w-4" />
+  </Button>
+  {img.length > 0 && (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button size="icon-sm" variant="ghost">
+          <Image className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="overflow-hidden p-0">
+        <div>
+          <div ref={sliderRef} className="keen-slider">
+            {img.map((image) => (
+              <div key={image} className="keen-slider__slide">
+                <ImageNext
+                  alt="Checklist image"
+                  width={510}
+                  height={680}
+                  src={image}
+                  className="rounded"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div
+            ref={thumbnailRef}
+            className="keen-slider thumbnail mt-4 px-2 pb-2"
+          >
+            {img.map((image) => (
+              <div key={image} className="keen-slider__slide">
+                <ImageNext
+                  alt="preview image"
+                  width={120}
+                  height={120}
+                  src={image}
+                  className="h-[120px] w-[120px] rounded object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )}
+// eslint-disable-next-line prettier/prettier, prettier/prettier
+</div> */
 }

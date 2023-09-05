@@ -30,6 +30,7 @@ export function NavigationBar() {
         return (
           <>
             <Button
+              key={path}
               className="capitalize text-slate-700 hover:text-violet-600"
               variant="link"
               onClick={() => handleNavigationToPath(currentPath, isHome)}
