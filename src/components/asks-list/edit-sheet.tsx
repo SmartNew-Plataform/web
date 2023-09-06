@@ -2,12 +2,15 @@
 import { api } from '@/lib/api'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AxiosError } from 'axios'
 import Image from 'next/image'
-import { Dispatch, SetStateAction } from 'react'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { Form } from '../form'
+import { ErrorMessage } from '../form/ErrorMessage'
 import { Button } from '../ui/button'
-import { Input } from '../ui/input'
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 import {
   Sheet,
   SheetContent,
@@ -25,36 +28,57 @@ interface EditSheetProps {
 }
 
 export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
-  const editFormSchema = z.object({
-    answer: z.string(),
-    children: z.string().optional(),
-    images: z.instanceof(FileList).optional(),
-  })
-
-  type EditFormData = z.infer<typeof editFormSchema>
-
-  const { toast } = useToast()
-
-  const { checklistAsksScreen } = useCoreScreensStore(
-    ({ checklistAsksScreen }) => ({
+  const { checklistAsksScreen, loadChecklistAsks } = useCoreScreensStore(
+    ({ checklistAsksScreen, loadChecklistAsks }) => ({
       checklistAsksScreen,
+      loadChecklistAsks,
     }),
   )
 
+  const editFormSchema = z.object({
+    answer: z.string(),
+    children: z.string().refine((children) => {
+      const hasChild = checklistAsksScreen?.editingAsk?.currentAnswerHasChild
+      const childAnswered = children !== 'undefined' && children.length !== 0
+
+      if (hasChild) {
+        return childAnswered
+      } else {
+        return true
+      }
+    }, 'A justificativa é obrigatória'),
+    images: z.instanceof(FileList).optional(),
+    observation: z.string().refine((observation) => {
+      const hasChild = checklistAsksScreen?.editingAsk?.currentAnswerHasChild
+
+      if (hasChild) {
+        return observation.length !== 0
+      } else {
+        return true
+      }
+    }, 'A observação e obrigatoria'),
+  })
+  type EditFormData = z.infer<typeof editFormSchema>
+  const { toast } = useToast()
   const editAskForm = useForm<EditFormData>({
     resolver: zodResolver(editFormSchema),
   })
-  const {
-    handleSubmit,
-    formState: { errors },
-    control,
-  } = editAskForm
+  const [isUpdating, setIsUpdating] = useState(false)
+  const { handleSubmit, setValue } = editAskForm
+
+  useEffect(() => {
+    setValue('answer', String(checklistAsksScreen?.editingAsk?.answer?.id))
+    setValue('observation', checklistAsksScreen?.editingAsk?.observation || '')
+    setValue(
+      'children',
+      String(checklistAsksScreen?.editingAsk?.answer?.child?.id),
+    )
+  }, [checklistAsksScreen?.editingAsk?.answer])
 
   async function handleEditAsk(data: EditFormData) {
-    const answerHasChild = checklistAsksScreen?.editingAsk?.answer?.some(
+    const answerHasChild = checklistAsksScreen?.editingAsk?.options?.some(
       ({ id, children }) => String(id) === data.answer && children.length > 0,
     )
-    console.log(answerHasChild, !data.children)
 
     if (answerHasChild && !data.children) {
       toast({
@@ -65,9 +89,33 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
     }
 
     const taskId = checklistAsksScreen?.editingAsk?.id
-    api.put(`/smart-list/check-list/update-task/${taskId}`, data)
 
-    console.log(data)
+    setIsUpdating(true)
+    const response = await api
+      .put(`/smart-list/check-list/update-task/${taskId}`, {
+        answerId: Number(data.answer),
+        childId: Number(data.children),
+        observation: data.observation,
+      })
+      .then((res) => res.data)
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast({
+          title: err.message,
+          description: err.response?.data.message,
+          variant: 'destructive',
+          duration: 1000 * 120,
+        })
+      })
+      .finally(() => setIsUpdating(false))
+
+    if (response.updated) {
+      toast({
+        title: 'Tarefa atualizada com sucesso!',
+        variant: 'success',
+      })
+      setSheetOpen(false)
+      loadChecklistAsks(String(checklistAsksScreen?.id))
+    }
   }
 
   return (
@@ -87,10 +135,11 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
           <>
             <SheetHeader className="mb-4">
               <SheetTitle>
-                {checklistAsksScreen?.editingAsk?.description}
+                {checklistAsksScreen?.editingAsk?.description} -{' '}
+                {checklistAsksScreen?.editingAsk?.id}
               </SheetTitle>
               <SheetDescription>
-                {checklistAsksScreen?.editingAsk?.description}
+                {checklistAsksScreen?.editingAsk?.observation}
               </SheetDescription>
             </SheetHeader>
 
@@ -99,9 +148,9 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
                 onSubmit={handleSubmit(handleEditAsk)}
                 className="flex h-full flex-1 flex-col gap-3"
               >
-                <AnswerModels data={checklistAsksScreen.editingAsk.answer} />
+                <AnswerModels data={checklistAsksScreen.editingAsk.options} />
 
-                <Controller
+                {/* <Controller
                   name="images"
                   control={control}
                   render={({ field }) => (
@@ -112,28 +161,54 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
                       type="file"
                     />
                   )}
-                />
-
-                <p>{errors?.images?.message}</p>
-                <p>{errors?.answer?.message}</p>
-                <p>{errors?.children?.message}</p>
-                <p>{errors?.root?.message}</p>
+                /> */}
 
                 <div className="flex flex-wrap gap-2">
                   {checklistAsksScreen.editingAsk.images?.map((src) => (
-                    <Image
-                      className="rounded"
-                      objectFit="cover"
-                      height={80}
-                      width={80}
-                      key={src.url}
-                      src={src.url}
-                      alt={src.url}
-                    />
+                    <Dialog key={src.url}>
+                      <DialogTrigger asChild>
+                        <Image
+                          className="rounded"
+                          objectFit="cover"
+                          height={80}
+                          width={80}
+                          src={src.url}
+                          alt={src.url}
+                        />
+                      </DialogTrigger>
+                      <DialogContent className="p-0">
+                        <Image
+                          className="rounded"
+                          objectFit="cover"
+                          width={510}
+                          height={680}
+                          src={src.url}
+                          alt={src.url}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   ))}
+                  <ErrorMessage field="images" />
                 </div>
 
-                <Button type="submit">Enviar</Button>
+                <Form.Field>
+                  <Form.Label htmlFor="observation-checklist">
+                    Observação:
+                  </Form.Label>
+                  <Form.Textarea
+                    name="observation"
+                    id="observation-checklist"
+                  />
+                  <ErrorMessage field="observation" />
+                </Form.Field>
+
+                <Button
+                  loading={isUpdating}
+                  disabled={isUpdating}
+                  type="submit"
+                >
+                  Enviar
+                </Button>
               </form>
             </FormProvider>
           </>

@@ -2,11 +2,12 @@
 import { SchemaAskType } from '@/store/checklist-types'
 import { useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
+import { ErrorMessage } from '../form/ErrorMessage'
 import { Label } from '../ui/label'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Status, StatusProps } from './models/status'
 
-type AnswerType = SchemaAskType['answer']
+type AnswerType = SchemaAskType['options']
 
 interface AnswerModelsProps {
   data: AnswerType
@@ -21,7 +22,7 @@ type AnswersType = {
   [key: string]: Array<{
     color: 'dark' | 'danger' | 'success'
     description: string
-    icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
+    icon: 'close-circle' | 'checkmark-circle' | 'remove-circle'
     id: number
     type: string
     children: ChildrenAnswerType
@@ -51,15 +52,16 @@ export function AnswerModels({ data }: AnswerModelsProps) {
       {Object.entries(answers).map(([type, value]) => {
         const CurrentAnswer = modelType[type]
         return (
-          <CurrentAnswer
-            onChange={setCurrentAnswer}
-            name="answer"
-            data={value}
-            key={type}
-          />
+          <div key={type}>
+            <CurrentAnswer
+              onChange={setCurrentAnswer}
+              name="answer"
+              data={value}
+            />
+            <ErrorMessage field="answer" />
+          </div>
         )
       })}
-
       <Controller
         control={control}
         name="children"
@@ -80,6 +82,7 @@ export function AnswerModels({ data }: AnswerModelsProps) {
           </RadioGroup>
         )}
       />
+      <ErrorMessage field="children" />
     </>
   )
 }

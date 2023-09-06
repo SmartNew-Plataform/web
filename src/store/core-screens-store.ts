@@ -10,6 +10,10 @@ import {
   SchemaAskType,
 } from './checklist-types'
 
+type EditingAskType = {
+  currentAnswerHasChild?: boolean
+} & SchemaAskType
+
 interface CoreScreensData {
   familyScreen: {
     table: Array<FamilyData>
@@ -29,7 +33,7 @@ interface CoreScreensData {
       id: number
       description: string
     }>
-    editingAsk: SchemaAskType | null
+    editingAsk: EditingAskType | null
     allDataTable: Array<AskType>
     table: Array<AskType> | null
   } | null
@@ -37,10 +41,14 @@ interface CoreScreensData {
   changeFilter: (params: FilterInfoChecklist) => void
   changeChecklistAsksTable: (status: string[]) => void
   changeAskEditing: (ask: AskType) => Promise<void>
+  checkIfAnswerHasChild: (answerId: number) => void
 
   loadFamily: () => Promise<void>
   loadInfo: () => Promise<void | Array<InfoData> | AxiosError | null>
-  loadChecklistAsks: (productionId: string) => Promise<void>
+  loadChecklistAsks: (
+    productionId: string,
+    resetData?: boolean,
+  ) => Promise<void>
 }
 
 export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
@@ -98,8 +106,6 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
         })
         .then((res) => res.data)
 
-      console.log(response)
-
       set({
         ...restStore,
         checklistAsksScreen: {
@@ -107,7 +113,31 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
           editingAsk: {
             description: ask.description,
             isLoading: false,
+            answerAsked: ask,
             ...response,
+          },
+        },
+      })
+    },
+
+    checkIfAnswerHasChild: (answerId) => {
+      const restStore = get()
+      const answers = restStore.checklistAsksScreen?.editingAsk?.options
+      const currentAnswer = answers?.find(({ id }) => id === answerId)
+      const hasChild = currentAnswer?.children
+        ? currentAnswer?.children.length > 0
+        : false
+
+      console.log(currentAnswer, hasChild)
+
+      if (!restStore.checklistAsksScreen?.editingAsk) return
+
+      set({
+        checklistAsksScreen: {
+          ...restStore.checklistAsksScreen,
+          editingAsk: {
+            ...restStore.checklistAsksScreen.editingAsk,
+            currentAnswerHasChild: hasChild,
           },
         },
       })
@@ -140,8 +170,10 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
       return response
     },
 
-    loadChecklistAsks: async (productionId) => {
-      set({ checklistAsksScreen: null })
+    loadChecklistAsks: async (productionId, resetData = true) => {
+      if (resetData) {
+        set({ checklistAsksScreen: null })
+      }
       const asks = await api
         .get('smart-list/check-list/find-by-id', {
           params: {

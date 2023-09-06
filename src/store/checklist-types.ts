@@ -23,7 +23,7 @@ export type AskType = {
   answer: {
     color: 'dark' | 'danger' | 'success'
     description: string
-    icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
+    icon: 'close-circle' | 'checkmark-circle' | 'remove-circle'
     id: number
     children: {
       id: number
@@ -32,21 +32,31 @@ export type AskType = {
   }
 }
 
+export type AnswerType = {
+  color: 'dark' | 'danger' | 'success'
+  description: string
+  icon: 'close-circle' | 'checkmark-circle' | 'remove-circle'
+  id: number
+  type: string
+  child: {
+    id: number
+    description: string
+  }
+}
+
+type OptionsType = {
+  children: Array<{
+    id: number
+    description: string
+  }>
+} & AnswerType
+
 export type SchemaAskType = {
   isLoading?: boolean
   observation?: string
   description?: string
   id: number
   images?: Array<{ url: string }>
-  answer?: Array<{
-    color: 'dark' | 'danger' | 'success'
-    description: string
-    icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
-    id: number
-    type: string
-    children: Array<{
-      id: number
-      description: string
-    }>
-  }>
+  options?: Array<OptionsType>
+  answer?: AnswerType
 }

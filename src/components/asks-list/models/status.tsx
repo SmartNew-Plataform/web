@@ -1,4 +1,5 @@
 'use client'
+import { useCoreScreensStore } from '@/store/core-screens-store'
 import { cva } from 'class-variance-authority'
 import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import dynamic from 'next/dynamic'
@@ -15,7 +16,7 @@ export interface StatusProps {
   data: Array<{
     color: 'dark' | 'danger' | 'success'
     description: string
-    icon: 'close-circle' | 'checkmark-circle' | 'question-circle'
+    icon: 'close-circle' | 'checkmark-circle' | 'remove-circle'
     id: number
     type: string
     children: ChildrenType
@@ -61,16 +62,20 @@ export function Status({ name, data, onChange }: StatusProps) {
     control,
     name,
   })
+  const { checkIfAnswerHasChild } = useCoreScreensStore(
+    ({ checkIfAnswerHasChild }) => ({ checkIfAnswerHasChild }),
+  )
 
   function handleChangeStatus({ id, children }: ChangeStatusProps) {
     onChange(children)
     field.onChange(String(id))
+    checkIfAnswerHasChild(id)
   }
 
   const iconsNames = {
     'close-circle': 'x-circle',
     'checkmark-circle': 'check-circle',
-    'question-circle': 'help-circle',
+    'remove-circle': 'help-circle',
   }
 
   return (
