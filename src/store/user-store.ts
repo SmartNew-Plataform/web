@@ -7,6 +7,7 @@ type ModuleData = {
   name: string
   id: number
   order: number
+  access: boolean
 }
 
 type UserData = {

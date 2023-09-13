@@ -8,24 +8,36 @@ interface ModuleButtonProps extends ComponentProps<typeof Button> {
   icon: keyof typeof dynamicIconImports
   name: string
   id: string
+  access: boolean
 }
 
-export function ModuleButton({ icon, name, id, ...props }: ModuleButtonProps) {
+export function ModuleButton({
+  icon,
+  name,
+  id,
+  access,
+  ...props
+}: ModuleButtonProps) {
   const Icon = dynamic(dynamicIconImports[icon])
   return (
     <Tooltip delayDuration={0.5} disableHoverableContent>
       <TooltipTrigger asChild>
         <Button
           {...props}
-          asChild
-          className="rounded p-4  text-white transition hover:bg-white hover:text-violet-500"
+          asChild={access}
+          className="rounded  p-4 text-white transition hover:bg-white hover:text-violet-500 disabled:bg-violet-800 disabled:hover:cursor-not-allowed"
+          disabled={!access}
         >
-          <a
-            href={`https://smartnewsystem.com.br/erp/Menu-v2/?usr_modulo=${id}`}
-            target="_blank"
-          >
+          {access ? (
+            <a
+              href={`https://www.smartnewsystem.com.br/erp/Menu-v2/?usr_modulo=${id}`}
+              target="_blank"
+            >
+              <Icon className="h-5 w-5" />
+            </a>
+          ) : (
             <Icon className="h-5 w-5" />
-          </a>
+          )}
         </Button>
       </TooltipTrigger>
       <TooltipContent sideOffset={8} side="right" className="z-[99999]">
