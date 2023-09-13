@@ -14,7 +14,7 @@ export function MainDashboard() {
       {loadingDashboard ? (
         <LoadingPage message="Carregando dados do dashboard..." />
       ) : (
-        <main className="flex flex-1 flex-col gap-5">
+        <main className="flex h-full flex-col gap-5 pb-4">
           <div className="grid grid-cols-auto gap-4">
             {summaryCards?.map(({ color, description, icon, id, quantity }) => {
               return (
@@ -29,7 +29,7 @@ export function MainDashboard() {
             })}
           </div>
 
-          <div className="grid grid-cols-auto gap-4">
+          <div className="grid h-full flex-1 grid-cols-auto gap-4">
             <Card>
               <CardContent>
                 <Bar />
