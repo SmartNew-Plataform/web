@@ -1,9 +1,8 @@
 'use client'
 
+import { Check, ChevronsUpDown, ListChecks } from 'lucide-react'
 import * as React from 'react'
-import { Check, ChevronsUpDown } from 'lucide-react'
 
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -17,8 +16,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 import { useController, useFormContext } from 'react-hook-form'
 import { ScrollArea } from '../ui/scroll-area'
+import { Toggle } from '../ui/toggle'
 
 interface MultiSelectProps {
   name: string
@@ -56,6 +57,15 @@ export function MultiSelect({ name, options }: MultiSelectProps) {
     field.onChange(newValue)
   }
 
+  function handleToggleOptions(pressed: boolean) {
+    if (pressed) {
+      field.onChange(options.map((option) => option.value))
+      return
+    }
+
+    field.onChange([])
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -73,7 +83,15 @@ export function MultiSelect({ name, options }: MultiSelectProps) {
       </PopoverTrigger>
       <PopoverContent className="p-0">
         <Command>
-          <CommandInput placeholder="Pesquisar item..." />
+          <div className="flex items-center border-b border-slate-200 px-1">
+            <CommandInput
+              placeholder="Pesquisar item..."
+              className="border-0"
+            />
+            <Toggle onPressedChange={handleToggleOptions}>
+              <ListChecks className="h-4 w-4" />
+            </Toggle>
+          </div>
           <CommandEmpty>Nenhum item encontrado.</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="max-h-[30vh] overflow-auto">
