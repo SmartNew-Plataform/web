@@ -25,7 +25,7 @@ export function Modules() {
   const { modules } = useUserStore()
 
   return (
-    <nav className="flex flex-col gap-2">
+    <nav className="flex max-h-full flex-col gap-2 overflow-auto px-5">
       {modules?.map((module) => {
         const iconIndex: IconNameType = module.icon.split(
           ' ',
