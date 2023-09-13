@@ -7,7 +7,7 @@ export default function LayoutChecklist({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col pb-4">
       <HeaderChecklist />
       <NavigationBar />
       <div className="flex h-full flex-col overflow-auto">{children}</div>

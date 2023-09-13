@@ -68,6 +68,7 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
     loadingDashboard: false,
 
     load: async (login: string) => {
+      const { searchData } = get()
       const [branch, equipment]: [
         branch: StoreState['branch'],
         equipment: StoreState['equipment'],
@@ -93,6 +94,8 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
           )
           .then((res) => res.data),
       ])
+
+      searchData({ login, period: undefined, branch: undefined })
 
       set({
         allEquipment: equipment,
