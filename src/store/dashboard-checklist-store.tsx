@@ -74,18 +74,24 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
         equipment: StoreState['equipment'],
       ] = await Promise.all([
         await api
-          .get('http://localhost:3123/public/branch/byLogin', {
-            params: {
-              login,
+          .get(
+            `${process.env.NEXT_PUBLIC_API_URL_CHECKLIST}/public/branch/byLogin`,
+            {
+              params: {
+                login,
+              },
             },
-          })
+          )
           .then((res) => res.data),
         await api
-          .get('http://localhost:3123/public/equipment/byLogin', {
-            params: {
-              login,
+          .get(
+            `${process.env.NEXT_PUBLIC_API_URL_CHECKLIST}/public/equipment/byLogin`,
+            {
+              params: {
+                login,
+              },
             },
-          })
+          )
           .then((res) => res.data),
       ])
 
@@ -99,15 +105,18 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
     searchData: async (data) => {
       set({ loadingDashboard: true })
       const response = await api
-        .get('http://localhost:3123/public/checkList/dashForFilter', {
-          params: {
-            login: data.login,
-            startDate: data.period?.from,
-            endDate: data.period?.to,
-            branch: data.branch?.join(','),
-            equipment: data.active?.join(','),
+        .get(
+          `${process.env.NEXT_PUBLIC_API_URL_CHECKLIST}/public/checkList/dashForFilter`,
+          {
+            params: {
+              login: data.login,
+              startDate: data.period?.from,
+              endDate: data.period?.to,
+              branch: data.branch?.join(','),
+              equipment: data.active?.join(','),
+            },
           },
-        })
+        )
         .then((res) => res.data)
 
       const equipments = Object.fromEntries(
