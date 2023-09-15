@@ -2,7 +2,7 @@
 import { SchemaAskType } from '@/store/checklist-types'
 import { useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-import { ErrorMessage } from '../form/ErrorMessage'
+import { Form } from '../form'
 import { Label } from '../ui/label'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Status, StatusProps } from './models/status'
@@ -58,7 +58,7 @@ export function AnswerModels({ data }: AnswerModelsProps) {
               name="answer"
               data={value}
             />
-            <ErrorMessage field="answer" />
+            <Form.ErrorMessage field="answer" />
           </div>
         )
       })}
@@ -82,7 +82,7 @@ export function AnswerModels({ data }: AnswerModelsProps) {
           </RadioGroup>
         )}
       />
-      <ErrorMessage field="children" />
+      <Form.ErrorMessage field="children" />
     </>
   )
 }
