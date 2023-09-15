@@ -3,7 +3,7 @@ import { useCoreScreensStore } from '@/store/core-screens-store'
 import { cva } from 'class-variance-authority'
 import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import dynamic from 'next/dynamic'
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useEffect } from 'react'
 import { useController, useFormContext } from 'react-hook-form'
 
 type ChildrenType = Array<{
@@ -66,11 +66,16 @@ export function Status({ name, data, onChange }: StatusProps) {
     ({ checkIfAnswerHasChild }) => ({ checkIfAnswerHasChild }),
   )
 
-  function handleChangeStatus({ id, children }: ChangeStatusProps) {
-    onChange(children)
+  function handleChangeStatus({ id }: ChangeStatusProps) {
     field.onChange(String(id))
     checkIfAnswerHasChild(id)
   }
+
+  useEffect(() => {
+    const children = data.find((option) => option.id === Number(field.value))
+      ?.children
+    onChange(children || null)
+  }, [field.value])
 
   const iconsNames = {
     'close-circle': 'x-circle',

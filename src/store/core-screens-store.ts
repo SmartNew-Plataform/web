@@ -42,6 +42,7 @@ interface CoreScreensData {
   changeChecklistAsksTable: (status: string[]) => void
   changeAskEditing: (ask: AskType) => Promise<void>
   checkIfAnswerHasChild: (answerId: number) => void
+  deleteImageFromAsk: (index: number) => void
 
   loadFamily: () => Promise<void>
   loadInfo: () => Promise<void | Array<InfoData> | AxiosError | null>
@@ -128,8 +129,6 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
         ? currentAnswer?.children.length > 0
         : false
 
-      console.log(currentAnswer, hasChild)
-
       if (!restStore.checklistAsksScreen?.editingAsk) return
 
       set({
@@ -138,6 +137,25 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
           editingAsk: {
             ...restStore.checklistAsksScreen.editingAsk,
             currentAnswerHasChild: hasChild,
+          },
+        },
+      })
+    },
+
+    deleteImageFromAsk: (index) => {
+      const restStore = get()
+      const images = get().checklistAsksScreen?.editingAsk?.images
+      const newImages = images?.filter((image, i) => i !== index)
+
+      if (!restStore.checklistAsksScreen?.editingAsk) return
+
+      set({
+        ...restStore,
+        checklistAsksScreen: {
+          ...restStore.checklistAsksScreen,
+          editingAsk: {
+            ...restStore.checklistAsksScreen?.editingAsk,
+            images: newImages,
           },
         },
       })
