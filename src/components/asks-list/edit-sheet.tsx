@@ -9,6 +9,15 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Form } from '../form'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/alert-dialog'
 import { Button } from '../ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../ui/sheet'
@@ -85,6 +94,7 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
     resolver: zodResolver(editFormSchema),
   })
   const [isUpdating, setIsUpdating] = useState(false)
+  const [confirmModal, setConfirmModal] = useState<number | null>(null)
   const { handleSubmit, setValue, reset } = editAskForm
 
   useEffect(() => {
@@ -222,7 +232,7 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
                           variant="destructive"
                           className="absolute right-1 top-1"
                           type="button"
-                          onClick={() => handleDeleteImage(index)}
+                          onClick={() => setConfirmModal(index)}
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
@@ -274,6 +284,29 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
             </FormProvider>
           </>
         )}
+        <AlertDialog
+          open={typeof confirmModal === 'number'}
+          onOpenChange={(isOpen) =>
+            setConfirmModal(isOpen ? confirmModal : null)
+          }
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Tem certeza que deseja deletar essa imagem ?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => handleDeleteImage(confirmModal ?? 0)}
+              >
+                <Trash2 className="h-4 w-4" />
+                Excluir
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SheetContent>
     </Sheet>
   )
