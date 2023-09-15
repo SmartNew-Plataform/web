@@ -95,7 +95,7 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
           .then((res) => res.data),
       ])
 
-      searchData({ login, period: undefined, branch: undefined })
+      // searchData({ login, period: undefined, branch: undefined })
 
       set({
         allEquipment: equipment,
