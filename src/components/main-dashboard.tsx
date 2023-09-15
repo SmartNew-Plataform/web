@@ -12,7 +12,7 @@ export function MainDashboard() {
   return (
     <>
       {loadingDashboard ? (
-        <LoadingPage message="Carregando dados do dashboard..." />
+        <LoadingPage message="Carregando dados do dashboard...Isso pode demorar alguns minutos!" />
       ) : (
         <main className="flex h-full flex-col gap-5 pb-4">
           <div className="grid grid-cols-auto gap-4">
