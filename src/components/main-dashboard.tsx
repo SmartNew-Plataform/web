@@ -4,7 +4,7 @@ import { CardStatus } from '@/components/card-status'
 import { Bar } from '@/components/charts/bar'
 import { Donut } from '@/components/charts/donut'
 import { LoadingPage } from '@/components/loading-page'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import { useDashboardChecklistStore } from '@/store/dashboard-checklist-store'
 
 export function MainDashboard() {
@@ -30,7 +30,10 @@ export function MainDashboard() {
           </div>
 
           <div className="grid h-full flex-1 grid-cols-auto gap-4">
-            <Card>
+            <Card className="p-2">
+              <CardTitle className="text-lg text-slate-700">
+                Qtd. Checklist realizados
+              </CardTitle>
               <CardContent>
                 <Bar />
               </CardContent>

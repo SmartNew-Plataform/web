@@ -1,24 +1,29 @@
 'use client'
 import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import dynamicNext from 'next/dynamic'
-import { ReactNode, memo } from 'react'
+import { memo } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 interface CardStatusProps {
   quantity: number
   label: string
-  icon: keyof typeof dynamicIconImports
+  icon: 'close-circle' | 'checkmark-circle' | 'remove-circle'
   className?: string
   color?: string
 }
 
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
-export const revalidate = true
-
 export const CardStatus = memo(
   ({ quantity, label, icon, className, color }: CardStatusProps) => {
-    const Icon = dynamicNext(dynamicIconImports[icon])
+    const iconsNames = {
+      'close-circle': 'x-circle',
+      'checkmark-circle': 'check-circle',
+      'remove-circle': 'help-circle',
+    }
+    const currentIcon = iconsNames[icon] as keyof typeof dynamicIconImports
+
+    const Icon = dynamicNext(dynamicIconImports[currentIcon])
+
+    console.log(icon)
 
     return (
       <div

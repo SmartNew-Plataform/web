@@ -1,12 +1,11 @@
 import { api } from '@/lib/api'
-import dynamicIconImports from 'lucide-react/dynamicIconImports'
 import { create } from 'zustand'
 
 interface StoreState {
   summaryCards: Array<{
     id: number
     description: string
-    icon: keyof typeof dynamicIconImports
+    icon: 'close-circle' | 'checkmark-circle' | 'remove-circle'
     color: string
     quantity: number
   }> | null
