@@ -68,7 +68,11 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
     loadingDashboard: false,
 
     load: async (login: string) => {
-      const { searchData } = get()
+      const {
+        searchData,
+        fillEquipmentsByBranch,
+        equipment: equipmentByBranch,
+      } = get()
       const [branch, equipment]: [
         branch: StoreState['branch'],
         equipment: StoreState['equipment'],
@@ -95,7 +99,18 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
           .then((res) => res.data),
       ])
 
-      // searchData({ login, period: undefined, branch: [''] })
+      const allBranches = branch?.map((item) => String(item.id))
+      fillEquipmentsByBranch(allBranches || [])
+
+      const equipmentsFiltered = equipment?.filter(
+        ({ branchId }) => allBranches?.includes(String(branchId)),
+      )
+
+      searchData({
+        login,
+        period: undefined,
+        branch: [''],
+      })
 
       set({
         allEquipment: equipment,
@@ -104,6 +119,8 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
     },
     searchData: async (data) => {
       set({ loadingDashboard: true })
+      console.log(data)
+
       const response = await api
         .get(
           `${process.env.NEXT_PUBLIC_API_URL_CHECKLIST}/public/checkList/dashForFilter`,
