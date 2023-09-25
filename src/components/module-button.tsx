@@ -30,7 +30,7 @@ export function ModuleButton({
         >
           {access ? (
             <a
-              href={`https://www.smartnewsystem.com.br/erp/Menu-v2/?usr_modulo=${id}`}
+              href={`https://sistemas.smartnewsystem.com.br/Menu-v2/?usr_modulo=${id}`}
               target="_blank"
             >
               <Icon className="h-5 w-5" />
