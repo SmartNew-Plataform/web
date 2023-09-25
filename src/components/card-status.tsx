@@ -23,8 +23,6 @@ export const CardStatus = memo(
 
     const Icon = dynamicNext(dynamicIconImports[currentIcon])
 
-    console.log(icon)
-
     return (
       <div
         className={twMerge(

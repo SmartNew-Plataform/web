@@ -1,9 +1,14 @@
-import { ReactNode } from 'react'
+import { ComponentProps, ReactNode } from 'react'
+import { twMerge } from 'tailwind-merge'
 
-interface FieldProps {
+interface FieldProps extends ComponentProps<'div'> {
   children: ReactNode
 }
 
-export function Field({ children }: FieldProps) {
-  return <div className="flex flex-col gap-3">{children}</div>
+export function Field({ children, className, ...props }: FieldProps) {
+  return (
+    <div {...props} className={twMerge('flex flex-col gap-3', className)}>
+      {children}
+    </div>
+  )
 }

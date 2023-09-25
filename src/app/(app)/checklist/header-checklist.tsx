@@ -58,27 +58,41 @@ export function HeaderChecklist() {
       <div className="flex gap-6">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" disabled>
+            <Button variant="ghost">
               <Plus className="h-4 w-4" />
               Cadastro
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem asChild>
-              <Link href="/checklist/task">Task</Link>
+              <Link
+                href={{
+                  pathname: '/checklist/tarefas',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Tarêfas
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/checklist/family">Checklist</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/checklist/bound">Vinculos</Link>
+              <Link
+                href={{
+                  pathname: '/checklist/vinculos',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Vinculos
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Button asChild variant="ghost">
           <Link href={`/checklist/grid?token=${token}`}>
             <AreaChart className="h-4 w-4" />
-            Checklist Grid
+            Checklist
           </Link>
         </Button>
       </div>

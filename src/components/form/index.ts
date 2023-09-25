@@ -1,4 +1,5 @@
 import { Label } from '../ui/label'
+import { Checkbox } from './checkbox'
 import { ErrorMessage } from './error-message'
 import { Field } from './field'
 import { ImagePicker } from './image-picker'
@@ -18,4 +19,5 @@ export const Form = {
   Textarea,
   ErrorMessage,
   ImagePicker,
+  Checkbox,
 }
