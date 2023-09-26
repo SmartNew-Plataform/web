@@ -42,11 +42,18 @@ export function HeaderChecklist() {
                   query: { token: searchParams.get('token') },
                 }}
               >
-                Tarêfas
+                Tarefas
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/checklist/family">Checklist</Link>
+              <Link
+                href={{
+                  pathname: '/checklist/controle',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Controle
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link
