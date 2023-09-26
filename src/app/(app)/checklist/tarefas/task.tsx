@@ -74,8 +74,11 @@ export function Task({ id, description, loadTasks }: TaskProps) {
               <Pencil className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-h-full overflow-auto">
-            <Tabs defaultValue="ask" className="h-full w-full">
+          <DialogContent className="flex flex-col">
+            <Tabs
+              defaultValue="ask"
+              className="flex h-full w-full flex-1 flex-col overflow-auto"
+            >
               <TabsList className="w-full">
                 <TabsTrigger className="w-full" value="ask">
                   Pergunta
@@ -109,7 +112,10 @@ export function Task({ id, description, loadTasks }: TaskProps) {
                   </Button>
                 </form>
               </TabsContent>
-              <TabsContent value="action">
+              <TabsContent
+                value="action"
+                className="flex h-full flex-col overflow-auto"
+              >
                 <SituationForm taskId={id} />
               </TabsContent>
             </Tabs>
