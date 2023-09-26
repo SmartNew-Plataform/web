@@ -7,7 +7,8 @@ import { FormNewTask } from './form-new-task'
 import { Task } from './task'
 
 export default function TaskPage() {
-  const { loadTasks, tasks, loadStatus, loadTypes } = useTasksStore()
+  const { loadTasks, tasks, loadStatus, loadTypes, filterTasks } =
+    useTasksStore()
 
   useEffect(() => {
     loadTasks()
@@ -18,7 +19,10 @@ export default function TaskPage() {
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4 pt-0">
       <Card className="flex justify-between p-4">
-        <Input className="max-w-xs" />
+        <Input
+          className="max-w-xs"
+          onChange={(e) => filterTasks(e.target.value)}
+        />
 
         <FormNewTask />
       </Card>
