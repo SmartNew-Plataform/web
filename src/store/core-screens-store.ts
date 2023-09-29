@@ -8,7 +8,7 @@ import {
   FamilyData,
   FilterInfoChecklist,
   SchemaAskType,
-} from './checklist-types'
+} from './smartlist/checklist-types'
 
 type EditingAskType = {
   currentAnswerHasChild?: boolean
