@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Plus } from 'lucide-react'
+import { GridControl } from './grid-control'
+import { SheetNewControl } from './sheet-new-control'
 
 export default function ControlePage() {
   return (
@@ -9,11 +9,10 @@ export default function ControlePage() {
       <Card className="flex justify-between p-4">
         <Input className="max-w-xs" placeholder="Digite para pesquisar..." />
 
-        <Button>
-          <Plus className="h-4 w-4" />
-          Novo controle
-        </Button>
+        <SheetNewControl />
       </Card>
+
+      <GridControl />
     </div>
   )
 }
