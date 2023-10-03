@@ -1,28 +1,37 @@
-import { api } from '@/lib/api'
+import { TaskControlData as GridData } from '@/app/(app)/taskcontrol/grid-taskcontrol'
+import { taskcontrolApi } from '@/lib/taskcontrol-api'
 import { create } from 'zustand'
 
 // type TaskType = {}
 
 interface TaskControlData {
-  tasks: undefined
+  tasks: GridData[] | undefined
 
+  autoLogin: () => Promise<void>
   loadTasks: () => Promise<void>
 }
 
-export const useTaskControlStore = create<TaskControlData>(() => {
+export const useTaskControlStore = create<TaskControlData>((set) => {
   return {
     tasks: undefined,
 
-    loadTasks: async () => {
-      const response = await api
-        .post('http://localhost:3000/v1/signin', {
+    autoLogin: async () => {
+      const response = await taskcontrolApi
+        .post('/signin', {
           login: 'admin',
-          password: 'Ypj042008',
           moduleId: 1,
         })
         .then((res) => res.headers)
 
-      console.log(response)
+      const token = response.authorization
+      taskcontrolApi.defaults.headers.common.Authorization = `Bearer ${token}`
+    },
+    loadTasks: async () => {
+      const response = await taskcontrolApi
+        .get('/tasks')
+        .then((res) => res.data)
+
+      set({ tasks: response.tasks })
     },
   }
 })
