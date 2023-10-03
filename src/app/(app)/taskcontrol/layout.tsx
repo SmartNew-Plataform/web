@@ -1,3 +1,4 @@
+import { NavigationBar } from '@/components/navigation-bar'
 import { ReactNode } from 'react'
 import { HeaderTaskControl } from './header-taskcontrol'
 
@@ -11,7 +12,8 @@ export default function TaskControlLayout({
   return (
     <div className="flex h-screen flex-col pb-4">
       <HeaderTaskControl />
-      {children}
+      <NavigationBar />
+      <div className="flex h-full flex-col overflow-auto">{children}</div>
     </div>
   )
 }

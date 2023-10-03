@@ -6,7 +6,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { ClipboardList } from 'lucide-react'
+import { ClipboardList, Save } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 
@@ -27,7 +27,7 @@ export function SheetEditTask() {
         <SheetTitle>Editar Task</SheetTitle>
 
         <FormProvider {...editTaskForm}>
-          <form className="flex flex-col gap-3">
+          <form className="mt-4 flex flex-col gap-3">
             <Form.Field>
               <Form.Label>Titulo:</Form.Label>
               <Form.Input name="title" />
@@ -56,6 +56,11 @@ export function SheetEditTask() {
                 options={[{ label: 'test', value: '1' }]}
               />
             </Form.Field>
+
+            <Button>
+              <Save className="h-4 w-4" />
+              Salvar task
+            </Button>
           </form>
         </FormProvider>
       </SheetContent>

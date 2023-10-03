@@ -1,12 +1,14 @@
 'use client'
 
 import { DataTable } from '@/components/data-table'
+import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { ColumnDef } from '@tanstack/react-table'
-import { Pencil } from 'lucide-react'
+import { Pencil, Save } from 'lucide-react'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { twMerge } from 'tailwind-merge'
 
 interface SubtaskData {
   id: number
@@ -54,6 +56,22 @@ export function GridSubtasks() {
     {
       accessorKey: 'status',
       header: 'Status',
+      cell: ({ row }) => {
+        const { color, description } = row.getValue(
+          'status',
+        ) as SubtaskData['status']
+
+        return (
+          <span
+            className={twMerge(
+              'rounded-full px-2 font-bold text-white',
+              `bg-[${color}]`,
+            )}
+          >
+            {description}
+          </span>
+        )
+      },
     },
     {
       accessorKey: 'item',
@@ -97,11 +115,48 @@ export function GridSubtasks() {
     <>
       <Sheet open={editSubtaskOpen} onOpenChange={setEditSubtaskOpen}>
         <SheetContent className="max-w-md">
+          <SheetTitle>Editar Subtask</SheetTitle>
           <FormProvider {...editSubtaskForm}>
-            <form action=""></form>
+            <form className="mt-4 flex flex-col gap-3">
+              <Form.Field>
+                <Form.Label>Item:</Form.Label>
+                <Form.Select
+                  name="item"
+                  options={[{ label: 'test', value: '1' }]}
+                />
+              </Form.Field>
+              <Form.Field>
+                <Form.Label>Status:</Form.Label>
+                <Form.Select
+                  name="status"
+                  options={[{ label: 'test', value: '1' }]}
+                />
+              </Form.Field>
+              <Form.Field>
+                <Form.Label>Data Reprogramada:</Form.Label>
+                <Form.Input name="reprogrammingDate" type="datetime-local" />
+              </Form.Field>
+              <Form.Field>
+                <Form.Label>Data Finalização:</Form.Label>
+                <Form.Input name="finishDate" type="datetime-local" />
+              </Form.Field>
+              <Form.Field>
+                <Form.Label>Responsáveis:</Form.Label>
+                <Form.Select
+                  name="responsible"
+                  options={[{ label: 'test', value: '1' }]}
+                />
+              </Form.Field>
+
+              <Button>
+                <Save className="h-4 w-4" />
+                Salvar subtask
+              </Button>
+            </form>
           </FormProvider>
         </SheetContent>
       </Sheet>
+
       <DataTable
         columns={columns}
         data={[
@@ -109,7 +164,7 @@ export function GridSubtasks() {
             id: 123,
             status: {
               id: 1,
-              color: '#ff000',
+              color: '#ff0000',
               description: 'aberto',
             },
             item: 'teste',
