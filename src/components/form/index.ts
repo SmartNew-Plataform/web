@@ -2,6 +2,7 @@ import { Label } from '../ui/label'
 import { Checkbox } from './checkbox'
 import { ErrorMessage } from './error-message'
 import { Field } from './field'
+import { IconPicker } from './icon-picker'
 import { ImagePicker } from './image-picker'
 import { Input } from './input'
 import { InputDateRange } from './input-date-range'
@@ -20,4 +21,5 @@ export const Form = {
   ErrorMessage,
   ImagePicker,
   Checkbox,
+  IconPicker,
 }
