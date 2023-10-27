@@ -4,33 +4,46 @@ import { DataTable } from '@/components/data-table'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { useSubtaskStore } from '@/store/taskcontrol/subtask-store'
 import { ColumnDef } from '@tanstack/react-table'
+import dayjs from 'dayjs'
 import { Pencil, Save } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { twMerge } from 'tailwind-merge'
 
-interface SubtaskData {
+export interface SubtaskData {
   id: number
-  situation: string
-  status: {
-    color: string
+  title: string
+  description: string
+  adminStatus: string
+  deadlineDate: string
+  executionDeadlineDate: string
+  rescheduledDate: string
+  completionDate: string
+  logUser: string
+  logDate: string
+  module: string
+  task: {
+    id: number
+    description: string
+    logUser: string
+    logDate: string
+  }
+  status: string
+  type: {
     id: number
     description: string
   }
-  item: string
-  description: string
-  emission: string
-  initialDate: string
-  prevDate: string
-  reprogrammingDate: string
-  finishDate: string
-  emitter: string
-  responsible: string
-  approved: boolean
+  messages: []
+  users: []
 }
 
-export function GridSubtasks() {
+interface GridSubtasks {
+  taskId: string
+}
+
+export function GridSubtasks({ taskId }: GridSubtasks) {
+  const { loadSubtasks, subtasks } = useSubtaskStore()
   const [editSubtaskOpen, setEditSubtaskOpen] = useState(false)
   const editSubtaskForm = useForm()
   const columns: ColumnDef<SubtaskData>[] = [
@@ -49,67 +62,107 @@ export function GridSubtasks() {
         )
       },
     },
+    // {
+    //   accessorKey: 'situation',
+    //   header: 'Situação',
+    // },
     {
-      accessorKey: 'situation',
-      header: 'Situação',
-    },
-    {
-      accessorKey: 'status',
+      accessorKey: 'adminStatus',
       header: 'Status',
-      cell: ({ row }) => {
-        const { color, description } = row.getValue(
-          'status',
-        ) as SubtaskData['status']
+      // cell: ({ row }) => {
+      //   const {  } = row.getValue(
+      //     'status',
+      //   ) as SubtaskData['status']
 
-        return (
-          <span
-            className={twMerge(
-              'rounded-full px-2 font-bold text-white',
-              `bg-[${color}]`,
-            )}
-          >
-            {description}
-          </span>
-        )
-      },
+      //   return (
+      //     <span
+      //       className={twMerge(
+      //         'rounded-full px-2 font-bold text-white',
+      //         `bg-[${color}]`,
+      //       )}
+      //     >
+      //       {description}
+      //     </span>
+      //   )
+      // },
     },
     {
-      accessorKey: 'item',
+      accessorKey: 'task',
       header: 'Item',
+      cell: ({ row }) => {
+        const task = row.getValue('task') as SubtaskData['task']
+        console.log(task)
+
+        return <div className="max-w-[280px] truncate">{task?.description}</div>
+      },
     },
     {
       accessorKey: 'description',
       header: 'Descrição',
+      cell: ({ row }) => {
+        const description: string = row.getValue('description')
+
+        return <div className="max-w-[280px] truncate">{description}</div>
+      },
     },
     {
-      accessorKey: 'emission',
+      accessorKey: 'logDate',
       header: 'Emissão',
+      cell: ({ row }) => {
+        const date: string = row.getValue('logDate')
+
+        return date ? dayjs(date).format('DD/MM/YYYY HH:mm') : 'Sem registro'
+      },
     },
     {
-      accessorKey: 'initialDate',
+      accessorKey: 'deadlineDate',
       header: 'Data de inicio',
+      cell: ({ row }) => {
+        const date: string = row.getValue('deadlineDate')
+
+        return date ? dayjs(date).format('DD/MM/YYYY HH:mm') : 'Sem registro'
+      },
     },
     {
-      accessorKey: 'prevDate',
+      accessorKey: 'completionDate',
       header: 'Data Prev. Termino',
+      cell: ({ row }) => {
+        const date: string = row.getValue('deadlineDate')
+
+        return date ? dayjs(date).format('DD/MM/YYYY HH:mm') : 'Sem registro'
+      },
     },
     {
-      accessorKey: 'reprogrammingDate',
+      accessorKey: 'rescheduledDate',
       header: 'Data Reprogramada',
+      cell: ({ row }) => {
+        const date: string = row.getValue('rescheduledDate')
+
+        return date ? dayjs(date).format('DD/MM/YYYY HH:mm') : 'Sem registro'
+      },
     },
     {
-      accessorKey: 'finishDate',
+      accessorKey: 'executionDeadlineDate',
       header: 'Data Finalização',
+      cell: ({ row }) => {
+        const date: string = row.getValue('executionDeadlineDate')
+
+        return date ? dayjs(date).format('DD/MM/YYYY HH:mm') : 'Sem registro'
+      },
     },
     {
-      accessorKey: 'emitter',
+      accessorKey: 'logUser',
       header: 'Emissor',
     },
-    {
-      accessorKey: 'approved',
-      header: 'Aprovado',
-    },
+    // {
+    //   accessorKey: 'approved',
+    //   header: 'Aprovado',
+    // },
   ]
+
+  useEffect(() => {
+    loadSubtasks({ taskId })
+  }, [])
 
   return (
     <>
@@ -157,30 +210,7 @@ export function GridSubtasks() {
         </SheetContent>
       </Sheet>
 
-      <DataTable
-        columns={columns}
-        data={[
-          {
-            id: 123,
-            status: {
-              id: 1,
-              color: '#ff0000',
-              description: 'aberto',
-            },
-            item: 'teste',
-            description: 'lorem ipsum',
-            emission: '01/01/2024',
-            initialDate: '01/01/2024',
-            prevDate: '01/01/2024',
-            reprogrammingDate: '01/01/2024',
-            finishDate: '01/01/2024',
-            emitter: 'dev',
-            approved: true,
-            responsible: 'dev',
-            situation: 'Em atraso',
-          },
-        ]}
-      />
+      <DataTable columns={columns} data={subtasks || []} />
     </>
   )
 }

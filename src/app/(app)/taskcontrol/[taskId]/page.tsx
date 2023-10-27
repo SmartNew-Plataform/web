@@ -23,7 +23,7 @@ export default function TaskPage({ params }: TaskpageProps) {
         <SheetEditTask />
       </Card>
 
-      <GridSubtasks />
+      <GridSubtasks taskId={params.taskId} />
     </div>
   )
 }

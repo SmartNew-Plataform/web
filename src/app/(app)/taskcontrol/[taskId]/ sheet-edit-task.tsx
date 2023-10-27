@@ -6,6 +6,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { useUserStore } from '@/store/user-store'
 import { ClipboardList, Save } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -13,6 +14,14 @@ import { FormProvider, useForm } from 'react-hook-form'
 export function SheetEditTask() {
   const params = useParams()
   const editTaskForm = useForm()
+  const { branches } = useUserStore(({ branches }) => {
+    return {
+      branches: branches?.map(({ id, branchNumber }) => ({
+        label: branchNumber,
+        value: id.toString(),
+      })),
+    }
+  })
 
   return (
     <Sheet>
@@ -35,10 +44,7 @@ export function SheetEditTask() {
 
             <Form.Field>
               <Form.Label>Cliente:</Form.Label>
-              <Form.Select
-                name="client"
-                options={[{ label: 'test', value: '1' }]}
-              />
+              <Form.Select name="client" options={branches || []} />
             </Form.Field>
 
             <Form.Field>

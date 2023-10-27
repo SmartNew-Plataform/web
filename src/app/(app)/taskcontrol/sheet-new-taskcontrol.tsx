@@ -6,15 +6,46 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { taskcontrolApi } from '@/lib/taskcontrol-api'
+import { useUserStore } from '@/store/user-store'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+const newTaskSchema = z.object({
+  branch: z.string({ required_error: 'A filial e obrigatória!' }),
+  description: z
+    .string({ required_error: 'O titulo e obrigatório' })
+    .nonempty({ message: 'Escreva um titulo pra sua nova task!' }),
+})
+
+type NewTaskData = z.infer<typeof newTaskSchema>
 
 export function SheetNewTaskControl() {
-  const newTaskForm = useForm()
+  const { branches } = useUserStore(({ branches }) => {
+    return {
+      branches: branches?.map(({ id, branchNumber }) => ({
+        label: branchNumber,
+        value: id.toString(),
+      })),
+    }
+  })
+  const newTaskForm = useForm<NewTaskData>({
+    resolver: zodResolver(newTaskSchema),
+  })
   const { handleSubmit } = newTaskForm
 
-  async function handleCreateTask(data: any) {
-    console.log(data)
+  async function handleCreateTask(data: NewTaskData) {
+    const response = await taskcontrolApi
+      .post('/task', {
+        description: data.description,
+        branchId: Number(data.branch),
+        subtasks: [],
+      })
+      .then((res) => res.data)
+
+    console.log(response)
   }
 
   return (
@@ -36,16 +67,13 @@ export function SheetNewTaskControl() {
           >
             <Form.Field>
               <Form.Label>Titulo:</Form.Label>
-              <Form.Input name="title" />
-              <Form.ErrorMessage field="title" />
+              <Form.Input name="description" />
+              <Form.ErrorMessage field="description" />
             </Form.Field>
 
             <Form.Field>
               <Form.Label>Filial:</Form.Label>
-              <Form.Select
-                name="branch"
-                options={[{ label: 'INDIRA', value: '1' }]}
-              />
+              <Form.Select name="branch" options={branches || []} />
               <Form.ErrorMessage field="branch" />
             </Form.Field>
 

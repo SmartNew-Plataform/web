@@ -2,8 +2,6 @@ import { TaskControlData as GridData } from '@/app/(app)/taskcontrol/grid-taskco
 import { taskcontrolApi } from '@/lib/taskcontrol-api'
 import { create } from 'zustand'
 
-// type TaskType = {}
-
 interface TaskControlData {
   tasks: GridData[] | undefined
 
