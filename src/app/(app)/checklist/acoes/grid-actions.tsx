@@ -4,41 +4,33 @@ import { DataTable } from '@/components/data-table'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, Save, Zap } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-
-interface GridActionsData {
-  id: number
-  responsible: string
-  createdAt: string
-  deadline: string
-  equipment: string
-  verify: string
-  locale: string
-  status: {
-    description: string
-    color: string
-  }
-}
 
 export function GridActions() {
   const actionForm = useForm()
   const { handleSubmit } = actionForm
   const [actionId, setActionId] = useState<string | null>(null)
+  const { actionList, fetchActionList } = useActionsStore()
+
+  useEffect(() => {
+    fetchActionList()
+  }, [])
 
   async function handleOpenSheetAction(id: string) {
     setActionId(id)
   }
 
-  const columns: ColumnDef<GridActionsData>[] = [
+  const columns: ColumnDef<ActionItem>[] = [
     {
       accessorKey: 'id',
       header: '',
       cell: ({ row }) => {
-        const id = row.getValue('id') as GridActionsData['id']
+        const id = row.getValue('id') as ActionItem['id']
 
         return (
           <Button
@@ -117,21 +109,7 @@ export function GridActions() {
       },
     },
     {
-      accessorKey: 'verify',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Verificação
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-    },
-    {
-      accessorKey: 'locale',
+      accessorKey: 'branch',
       header: ({ column }) => {
         return (
           <Button
@@ -157,19 +135,6 @@ export function GridActions() {
           </Button>
         )
       },
-      cell: ({ row }) => {
-        const status = row.getValue('status') as GridActionsData['status']
-
-        return (
-          <div className="flex items-center gap-2">
-            <span
-              className="h-3 w-3 rounded-full"
-              style={{ backgroundColor: status.color }}
-            />
-            {status.description}
-          </div>
-        )
-      },
     },
   ]
 
@@ -181,21 +146,8 @@ export function GridActions() {
     <>
       <DataTable
         columns={columns}
-        data={[
-          {
-            id: 12,
-            responsible: 'Bruno Matias',
-            createdAt: '2023-10-01',
-            deadline: '2023-10-20',
-            equipment: 'Escavadeira',
-            locale: 'Goiania',
-            verify: 'Limpeza eexterna',
-            status: {
-              description: 'Vencido',
-              color: '#ff0000',
-            },
-          },
-        ]}
+        data={actionList || []}
+        isLoading={!actionList}
       />
       <Sheet
         open={!!actionId}
