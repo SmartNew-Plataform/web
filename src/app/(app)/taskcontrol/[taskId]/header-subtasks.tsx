@@ -1,9 +1,9 @@
 'use client'
 import { Card } from '@/components/ui/card'
-import { SheetEditTask } from './ sheet-edit-task'
 import { useTaskControlStore } from '@/store/taskcontrol/taskcontrol-store'
-import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
+import { useEffect } from 'react'
+import { SheetEditTask } from './ sheet-edit-task'
 
 export function HeaderSubtasks() {
   const { searchTask, currentTask } = useTaskControlStore(
@@ -12,7 +12,7 @@ export function HeaderSubtasks() {
   const params = useParams()
 
   useEffect(() => {
-    searchTask(params?.taskId)
+    searchTask(Number(params?.taskId))
   }, [])
 
   return (

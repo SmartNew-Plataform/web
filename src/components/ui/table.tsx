@@ -124,6 +124,5 @@ export {
   TableHead,
   TableHeadWithIcon,
   TableHeader,
-  TableRow
+  TableRow,
 }
-

@@ -66,6 +66,8 @@ export function MultiSelect({ name, options }: MultiSelectProps) {
     field.onChange([])
   }
 
+  console.log(options)
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
