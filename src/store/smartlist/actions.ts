@@ -3,18 +3,24 @@ import { create } from 'zustand'
 
 export type ActionItem = {
   id: number
+  actionId: number | null
+  description: string | null
   equipment: string
   branch: string
-  responsible: string | null
+  responsible: {
+    login: string
+    name: string
+  } | null
   startDate: string
   endDate: string | null
+  doneAt: string | null
   task: string
   status: string
 }
 
 interface StoreData {
   actionList: Array<ActionItem> | undefined
-  currentTaskId: number | undefined
+  currentTask: ActionItem | undefined
   responsible:
     | Array<{
         login: string
@@ -24,16 +30,17 @@ interface StoreData {
 
   fetchActionList: () => Promise<void>
   fetchResponsible: (itemId: number) => Promise<void>
-  setCurrentTaskId: (taskId: number) => void
+  setCurrentTask: (task: ActionItem) => void
 }
 
 export const useActionsStore = create<StoreData>((set, get) => {
   return {
     actionList: undefined,
-    currentTaskId: undefined,
+    currentTask: undefined,
     responsible: undefined,
 
     fetchActionList: async () => {
+      set({ actionList: undefined })
       const response: { action: Array<ActionItem> } = await api
         .get('smart-list/action')
         .then((res) => res.data)
@@ -42,6 +49,8 @@ export const useActionsStore = create<StoreData>((set, get) => {
     },
 
     fetchResponsible: async (itemId) => {
+      set({ responsible: undefined })
+
       const response = await api
         .get('/smart-list/action/responsible', {
           params: {
@@ -53,8 +62,8 @@ export const useActionsStore = create<StoreData>((set, get) => {
       set({ responsible: response.responsible })
     },
 
-    setCurrentTaskId: (taskId) => {
-      set({ currentTaskId: taskId })
+    setCurrentTask: (task) => {
+      set({ currentTask: task })
     },
   }
 })

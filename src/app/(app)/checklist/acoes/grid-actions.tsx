@@ -11,16 +11,16 @@ import { SheetAction } from './sheet-action'
 
 export function GridActions() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
-  const { actionList, fetchActionList, setCurrentTaskId, fetchResponsible } =
+  const { actionList, fetchActionList, setCurrentTask, fetchResponsible } =
     useActionsStore()
 
   useEffect(() => {
     fetchActionList()
   }, [])
 
-  async function handleOpenSheetAction(id: number) {
-    setCurrentTaskId(id)
-    fetchResponsible(id)
+  async function handleOpenSheetAction(task: ActionItem) {
+    setCurrentTask(task)
+    fetchResponsible(task.id)
     setSheetActionOpen(true)
   }
 
@@ -29,17 +29,16 @@ export function GridActions() {
       accessorKey: 'id',
       header: '',
       cell: ({ row }) => {
-        const id = row.getValue('id') as ActionItem['id']
-
+        const task = row.original as ActionItem
         return (
-          <Button size="icon-xs" onClick={() => handleOpenSheetAction(id)}>
+          <Button size="icon-xs" onClick={() => handleOpenSheetAction(task)}>
             <Zap className="h-3 w-3" />
           </Button>
         )
       },
     },
     {
-      accessorKey: 'responsible',
+      accessorKey: 'responsible.name',
       header: ({ column }) => {
         return (
           <Button
@@ -53,7 +52,7 @@ export function GridActions() {
       },
     },
     {
-      accessorKey: 'createdAt',
+      accessorKey: 'startDate',
       header: ({ column }) => {
         return (
           <Button
@@ -66,13 +65,15 @@ export function GridActions() {
         )
       },
       cell: ({ row }) => {
-        const createdAt = row.getValue('createdAt') as string
+        const createdAt = row.getValue('startDate') as string
 
-        return dayjs(createdAt).format('DD/MM/YYYY')
+        return createdAt
+          ? dayjs(createdAt).format('DD/MM/YYYY')
+          : 'Sem registro'
       },
     },
     {
-      accessorKey: 'deadline',
+      accessorKey: 'endDate',
       header: ({ column }) => {
         return (
           <Button
@@ -85,9 +86,9 @@ export function GridActions() {
         )
       },
       cell: ({ row }) => {
-        const deadline = row.getValue('deadline') as string
+        const deadline = row.getValue('endDate') as string
 
-        return dayjs(deadline).format('DD/MM/YYYY')
+        return deadline ? dayjs(deadline).format('DD/MM/YYYY') : 'Sem registro'
       },
     },
     {
