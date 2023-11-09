@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { ArrowDownWideNarrow, Zap } from 'lucide-react'
+import { ArrowDownWideNarrow, Timer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SheetAction } from './sheet-action'
 
@@ -32,7 +32,7 @@ export function GridActions() {
         const task = row.original as ActionItem
         return (
           <Button size="icon-xs" onClick={() => handleOpenSheetAction(task)}>
-            <Zap className="h-3 w-3" />
+            <Timer className="h-3 w-3" />
           </Button>
         )
       },
