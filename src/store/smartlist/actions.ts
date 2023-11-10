@@ -28,9 +28,13 @@ interface StoreData {
       }>
     | undefined
 
+  attach: Array<{ url: string }> | undefined
+
   fetchActionList: () => Promise<void>
   fetchResponsible: (itemId: number) => Promise<void>
+  fetchAttach: (actionId: number) => Promise<void>
   setCurrentTask: (task: ActionItem) => void
+  clearAttach: () => void
 }
 
 export const useActionsStore = create<StoreData>((set, get) => {
@@ -38,12 +42,14 @@ export const useActionsStore = create<StoreData>((set, get) => {
     actionList: undefined,
     currentTask: undefined,
     responsible: undefined,
+    attach: undefined,
 
     fetchActionList: async () => {
       set({ actionList: undefined })
       const response: { action: Array<ActionItem> } = await api
         .get('smart-list/action')
         .then((res) => res.data)
+        .catch(() => set({ actionList: [] }))
 
       set({ actionList: response.action })
     },
@@ -58,8 +64,24 @@ export const useActionsStore = create<StoreData>((set, get) => {
           },
         })
         .then((res) => res.data)
+        .catch(() => set({ responsible: [] }))
 
       set({ responsible: response.responsible })
+    },
+
+    fetchAttach: async (actionId) => {
+      set({ attach: undefined })
+
+      const response = await api
+        .get(`/smart-list/action/attach/${actionId}`)
+        .then((res) => res.data)
+        .catch(() => set({ attach: [] }))
+
+      set({ attach: response.img })
+    },
+
+    clearAttach: () => {
+      set({ attach: undefined })
     },
 
     setCurrentTask: (task) => {

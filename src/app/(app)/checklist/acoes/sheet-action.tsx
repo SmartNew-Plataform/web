@@ -1,4 +1,5 @@
 'use client'
+import { AttachList } from '@/components/attach-list'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
@@ -27,20 +28,35 @@ type ActionFormType = z.infer<typeof actionFormSchema>
 type SheetActionProps = ComponentProps<typeof Sheet>
 
 export function SheetAction(props: SheetActionProps) {
-  const { responsible, currentTask, fetchActionList, setCurrentTask } =
-    useActionsStore(
-      ({ responsible, currentTask, fetchActionList, setCurrentTask }) => {
-        return {
-          fetchActionList,
-          setCurrentTask,
-          currentTask,
-          responsible: responsible?.map(({ login, name }) => ({
-            value: login,
-            label: name,
-          })),
-        }
-      },
-    )
+  const {
+    responsible,
+    attach,
+    currentTask,
+    fetchActionList,
+    setCurrentTask,
+    fetchAttach,
+  } = useActionsStore(
+    ({
+      responsible,
+      currentTask,
+      fetchActionList,
+      fetchAttach,
+      setCurrentTask,
+      attach,
+    }) => {
+      return {
+        attach: attach?.map(({ url }) => url),
+        fetchActionList,
+        fetchAttach,
+        setCurrentTask,
+        currentTask,
+        responsible: responsible?.map(({ login, name }) => ({
+          value: login,
+          label: name,
+        })),
+      }
+    },
+  )
   const actionForm = useForm<ActionFormType>({
     resolver: zodResolver(actionFormSchema),
   })
@@ -51,22 +67,60 @@ export function SheetAction(props: SheetActionProps) {
     formState: { isSubmitting },
   } = actionForm
   const isNewAction = !currentTask?.actionId
+  const isDone = !!currentTask?.doneAt
 
   const { toast } = useToast()
 
   async function handleCreateAction(data: ActionFormType) {
+    const response: ActionItem = await api
+      .post('smart-list/action', {
+        itemId: currentTask?.id,
+        ...data,
+      })
+      .then((res) => res.data)
+
+    fetchActionList()
+    setCurrentTask(response)
+    toast({
+      title: 'Ação criada com sucesso!',
+      variant: 'success',
+    })
+  }
+
+  async function handleUpdateAction(data: ActionFormType) {
     try {
-      const response: ActionItem = await api
-        .post('smart-list/action', {
+      const response = await api
+        .put('smart-list/action', {
           itemId: currentTask?.id,
+          actionId: currentTask?.actionId,
           ...data,
         })
         .then((res) => res.data)
 
+      Array.from(data.attach).forEach(async (image) => {
+        const formData = new FormData()
+        formData.append('file', image)
+        const responseAttach = await api
+          .post(
+            `smart-list/action/insert-attach/${currentTask?.actionId}`,
+            formData,
+          )
+          .then((res) => res.data)
+
+        if (responseAttach?.inserted)
+          toast({
+            title: 'Erro ao inserir imagem!',
+            description: image.name,
+            variant: 'destructive',
+          })
+      })
+
       fetchActionList()
+      fetchAttach(currentTask!.actionId!)
       setCurrentTask(response)
+      setValue('attach', [])
       toast({
-        title: 'Ação criada com sucesso!',
+        title: 'Ação atualizada com sucesso!',
         variant: 'success',
       })
     } catch (error) {
@@ -74,21 +128,23 @@ export function SheetAction(props: SheetActionProps) {
     }
   }
 
-  async function handleUpdateAction(data: ActionFormType) {
-    try {
-      await api.put('smart-list/action', {
-        itemId: currentTask?.id,
-        actionId: currentTask?.actionId,
-        ...data,
-      })
+  async function handleDeleteAttach(url: string) {
+    const path = url.split('https://www.smartnewsystem.com.br/')[1]
 
-      fetchActionList()
+    const response = await api
+      .delete(`/smart-list/action/delete-attach/${currentTask?.actionId}`, {
+        data: {
+          urlFile: path,
+        },
+      })
+      .then((res) => res.data)
+
+    if (response?.delete) {
+      fetchAttach(currentTask!.actionId!)
       toast({
-        title: 'Ação atualizada com sucesso!',
+        title: 'Imagem deletada com sucesso!',
         variant: 'success',
       })
-    } catch (error) {
-      console.error(error)
     }
   }
 
@@ -106,6 +162,12 @@ export function SheetAction(props: SheetActionProps) {
   return (
     <Sheet {...props}>
       <SheetContent className="max-w-md overflow-auto">
+        <span className="mb-6 flex items-center gap-1 font-medium">
+          Status:
+          <span className="ml-2 rounded bg-slate-200 px-2 py-1 font-semibold text-slate-700">
+            {currentTask?.status}
+          </span>
+        </span>
         <FormProvider {...actionForm}>
           <form
             className="flex w-full flex-col gap-3"
@@ -115,23 +177,36 @@ export function SheetAction(props: SheetActionProps) {
           >
             <Form.Field>
               <Form.Label htmlFor="description">Ação:</Form.Label>
-              <Form.Textarea id="description" name="description" />
+              <Form.Textarea
+                disabled={isDone}
+                id="description"
+                name="description"
+              />
               <Form.ErrorMessage field="description" />
             </Form.Field>
 
-            <Form.Field>
-              <Form.Label htmlFor="responsible">Responsável:</Form.Label>
-              <Form.Select
-                options={responsible || []}
-                id="responsible"
-                name="responsible"
-              />
-              <Form.ErrorMessage field="responsible" />
-            </Form.Field>
+            {!responsible ? (
+              <Form.SkeletonField />
+            ) : (
+              <Form.Field>
+                <Form.Label htmlFor="responsible">Responsável:</Form.Label>
+                <Form.Select
+                  options={responsible || []}
+                  id="responsible"
+                  name="responsible"
+                  disabled={isDone}
+                />
+                <Form.ErrorMessage field="responsible" />
+              </Form.Field>
+            )}
 
             <Form.Field>
               <Form.Label htmlFor="deadline">Prazo:</Form.Label>
-              <Form.DatePicker id="deadline" name="deadline" />
+              <Form.DatePicker
+                disabled={isDone}
+                id="deadline"
+                name="deadline"
+              />
               <Form.ErrorMessage field="deadline" />
             </Form.Field>
 
@@ -139,7 +214,7 @@ export function SheetAction(props: SheetActionProps) {
               <Form.Label htmlFor="doneAt">Data Conclusão:</Form.Label>
               <Form.DatePicker
                 id="doneAt"
-                disabled={isNewAction}
+                disabled={isNewAction || isDone}
                 name="doneAt"
               />
               <Form.ErrorMessage field="doneAt" />
@@ -149,13 +224,20 @@ export function SheetAction(props: SheetActionProps) {
               <Form.Label htmlFor="attach">Anexo:</Form.Label>
               <Form.ImagePicker
                 id="attach"
-                disabled={isNewAction}
+                disabled={isNewAction || isDone}
                 name="attach"
+                multiple
               />
               <Form.ErrorMessage field="attach" />
             </Form.Field>
 
-            <Button loading={isSubmitting}>
+            <AttachList
+              data={attach || []}
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              onDelete={!isDone ? handleDeleteAttach : () => {}}
+            />
+
+            <Button loading={isSubmitting} disabled={isDone}>
               <Save className="h-4 w-4" />
               Salvar
             </Button>

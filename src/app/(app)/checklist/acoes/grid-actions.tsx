@@ -11,8 +11,14 @@ import { SheetAction } from './sheet-action'
 
 export function GridActions() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
-  const { actionList, fetchActionList, setCurrentTask, fetchResponsible } =
-    useActionsStore()
+  const {
+    actionList,
+    fetchActionList,
+    setCurrentTask,
+    fetchResponsible,
+    fetchAttach,
+    clearAttach,
+  } = useActionsStore()
 
   useEffect(() => {
     fetchActionList()
@@ -21,6 +27,10 @@ export function GridActions() {
   async function handleOpenSheetAction(task: ActionItem) {
     setCurrentTask(task)
     fetchResponsible(task.id)
+    clearAttach()
+    if (task.actionId) {
+      fetchAttach(task.actionId)
+    }
     setSheetActionOpen(true)
   }
 
@@ -89,6 +99,20 @@ export function GridActions() {
         const deadline = row.getValue('endDate') as string
 
         return deadline ? dayjs(deadline).format('DD/MM/YYYY') : 'Sem registro'
+      },
+    },
+    {
+      accessorKey: 'task',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Verificação
+            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+          </Button>
+        )
       },
     },
     {

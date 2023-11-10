@@ -10,6 +10,7 @@ import { Input } from './input'
 import { InputDateRange } from './input-date-range'
 import { MultiSelect } from './multi-select'
 import { Select } from './select'
+import { SkeletonField } from './skeleton-field'
 import { Textarea } from './textarea'
 
 export const Form = {
@@ -26,4 +27,5 @@ export const Form = {
   IconPicker,
   ColorPicker,
   DatePicker,
+  SkeletonField,
 }

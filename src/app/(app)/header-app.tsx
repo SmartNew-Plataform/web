@@ -35,6 +35,23 @@ export function HeaderApp({ children }: HeaderAppProps) {
         duration: 1000 * 120,
       })
     })
+
+    api.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response) {
+          console.error('Erro de resposta do servidor:', error)
+          toast({
+            title: error.message,
+            description: error.response.data.message,
+            variant: 'destructive',
+            duration: 1000 * 120,
+          })
+        }
+
+        return Promise.reject(error)
+      },
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return (
