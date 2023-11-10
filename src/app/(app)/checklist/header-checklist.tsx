@@ -45,7 +45,7 @@ export function HeaderChecklist() {
                 Tarefas
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem disabled asChild>
               <Link
                 href={{
                   pathname: '/checklist/controle',
