@@ -20,6 +20,7 @@ const actionFormSchema = z.object({
   responsible: z.string({ required_error: 'Este campo e obrigatório' }),
   deadline: z.date({ required_error: 'Este campo e obrigatório!' }),
   doneAt: z.date().optional(),
+  descriptionAction: z.string(),
   attach: z.instanceof(File).array(),
 })
 
@@ -152,6 +153,7 @@ export function SheetAction(props: SheetActionProps) {
     reset()
     if (!currentTask) return
     setValue('description', currentTask.description || '')
+    setValue('descriptionAction', currentTask.descriptionAction || '')
     setValue('responsible', currentTask?.responsible?.login || '')
     if (currentTask.endDate)
       setValue('deadline', dayjs(currentTask.endDate).toDate())
@@ -218,6 +220,18 @@ export function SheetAction(props: SheetActionProps) {
                 name="doneAt"
               />
               <Form.ErrorMessage field="doneAt" />
+            </Form.Field>
+
+            <Form.Field>
+              <Form.Label htmlFor="descriptionAction">
+                Descrição ação:
+              </Form.Label>
+              <Form.Textarea
+                disabled={isNewAction || isDone}
+                id="descriptionAction"
+                name="descriptionAction"
+              />
+              <Form.ErrorMessage field="descriptionAction" />
             </Form.Field>
 
             <Form.Field>

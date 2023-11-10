@@ -16,6 +16,7 @@ export type ActionItem = {
   doneAt: string | null
   task: string
   status: string
+  descriptionAction: string | null
 }
 
 interface StoreData {
