@@ -21,18 +21,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   globalFilter?: string
+  isLoading?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   globalFilter = '',
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -57,7 +60,18 @@ export function DataTable<TData, TValue>({
   }, [globalFilter])
 
   return (
-    <div className="flex h-full flex-col gap-4 overflow-auto">
+    <div className="relative flex h-full flex-col gap-4 overflow-auto">
+      {isLoading && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-zinc-800/40">
+          <div className="flex items-center gap-2">
+            <Loader2
+              className="h-6 w-6 animate-spin text-blue-500"
+              strokeWidth="3"
+            />
+            <p className="font-semibold text-white">Carregando... Aguarde!</p>
+          </div>
+        </div>
+      )}
       <div className="max-h-full flex-1 overflow-auto rounded-md border border-zinc-300 bg-white">
         <Table className="overflow-auto">
           <TableHeader className="sticky top-0">

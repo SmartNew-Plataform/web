@@ -23,6 +23,7 @@ type UserData = {
 interface UserStoreData {
   modules: Array<ModuleData> | null
   user: UserData | null
+  isLoading: boolean
 
   fetchUserData: () => Promise<void | AxiosError>
 }
@@ -31,15 +32,17 @@ export const useUserStore = create<UserStoreData>((set) => {
   return {
     modules: null,
     user: null,
+    isLoading: false,
 
     fetchUserData: async () => {
+      set({ isLoading: true })
       const data = await api.get('/profile').then((res) => res.data)
 
       const modules = data?.modules.sort((a: ModuleData, b: ModuleData) => {
         return a.order > b.order ? 1 : -1
       })
 
-      set({ modules, user: data.user })
+      set({ modules, user: data.user, isLoading: false })
 
       return data
     },

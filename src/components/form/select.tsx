@@ -1,9 +1,8 @@
 'use client'
 
-import * as React from 'react'
 import { Check, ChevronsUpDown } from 'lucide-react'
+import * as React from 'react'
 
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -17,22 +16,32 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 import { useController, useFormContext } from 'react-hook-form'
+import { twMerge } from 'tailwind-merge'
+import { ScrollArea } from '../ui/scroll-area'
 
-interface SelectProps {
+interface SelectProps extends React.ComponentProps<typeof Button> {
   name: string
   options: Array<{
     label: string
     value: string
   }>
+  value?: string
 }
 
-export function Select({ name, options }: SelectProps) {
+export function Select({
+  name,
+  options,
+  value = undefined,
+  className,
+  ...props
+}: SelectProps) {
   const { control } = useFormContext()
   const { field } = useController({
     control,
     name,
-    defaultValue: null,
+    defaultValue: value,
   })
   const [open, setOpen] = React.useState(false)
 
@@ -40,14 +49,17 @@ export function Select({ name, options }: SelectProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          {...props}
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="justify-between"
+          className={twMerge('justify-between', className)}
         >
-          {field.value
-            ? options.find((option) => option.value === field.value)?.label
-            : 'Selecione...'}
+          <span className="flex-1 truncate text-left font-normal">
+            {field.value
+              ? options.find((option) => option.value === field.value)?.label
+              : 'Selecione...'}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -56,23 +68,27 @@ export function Select({ name, options }: SelectProps) {
           <CommandInput placeholder="Pesquisar item..." />
           <CommandEmpty>Nenhum item encontrado.</CommandEmpty>
           <CommandGroup>
-            {options.map((option) => (
-              <CommandItem
-                key={option.value}
-                onSelect={() => {
-                  field.onChange(option.value)
-                  setOpen(false)
-                }}
-              >
-                <Check
-                  className={cn(
-                    'mr-2 h-4 w-4',
-                    field.value === option.value ? 'opacity-100' : 'opacity-0',
-                  )}
-                />
-                {option.label}
-              </CommandItem>
-            ))}
+            <ScrollArea className="max-h-[30vh] overflow-auto">
+              {options.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  onSelect={() => {
+                    field.onChange(option.value)
+                    setOpen(false)
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      field.value === option.value
+                        ? 'opacity-100'
+                        : 'opacity-0',
+                    )}
+                  />
+                  {option.label}
+                </CommandItem>
+              ))}
+            </ScrollArea>
           </CommandGroup>
         </Command>
       </PopoverContent>

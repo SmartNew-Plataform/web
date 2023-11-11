@@ -1,5 +1,5 @@
-import { HeaderChecklist } from '@/components/header-checklist'
 import { NavigationBar } from '@/components/navigation-bar'
+import { HeaderChecklist } from './header-checklist'
 
 export default function LayoutChecklist({
   children,
