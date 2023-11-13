@@ -48,20 +48,6 @@ export function GridActions() {
       },
     },
     {
-      accessorKey: 'responsible.name',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Responsável
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-    },
-    {
       accessorKey: 'startDate',
       header: ({ column }) => {
         return (
@@ -83,6 +69,20 @@ export function GridActions() {
       },
     },
     {
+      accessorKey: 'task',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Verificação
+            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+    },
+    {
       accessorKey: 'endDate',
       header: ({ column }) => {
         return (
@@ -99,20 +99,6 @@ export function GridActions() {
         const deadline = row.getValue('endDate') as string
 
         return deadline ? dayjs(deadline).format('DD/MM/YYYY') : 'Sem registro'
-      },
-    },
-    {
-      accessorKey: 'task',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Verificação
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
       },
     },
     {
@@ -138,6 +124,20 @@ export function GridActions() {
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Local
+            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+    },
+    {
+      accessorKey: 'responsible.name',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Responsável
             <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
           </Button>
         )

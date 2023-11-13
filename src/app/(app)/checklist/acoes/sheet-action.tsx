@@ -163,100 +163,108 @@ export function SheetAction(props: SheetActionProps) {
 
   return (
     <Sheet {...props}>
-      <SheetContent className="max-w-md overflow-auto">
-        <span className="mb-6 flex items-center gap-1 font-medium">
-          Status:
-          <span className="ml-2 rounded bg-slate-200 px-2 py-1 font-semibold text-slate-700">
-            {currentTask?.status}
+      <SheetContent className="max-w-md overflow-auto p-4">
+        <div className="relative h-full w-full py-4">
+          <span className="mb-6 flex items-center gap-1 font-medium">
+            Status:
+            <span className="ml-2 rounded bg-slate-200 px-2 py-1 font-semibold text-slate-700">
+              {currentTask?.status}
+            </span>
           </span>
-        </span>
-        <FormProvider {...actionForm}>
-          <form
-            className="flex w-full flex-col gap-3"
-            onSubmit={handleSubmit(
-              isNewAction ? handleCreateAction : handleUpdateAction,
-            )}
-          >
-            <Form.Field>
-              <Form.Label htmlFor="description">Ação:</Form.Label>
-              <Form.Textarea
-                disabled={isDone}
-                id="description"
-                name="description"
-              />
-              <Form.ErrorMessage field="description" />
-            </Form.Field>
-
-            {!responsible ? (
-              <Form.SkeletonField />
-            ) : (
+          <FormProvider {...actionForm}>
+            <form
+              className="flex w-full flex-col gap-3"
+              onSubmit={handleSubmit(
+                isNewAction ? handleCreateAction : handleUpdateAction,
+              )}
+            >
               <Form.Field>
-                <Form.Label htmlFor="responsible">Responsável:</Form.Label>
-                <Form.Select
-                  options={responsible || []}
-                  id="responsible"
-                  name="responsible"
+                <Form.Label htmlFor="description">Ação:</Form.Label>
+                <Form.Textarea
                   disabled={isDone}
+                  id="description"
+                  name="description"
                 />
-                <Form.ErrorMessage field="responsible" />
+                <Form.ErrorMessage field="description" />
               </Form.Field>
-            )}
 
-            <Form.Field>
-              <Form.Label htmlFor="deadline">Prazo:</Form.Label>
-              <Form.DatePicker
-                disabled={isDone}
-                id="deadline"
-                name="deadline"
+              {!responsible ? (
+                <Form.SkeletonField />
+              ) : (
+                <Form.Field>
+                  <Form.Label htmlFor="responsible">Responsável:</Form.Label>
+                  <Form.Select
+                    options={responsible || []}
+                    id="responsible"
+                    name="responsible"
+                    disabled={isDone}
+                  />
+                  <Form.ErrorMessage field="responsible" />
+                </Form.Field>
+              )}
+
+              <Form.Field>
+                <Form.Label htmlFor="deadline">Prazo:</Form.Label>
+                <Form.DatePicker
+                  disabled={isDone}
+                  id="deadline"
+                  name="deadline"
+                />
+                <Form.ErrorMessage field="deadline" />
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label htmlFor="doneAt">Data Conclusão:</Form.Label>
+                <Form.DatePicker
+                  id="doneAt"
+                  disabled={isNewAction || isDone}
+                  name="doneAt"
+                />
+                <Form.ErrorMessage field="doneAt" />
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label htmlFor="descriptionAction">
+                  Descrição ação:
+                </Form.Label>
+                <Form.Textarea
+                  disabled={isNewAction || isDone}
+                  id="descriptionAction"
+                  name="descriptionAction"
+                />
+                <Form.ErrorMessage field="descriptionAction" />
+              </Form.Field>
+
+              <Form.Field>
+                <Form.Label htmlFor="attach">Anexo:</Form.Label>
+                <Form.ImagePicker
+                  id="attach"
+                  disabled={isNewAction || isDone}
+                  name="attach"
+                  multiple
+                />
+                <Form.ErrorMessage field="attach" />
+              </Form.Field>
+
+              <AttachList
+                data={attach || []}
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                onDelete={!isDone ? handleDeleteAttach : () => {}}
               />
-              <Form.ErrorMessage field="deadline" />
-            </Form.Field>
 
-            <Form.Field>
-              <Form.Label htmlFor="doneAt">Data Conclusão:</Form.Label>
-              <Form.DatePicker
-                id="doneAt"
-                disabled={isNewAction || isDone}
-                name="doneAt"
-              />
-              <Form.ErrorMessage field="doneAt" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="descriptionAction">
-                Descrição ação:
-              </Form.Label>
-              <Form.Textarea
-                disabled={isNewAction || isDone}
-                id="descriptionAction"
-                name="descriptionAction"
-              />
-              <Form.ErrorMessage field="descriptionAction" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="attach">Anexo:</Form.Label>
-              <Form.ImagePicker
-                id="attach"
-                disabled={isNewAction || isDone}
-                name="attach"
-                multiple
-              />
-              <Form.ErrorMessage field="attach" />
-            </Form.Field>
-
-            <AttachList
-              data={attach || []}
-              // eslint-disable-next-line @typescript-eslint/no-empty-function
-              onDelete={!isDone ? handleDeleteAttach : () => {}}
-            />
-
-            <Button loading={isSubmitting} disabled={isDone}>
-              <Save className="h-4 w-4" />
-              Salvar
-            </Button>
-          </form>
-        </FormProvider>
+              <div className="sticky bottom-0 bg-white py-4">
+                <Button
+                  loading={isSubmitting}
+                  disabled={isDone}
+                  className="w-full"
+                >
+                  <Save className="h-4 w-4" />
+                  Salvar
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
+        </div>
       </SheetContent>
     </Sheet>
   )
