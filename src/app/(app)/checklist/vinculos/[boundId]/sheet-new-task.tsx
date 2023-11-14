@@ -18,10 +18,12 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const newTaskSchema = z.object({
-  task: z.string({
-    required_error: 'Escolha uma tarefa!',
-    invalid_type_error: 'Você não selecionou nada!',
-  }),
+  task: z.array(
+    z.string({
+      required_error: 'Escolha uma tarefa!',
+      invalid_type_error: 'Você não selecionou nada!',
+    }),
+  ),
   control: z.string({
     required_error: 'Escolha um tipo de controle!',
     invalid_type_error: 'Você não selecionou nada!',
@@ -70,7 +72,7 @@ export function SheetNewTask({ boundId }: SheetNewTask) {
   const { toast } = useToast()
 
   async function handleNewTask(data: NewTaskData) {
-    const response = await api
+    await api
       .post(`/smart-list/bound/${boundId}/item`, {
         controlId: Number(data.control),
         taskId: Number(data.task),
@@ -91,7 +93,7 @@ export function SheetNewTask({ boundId }: SheetNewTask) {
       title: 'Task criada com sucesso!',
       variant: 'success',
     })
-    reset({ control: '', task: '' })
+    reset({ control: '', task: [] })
     loadTasksBounded(boundId)
   }
 
@@ -100,19 +102,19 @@ export function SheetNewTask({ boundId }: SheetNewTask) {
       <SheetTrigger asChild>
         <Button>
           <Plus className="h-4 w-4" />
-          Vincular tarêfa
+          Vincular tarefa
         </Button>
       </SheetTrigger>
       <SheetContent className="max-w-md">
-        <SheetTitle>Vincular tarêfa</SheetTitle>
+        <SheetTitle>Vincular tarefa</SheetTitle>
         <FormProvider {...newTaskForm}>
           <form
             className="mt-4 flex w-full flex-col gap-3"
             onSubmit={handleSubmit(handleNewTask)}
           >
             <Form.Field>
-              <Form.Label>Tarêfas:</Form.Label>
-              <Form.Select name="task" options={task} />
+              <Form.Label>Tarefas:</Form.Label>
+              <Form.MultiSelect name="task" options={task} />
               <Form.ErrorMessage field="task" />
             </Form.Field>
 
