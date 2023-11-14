@@ -4,17 +4,17 @@ import {
   Toast,
   ToastClose,
   ToastDescription,
-  ToastProvider,
   ToastTitle,
   ToastViewport,
 } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
+import { Provider as ToastProviderPrimitive } from '@radix-ui/react-toast'
 
 export function Toaster() {
   const { toasts } = useToast()
 
   return (
-    <ToastProvider swipeDirection="up">
+    <ToastProviderPrimitive swipeDirection="up">
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
           <Toast key={id} {...props}>
@@ -30,6 +30,6 @@ export function Toaster() {
         )
       })}
       <ToastViewport />
-    </ToastProvider>
+    </ToastProviderPrimitive>
   )
 }
