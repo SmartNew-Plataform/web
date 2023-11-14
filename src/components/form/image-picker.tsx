@@ -1,5 +1,6 @@
 'use client'
 import { ThumbnailPlugin } from '@/lib/thumb-slider'
+import 'keen-slider/keen-slider.min.css'
 import { useKeenSlider } from 'keen-slider/react'
 import { Plus } from 'lucide-react'
 import Image from 'next/image'
