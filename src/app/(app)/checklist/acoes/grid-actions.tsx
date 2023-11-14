@@ -1,16 +1,21 @@
 'use client'
 
+import { AttachThumbList } from '@/components/attach-thumb-list'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
+import { useLoading } from '@/store/loading-store'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { ArrowDownWideNarrow, Timer } from 'lucide-react'
+import { ArrowDownWideNarrow, Image, Timer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SheetAction } from './sheet-action'
 
 export function GridActions() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
+  const [attachModalOpen, setAttachModalOpen] = useState<boolean>(false)
+  const { show, hide } = useLoading()
   const {
     actionList,
     fetchActionList,
@@ -18,7 +23,12 @@ export function GridActions() {
     fetchResponsible,
     fetchAttach,
     clearAttach,
-  } = useActionsStore()
+    attach,
+  } = useActionsStore(({ attach, ...rest }) => ({
+    attach: attach?.map(({ url }) => url),
+    ...rest,
+  }))
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchActionList()
@@ -34,6 +44,22 @@ export function GridActions() {
     setSheetActionOpen(true)
   }
 
+  async function loadAttach(actionId: number | null) {
+    if (!actionId) return
+    clearAttach()
+    show()
+    const responseAttach = await fetchAttach(actionId)
+    hide()
+    if (responseAttach.length > 0) {
+      setAttachModalOpen(true)
+      return
+    }
+
+    toast({
+      title: 'Nenhum anexo encontrado nessa ação!',
+    })
+  }
+
   const columns: ColumnDef<ActionItem>[] = [
     {
       accessorKey: 'id',
@@ -41,9 +67,20 @@ export function GridActions() {
       cell: ({ row }) => {
         const task = row.original as ActionItem
         return (
-          <Button size="icon-xs" onClick={() => handleOpenSheetAction(task)}>
-            <Timer className="h-3 w-3" />
-          </Button>
+          <div className="flex gap-2">
+            <Button size="icon-xs" onClick={() => handleOpenSheetAction(task)}>
+              <Timer className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={!task.actionId}
+              size="icon-xs"
+              onClick={() => loadAttach(task.actionId)}
+            >
+              {/* eslint-disable-next-line jsx-a11y/alt-text */}
+              <Image className="h-3 w-3" />
+            </Button>
+          </div>
         )
       },
     },
@@ -168,6 +205,12 @@ export function GridActions() {
       />
 
       <SheetAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />
+
+      <AttachThumbList
+        images={attach || []}
+        open={attachModalOpen}
+        onOpenChange={setAttachModalOpen}
+      />
     </>
   )
 }

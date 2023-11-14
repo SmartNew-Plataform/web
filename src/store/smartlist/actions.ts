@@ -33,12 +33,12 @@ interface StoreData {
 
   fetchActionList: () => Promise<void>
   fetchResponsible: (itemId: number) => Promise<void>
-  fetchAttach: (actionId: number) => Promise<void>
+  fetchAttach: (actionId: number) => Promise<Array<{ url: string }>>
   setCurrentTask: (task: ActionItem) => void
   clearAttach: () => void
 }
 
-export const useActionsStore = create<StoreData>((set, get) => {
+export const useActionsStore = create<StoreData>((set) => {
   return {
     actionList: undefined,
     currentTask: undefined,
@@ -79,6 +79,8 @@ export const useActionsStore = create<StoreData>((set, get) => {
         .catch(() => set({ attach: [] }))
 
       set({ attach: response.img })
+
+      return response.img
     },
 
     clearAttach: () => {

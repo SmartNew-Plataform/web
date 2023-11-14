@@ -163,8 +163,8 @@ export function SheetAction(props: SheetActionProps) {
 
   return (
     <Sheet {...props}>
-      <SheetContent className="max-w-md overflow-auto p-4">
-        <div className="relative h-full w-full py-4">
+      <SheetContent className="max-w-md overflow-auto pb-0">
+        <div className="relative h-full w-full">
           <span className="mb-6 flex items-center gap-1 font-medium">
             Status:
             <span className="ml-2 rounded bg-slate-200 px-2 py-1 font-semibold text-slate-700">
