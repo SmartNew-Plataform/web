@@ -5,8 +5,6 @@ import { Loader2 } from 'lucide-react'
 export function GlobalLoading() {
   const { loading } = useLoading()
 
-  console.log(loading)
-
   return (
     <div
       data-loading={loading}
