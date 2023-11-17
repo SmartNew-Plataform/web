@@ -202,7 +202,7 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
 
       const status = await api
         .get('/smart-list/check-list/list-status')
-        .then((res) => res.data)
+        .then((res) => res.data.status)
 
       set({
         checklistAsksScreen: {

@@ -2,7 +2,7 @@
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import 'keen-slider/keen-slider.min.css'
 
-import { AskType } from '@/store/checklist-types'
+import { AskType } from '@/store/smartlist/checklist-types'
 import { useEffect, useState } from 'react'
 import { Skeleton } from '../ui/skeleton'
 import { CardAsk } from './card-ask'

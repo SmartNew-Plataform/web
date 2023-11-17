@@ -1,5 +1,5 @@
 'use client'
-import { SchemaAskType } from '@/store/checklist-types'
+import { SchemaAskType } from '@/store/smartlist/checklist-types'
 import { useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import { Form } from '../form'

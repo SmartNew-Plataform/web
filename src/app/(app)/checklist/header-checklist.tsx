@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useUserStore } from '@/store/user-store'
-import { AreaChart, Plus } from 'lucide-react'
+import { AreaChart, Plus, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
@@ -45,7 +45,7 @@ export function HeaderChecklist() {
                 Tarefas
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem disabled asChild>
               <Link
                 href={{
                   pathname: '/checklist/controle',
@@ -67,10 +67,18 @@ export function HeaderChecklist() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
         <Button asChild variant="ghost">
           <Link href={`/checklist/grid?token=${searchParams.get('token')}`}>
             <AreaChart className="h-4 w-4" />
             Checklist
+          </Link>
+        </Button>
+
+        <Button asChild variant="ghost">
+          <Link href={`/checklist/acoes?token=${searchParams.get('token')}`}>
+            <XCircle className="h-4 w-4" />
+            Ações Geradas
           </Link>
         </Button>
       </div>

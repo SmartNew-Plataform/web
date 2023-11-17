@@ -43,7 +43,7 @@ export function SheetNewControl() {
 
             <Form.Field>
               <Form.Label>Cor:</Form.Label>
-              <Form.Input name="color" type="color" />
+              <Form.ColorPicker name="color" />
               <Form.ErrorMessage field="color" />
             </Form.Field>
 
