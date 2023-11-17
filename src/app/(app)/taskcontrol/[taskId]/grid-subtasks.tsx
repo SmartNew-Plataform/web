@@ -4,35 +4,36 @@ import { DataTable } from '@/components/data-table'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { useTaskControlStore } from '@/store/taskcontrol/taskcontrol-store'
 import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Save } from 'lucide-react'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
 
-interface SubtaskData {
+export interface SubtaskData {
   id: number
-  situation: string
-  status: {
-    color: string
-    id: number
-    description: string
-  }
-  item: string
+  moduleId: number
+  taskId: number
+  statusId: number
+  typeId: number
+  title: string
   description: string
-  emission: string
-  initialDate: string
-  prevDate: string
-  reprogrammingDate: string
-  finishDate: string
-  emitter: string
-  responsible: string
-  approved: boolean
+  adminStatus: number
+  deadlineDate: string
+  executionDeadlineDate: string
+  rescheduledDate: string
+  completionDate: string
+  users: {
+    login: string
+    name: string
+  }[]
 }
 
 export function GridSubtasks() {
   const [editSubtaskOpen, setEditSubtaskOpen] = useState(false)
   const editSubtaskForm = useForm()
+  const { currentTaskLoading, currentTask } = useTaskControlStore()
   const columns: ColumnDef<SubtaskData>[] = [
     {
       accessorKey: 'id',
@@ -57,9 +58,7 @@ export function GridSubtasks() {
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => {
-        const { color, description } = row.getValue(
-          'status',
-        ) as SubtaskData['status']
+        const { color, description } = row.getValue('status')
 
         return (
           <span
@@ -159,27 +158,8 @@ export function GridSubtasks() {
 
       <DataTable
         columns={columns}
-        data={[
-          {
-            id: 123,
-            status: {
-              id: 1,
-              color: '#ff0000',
-              description: 'aberto',
-            },
-            item: 'teste',
-            description: 'lorem ipsum',
-            emission: '01/01/2024',
-            initialDate: '01/01/2024',
-            prevDate: '01/01/2024',
-            reprogrammingDate: '01/01/2024',
-            finishDate: '01/01/2024',
-            emitter: 'dev',
-            approved: true,
-            responsible: 'dev',
-            situation: 'Em atraso',
-          },
-        ]}
+        isLoading={currentTaskLoading}
+        data={currentTask?.subtasks || []}
       />
     </>
   )
