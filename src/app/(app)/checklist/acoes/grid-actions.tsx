@@ -1,7 +1,7 @@
 'use client'
 
 import { AttachThumbList } from '@/components/attach-thumb-list'
-import { DataTable } from '@/components/data-table'
+import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { useLoading } from '@/store/loading-store'
@@ -24,6 +24,7 @@ export function GridActions() {
     fetchAttach,
     clearAttach,
     attach,
+    fetchDataTable,
   } = useActionsStore(({ attach, ...rest }) => ({
     attach: attach?.map(({ url }) => url),
     ...rest,
@@ -198,10 +199,10 @@ export function GridActions() {
 
   return (
     <>
-      <DataTable
+      <DataTableServerPagination
+        id="action-table"
         columns={columns}
-        data={actionList || []}
-        isLoading={!actionList}
+        fetchData={fetchDataTable}
       />
 
       <SheetAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />

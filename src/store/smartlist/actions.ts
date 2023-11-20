@@ -32,6 +32,7 @@ interface StoreData {
   attach: Array<{ url: string }> | undefined
 
   fetchActionList: () => Promise<void>
+  fetchDataTable: (params: { index: number; perPage: number }) => Promise<any>
   fetchResponsible: (itemId: number) => Promise<void>
   fetchAttach: (actionId: number) => Promise<Array<{ url: string }>>
   setCurrentTask: (task: ActionItem) => void
@@ -53,6 +54,14 @@ export const useActionsStore = create<StoreData>((set) => {
         .catch(() => set({ actionList: [] }))
 
       set({ actionList: response.action })
+    },
+
+    async fetchDataTable(params: { index: number; perPage: number }) {
+      return api
+        .get('/smart-list/action', {
+          params,
+        })
+        .then((res) => res.data)
     },
 
     fetchResponsible: async (itemId) => {
