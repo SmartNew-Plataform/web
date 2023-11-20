@@ -1,3 +1,4 @@
+import { SubtaskData } from '@/app/(app)/taskcontrol/[taskId]/grid-subtasks'
 import { TaskControlData as GridData } from '@/app/(app)/taskcontrol/grid-taskcontrol'
 import { taskcontrolApi } from '@/lib/taskcontrol-api'
 import { create } from 'zustand'
@@ -25,26 +26,11 @@ interface TaskControlData {
           description: string
           color: string
         }
-        subtasks: {
-          id: number
-          moduleId: number
-          taskId: number
-          statusId: number
-          typeId: number
-          title: string
-          description: string
-          adminStatus: number
-          deadlineDate: string
-          executionDeadlineDate: string
-          rescheduledDate: string
-          completionDate: string
-          users: {
-            login: string
-            name: string
-          }[]
-        }[]
+        subtasks: SubtaskData[]
       }
     | undefined
+  taskLoading: boolean
+  currentTaskLoading: boolean
 
   autoLogin: () => Promise<void>
   loadTasks: () => Promise<void>
@@ -55,31 +41,41 @@ export const useTaskControlStore = create<TaskControlData>((set, get) => {
   return {
     tasks: undefined,
     currentTask: undefined,
+    taskLoading: false,
+    currentTaskLoading: false,
 
     autoLogin: async () => {
+      set({ taskLoading: true })
       const response = await taskcontrolApi
         .post('/signin', {
           login: 'admin',
           moduleId: 1,
         })
         .then((res) => res.headers)
+      set({ taskLoading: false })
 
       const token = response.authorization
       taskcontrolApi.defaults.headers.common.Authorization = `Bearer ${token}`
     },
     loadTasks: async () => {
+      set({ taskLoading: true })
       const response = await taskcontrolApi
         .get('/tasks')
         .then((res) => res.data)
 
-      set({ tasks: response.tasks })
+      set({
+        tasks: response.tasks,
+        taskLoading: false,
+      })
     },
     searchTask: async (taskId) => {
+      set({ currentTaskLoading: true })
       const task = get().tasks?.find(({ id }) => id === taskId)
       const response = await taskcontrolApi
         .get(`/v1/tasks/${taskId}/subtasks`)
         .then((res) => res.data)
 
+      set({ currentTaskLoading: false })
       if (!task) return
 
       set({

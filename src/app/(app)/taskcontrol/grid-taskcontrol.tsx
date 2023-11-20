@@ -31,7 +31,7 @@ export interface TaskControlData {
 }
 
 export function GridTaskControl() {
-  const { loadTasks, autoLogin, tasks } = useTaskControlStore()
+  const { loadTasks, autoLogin, tasks, taskLoading } = useTaskControlStore()
   const searchParams = useSearchParams()
   const columns: ColumnDef<TaskControlData>[] = [
     {
@@ -161,5 +161,7 @@ export function GridTaskControl() {
     await loadTasks()
   }
 
-  return <DataTable columns={columns} data={tasks || []} />
+  return (
+    <DataTable columns={columns} data={tasks || []} isLoading={taskLoading} />
+  )
 }
