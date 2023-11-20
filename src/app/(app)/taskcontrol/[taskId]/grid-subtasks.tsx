@@ -30,6 +30,12 @@ export interface SubtaskData {
   }[]
 }
 
+type StatusType = {
+  id: number
+  description: string
+  color: string
+}
+
 export function GridSubtasks() {
   const [editSubtaskOpen, setEditSubtaskOpen] = useState(false)
   const editSubtaskForm = useForm()
@@ -58,7 +64,7 @@ export function GridSubtasks() {
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => {
-        const { color, description } = row.getValue('status')
+        const { color, description }: StatusType = row.getValue('status')
 
         return (
           <span
