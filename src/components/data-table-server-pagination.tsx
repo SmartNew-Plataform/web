@@ -43,6 +43,7 @@ export interface DataTableProps<TData, TValue> {
   filterText?: string
   dateFrom?: Date
   dateTo?: Date
+  id: string
 }
 
 export function DataTableServerPagination<TData, TValue>({
@@ -51,6 +52,7 @@ export function DataTableServerPagination<TData, TValue>({
   filterText = '',
   dateFrom,
   dateTo,
+  id,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -67,10 +69,13 @@ export function DataTableServerPagination<TData, TValue>({
     dateTo,
   }
 
-  const { data, isFetching, isLoading, isPlaceholderData, isRefetching } =
-    useQuery(['data', fetchDataOptions], () => fetchData(fetchDataOptions), {
+  const { data, isFetching, isLoading } = useQuery(
+    [id, fetchDataOptions],
+    () => fetchData(fetchDataOptions),
+    {
       keepPreviousData: true,
-    })
+    },
+  )
 
   const defaultData = useMemo(() => [], []) as TData[]
 

@@ -18,6 +18,7 @@ export function TableInfo() {
 
   return (
     <DataTableServerPagination
+      id="checklist-table"
       columns={columns}
       fetchData={fetchDataTable}
       filterText={infoScreen?.filter?.filterText}

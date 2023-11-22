@@ -72,8 +72,6 @@ export const useTasksStore = create<StoreData>((set, get) => {
           .includes(text.toLocaleLowerCase().trim())
       })
 
-      console.log(tasksFiltered)
-
       set({
         tasks: tasksFiltered,
       })

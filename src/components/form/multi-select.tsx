@@ -66,8 +66,6 @@ export function MultiSelect({ name, options }: MultiSelectProps) {
     field.onChange([])
   }
 
-  console.log(options)
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -104,7 +102,7 @@ export function MultiSelect({ name, options }: MultiSelectProps) {
                 >
                   <Check
                     className={cn(
-                      'mr-2 h-4 w-4',
+                      'mr-2 h-4 w-4 flex-shrink-0',
                       field.value.includes(option.value)
                         ? 'opacity-100'
                         : 'opacity-0',
