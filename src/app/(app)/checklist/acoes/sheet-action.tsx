@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
@@ -29,35 +30,21 @@ type ActionFormType = z.infer<typeof actionFormSchema>
 type SheetActionProps = ComponentProps<typeof Sheet>
 
 export function SheetAction(props: SheetActionProps) {
-  const {
-    responsible,
-    attach,
-    currentTask,
-    fetchActionList,
-    setCurrentTask,
-    fetchAttach,
-  } = useActionsStore(
-    ({
-      responsible,
-      currentTask,
-      fetchActionList,
-      fetchAttach,
-      setCurrentTask,
-      attach,
-    }) => {
-      return {
-        attach: attach?.map(({ url }) => url),
-        fetchActionList,
-        fetchAttach,
-        setCurrentTask,
-        currentTask,
-        responsible: responsible?.map(({ login, name }) => ({
-          value: login,
-          label: name,
-        })),
-      }
-    },
-  )
+  const { responsible, attach, currentTask, setCurrentTask, fetchAttach } =
+    useActionsStore(
+      ({ responsible, currentTask, fetchAttach, setCurrentTask, attach }) => {
+        return {
+          attach: attach?.map(({ url }) => url),
+          fetchAttach,
+          setCurrentTask,
+          currentTask,
+          responsible: responsible?.map(({ login, name }) => ({
+            value: login,
+            label: name,
+          })),
+        }
+      },
+    )
   const actionForm = useForm<ActionFormType>({
     resolver: zodResolver(actionFormSchema),
   })
@@ -71,6 +58,7 @@ export function SheetAction(props: SheetActionProps) {
   const isDone = !!currentTask?.doneAt
 
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   async function handleCreateAction(data: ActionFormType) {
     const response: ActionItem = await api
@@ -80,7 +68,7 @@ export function SheetAction(props: SheetActionProps) {
       })
       .then((res) => res.data)
 
-    fetchActionList()
+    queryClient.invalidateQueries(['action-table'])
     setCurrentTask(response)
     toast({
       title: 'Ação criada com sucesso!',
@@ -116,7 +104,8 @@ export function SheetAction(props: SheetActionProps) {
           })
       })
 
-      fetchActionList()
+      queryClient.invalidateQueries(['action-table'])
+
       fetchAttach(currentTask!.actionId!)
       setCurrentTask(response)
       setValue('attach', [])

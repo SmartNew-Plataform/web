@@ -9,7 +9,7 @@ import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, Image, Timer } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { SheetAction } from './sheet-action'
 
 export function GridActions() {
@@ -17,8 +17,6 @@ export function GridActions() {
   const [attachModalOpen, setAttachModalOpen] = useState<boolean>(false)
   const { show, hide } = useLoading()
   const {
-    actionList,
-    fetchActionList,
     setCurrentTask,
     fetchResponsible,
     fetchAttach,
@@ -30,10 +28,6 @@ export function GridActions() {
     ...rest,
   }))
   const { toast } = useToast()
-
-  useEffect(() => {
-    fetchActionList()
-  }, [])
 
   async function handleOpenSheetAction(task: ActionItem) {
     setCurrentTask(task)

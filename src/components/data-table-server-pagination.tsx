@@ -44,6 +44,7 @@ export interface DataTableProps<TData, TValue> {
   dateFrom?: Date
   dateTo?: Date
   id: string
+  refetchFn?: (fn: any) => void
 }
 
 export function DataTableServerPagination<TData, TValue>({
