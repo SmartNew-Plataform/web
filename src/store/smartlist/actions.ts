@@ -30,26 +30,39 @@ interface StoreData {
     | undefined
 
   attach: Array<{ url: string }> | undefined
+  selectedTasks: string[]
 
   fetchDataTable: (params: { index: number; perPage: number }) => Promise<any>
+  fetchDataTableGroups: (params: {
+    index: number
+    perPage: number
+  }) => Promise<any>
   fetchResponsible: (itemId: number) => Promise<void>
   fetchAttach: (actionId: number) => Promise<Array<{ url: string }>>
   setCurrentTask: (task: ActionItem) => void
   clearAttach: () => void
+  updateSelectedTasks: (tasks: string[]) => void
 }
 
-export const useActionsStore = create<StoreData>((set) => {
+export const useActionsStore = create<StoreData>((set, get) => {
   return {
     actionList: undefined,
     currentTask: undefined,
     responsible: undefined,
     attach: undefined,
+    selectedTasks: [],
 
     async fetchDataTable(params: { index: number; perPage: number }) {
-      console.log(params)
-      // if (!params.index || !params.perPage) return
       return api
         .get('/smart-list/action', {
+          params,
+        })
+        .then((res) => res.data)
+    },
+
+    async fetchDataTableGroups(params: { index: number; perPage: number }) {
+      return api
+        .get('/smart-list/action/group', {
           params,
         })
         .then((res) => res.data)
@@ -89,6 +102,10 @@ export const useActionsStore = create<StoreData>((set) => {
 
     setCurrentTask: (task) => {
       set({ currentTask: task })
+    },
+
+    updateSelectedTasks: (tasks: string[]) => {
+      set({ selectedTasks: tasks })
     },
   }
 })
