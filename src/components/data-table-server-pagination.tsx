@@ -69,6 +69,7 @@ export function DataTableServerPagination<TData, TValue>({
     dateFrom,
     dateTo,
   }
+  console.log(id, 'react query')
 
   const { data, isFetching, isLoading } = useQuery(
     [id, fetchDataOptions],

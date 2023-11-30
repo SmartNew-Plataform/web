@@ -3,65 +3,77 @@
 import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useToast } from '@/components/ui/use-toast'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { useLoading } from '@/store/loading-store'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
-import { ColumnDef } from '@tanstack/react-table'
+import { ColumnDef, Row } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, Timer } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { MoveToGroupModal } from './move-to-group-modal'
 import { SheetAction } from './sheet-action'
+
+type ToggleSelectedProps = {
+  task: ActionItem
+  row: Row<ActionItem>
+}
 
 export function GridActions() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
+  const [moveGroupModalOpen, setMoveGroupModalOpen] = useState<boolean>(false)
+  const [currentBranch, setCurrentBranch] = useState<number>()
   const { show, hide } = useLoading()
   const {
-    setCurrentTask,
     fetchResponsible,
-    fetchAttach,
     clearAttach,
     selectedTasks,
     updateSelectedTasks,
     fetchDataTable,
+    fetchListGroup,
   } = useActionsStore(({ attach, ...rest }) => ({
     attach: attach?.map(({ url }) => url),
     ...rest,
   }))
-  const { toast } = useToast()
 
-  function handleToggleSelected({ taskId }: { taskId: string }) {
+  function handleToggleSelected({
+    taskId,
+    branchId,
+  }: {
+    taskId: string
+    branchId: number
+  }) {
     const currentTasks = selectedTasks || []
+
+    if (!currentBranch) {
+      setCurrentBranch(branchId)
+    }
+
     if (currentTasks.includes(taskId)) {
-      updateSelectedTasks(currentTasks.filter((id) => id !== taskId))
+      const tasks = currentTasks.filter((id) => id !== taskId)
+      updateSelectedTasks(tasks)
+      if (tasks.length === 0) setCurrentBranch(undefined)
     } else updateSelectedTasks([...currentTasks, taskId])
-    console.log(taskId, currentTasks)
   }
 
-  async function handleOpenSheetAction(task: ActionItem) {
-    setCurrentTask(task)
-    fetchResponsible(task.id)
+  async function handleOpenSheetAction() {
+    fetchResponsible(Number(currentBranch))
     clearAttach()
-    if (task.actionId) {
-      fetchAttach(task.actionId)
-    }
+    // if (task.actionId) {
+    //   fetchAttach(task.actionId)
+    // }
     setSheetActionOpen(true)
   }
 
-  // async function loadAttach(actionId: number | null) {
-  //   if (!actionId) return
-  //   clearAttach()
-  //   show()
-  //   const responseAttach = await fetchAttach(actionId)
-  //   hide()
-  //   if (responseAttach.length > 0) {
-  //     setAttachModalOpen(true)
-  //     return
-  //   }
-
-  //   toast({
-  //     title: 'Nenhum anexo encontrado nessa ação!',
-  //   })
-  // }
+  async function handleOpenMoveGroupModal() {
+    fetchResponsible(Number(currentBranch))
+    fetchListGroup(String(currentBranch))
+    setMoveGroupModalOpen(true)
+  }
 
   const columns: ColumnDef<ActionItem>[] = [
     {
@@ -69,12 +81,23 @@ export function GridActions() {
       header: '',
       cell: ({ row }) => {
         const task = row.original as ActionItem
+
         return (
           <div className="flex gap-2">
             <Checkbox
               name="task"
+              disabled={
+                currentBranch
+                  ? currentBranch !== task.branchId
+                  : !!currentBranch
+              }
               checked={row.getIsSelected()}
-              onClick={() => handleToggleSelected({ taskId: String(task.id) })}
+              onClick={() =>
+                handleToggleSelected({
+                  taskId: String(task.id),
+                  branchId: task.branchId,
+                })
+              }
               onCheckedChange={(value) => row.toggleSelected(!!value)}
             />
             {/* <Button size="icon-xs" onClick={() => handleOpenSheetAction(task)}>
@@ -175,20 +198,6 @@ export function GridActions() {
       },
     },
     {
-      accessorKey: 'responsible.name',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Responsável
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-    },
-    {
       accessorKey: 'status',
       header: ({ column }) => {
         return (
@@ -204,14 +213,32 @@ export function GridActions() {
     },
   ]
 
+  useEffect(() => {
+    updateSelectedTasks([])
+  }, [])
+
   return (
     <div className="flex h-full flex-col">
-      {selectedTasks.length > 0 && (
-        <Button className="mb-2 self-end">
-          <Timer />
-          Criar ação
-        </Button>
-      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            className="mb-2 self-end"
+            disabled={selectedTasks.length === 0}
+          >
+            <Timer />
+            Atribuir ação
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={handleOpenMoveGroupModal}>
+            Adicionar a um grupo
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleOpenSheetAction}>
+            Criar um grupo
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <DataTableServerPagination
         id="action-table"
         columns={columns}
@@ -219,6 +246,11 @@ export function GridActions() {
       />
 
       <SheetAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />
+
+      <MoveToGroupModal
+        open={moveGroupModalOpen}
+        onOpenChange={setMoveGroupModalOpen}
+      />
 
       {/* <AttachThumbList
         images={attach || []}

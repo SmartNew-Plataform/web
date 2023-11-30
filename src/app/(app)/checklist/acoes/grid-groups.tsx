@@ -29,13 +29,7 @@ export function GridGroups() {
   }))
   const { toast } = useToast()
 
-  async function handleOpenSheetAction(task: ActionItem) {
-    setCurrentTask(task)
-    fetchResponsible(task.id)
-    clearAttach()
-    if (task.actionId) {
-      fetchAttach(task.actionId)
-    }
+  async function handleOpenSheetAction(taskId: number) {
     setSheetActionOpen(true)
   }
 
@@ -63,7 +57,10 @@ export function GridGroups() {
         const task = row.original as ActionItem
         return (
           <div className="flex gap-2">
-            <Button size="icon-xs" onClick={() => handleOpenSheetAction(task)}>
+            <Button
+              size="icon-xs"
+              onClick={() => handleOpenSheetAction(task.id)}
+            >
               <Timer className="h-3 w-3" />
             </Button>
             <Button
@@ -88,20 +85,6 @@ export function GridGroups() {
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Código
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-    },
-    {
-      accessorKey: 'title',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Titulo
             <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -208,7 +191,7 @@ export function GridGroups() {
   return (
     <>
       <DataTableServerPagination
-        id="action-table"
+        id="group-table"
         columns={columns}
         fetchData={fetchDataTableGroups}
       />

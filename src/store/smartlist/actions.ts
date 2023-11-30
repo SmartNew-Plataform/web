@@ -7,6 +7,7 @@ export type ActionItem = {
   description: string | null
   equipment: string
   branch: string
+  branchId: number
   responsible: {
     login: string
     name: string
@@ -31,14 +32,16 @@ interface StoreData {
 
   attach: Array<{ url: string }> | undefined
   selectedTasks: string[]
+  groups: Array<{ id: number; title: string }> | undefined
 
   fetchDataTable: (params: { index: number; perPage: number }) => Promise<any>
   fetchDataTableGroups: (params: {
     index: number
     perPage: number
   }) => Promise<any>
-  fetchResponsible: (itemId: number) => Promise<void>
+  fetchResponsible: (branchId: number) => Promise<void>
   fetchAttach: (actionId: number) => Promise<Array<{ url: string }>>
+  fetchListGroup: (branchId: string) => Promise<void>
   setCurrentTask: (task: ActionItem) => void
   clearAttach: () => void
   updateSelectedTasks: (tasks: string[]) => void
@@ -51,6 +54,7 @@ export const useActionsStore = create<StoreData>((set, get) => {
     responsible: undefined,
     attach: undefined,
     selectedTasks: [],
+    groups: undefined,
 
     async fetchDataTable(params: { index: number; perPage: number }) {
       return api
@@ -68,13 +72,13 @@ export const useActionsStore = create<StoreData>((set, get) => {
         .then((res) => res.data)
     },
 
-    fetchResponsible: async (itemId) => {
+    fetchResponsible: async (branchId) => {
       set({ responsible: undefined })
 
       const response = await api
         .get('/smart-list/action/responsible', {
           params: {
-            itemId,
+            branchId,
           },
         })
         .then((res) => res.data)
@@ -106,6 +110,14 @@ export const useActionsStore = create<StoreData>((set, get) => {
 
     updateSelectedTasks: (tasks: string[]) => {
       set({ selectedTasks: tasks })
+    },
+
+    fetchListGroup: async (branchId) => {
+      const response = await api
+        .get(`smart-list/action/list-group/${branchId}`)
+        .then((res) => res.data)
+
+      set({ groups: response.groups })
     },
   }
 })
