@@ -29,7 +29,17 @@ export function GridGroups() {
   }))
   const { toast } = useToast()
 
-  async function handleOpenSheetAction(taskId: number) {
+  async function handleOpenSheetAction({
+    taskId,
+    code,
+    branchId,
+  }: {
+    taskId: number
+    code: number
+    branchId: number
+  }) {
+    setCurrentTask({ taskId, code })
+    fetchResponsible(branchId)
     setSheetActionOpen(true)
   }
 
@@ -59,7 +69,13 @@ export function GridGroups() {
           <div className="flex gap-2">
             <Button
               size="icon-xs"
-              onClick={() => handleOpenSheetAction(task.id)}
+              onClick={() =>
+                handleOpenSheetAction({
+                  taskId: task.id,
+                  code: task.code,
+                  branchId: task.branchId,
+                })
+              }
             >
               <Timer className="h-3 w-3" />
             </Button>

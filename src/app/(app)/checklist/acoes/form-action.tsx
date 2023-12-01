@@ -1,3 +1,4 @@
+'use client'
 import { AttachList } from '@/components/attach-list'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ import { Save } from 'lucide-react'
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { InfoData } from './sheet-action'
 
 const actionFormSchema = z.object({
   description: z
@@ -25,26 +27,28 @@ const actionFormSchema = z.object({
 
 type ActionFormType = z.infer<typeof actionFormSchema>
 
-export function FormAction() {
-  const {
-    responsible,
-    attach,
-    currentTask,
-    setCurrentTask,
-    fetchAttach,
-    selectedTasks,
-    updateSelectedTasks,
-  } = useActionsStore(({ responsible, attach, ...rest }) => {
-    return {
-      attach: attach?.map(({ url }) => url),
-      responsible: responsible?.map(({ login, name }) => ({
-        value: login,
-        label: name,
-      })),
-      ...rest,
-    }
-  })
+interface FormActionProps {
+  dataTask: InfoData
+  handleSubmitGroupForm: (data: ActionFormType) => Promise<void>
+}
 
+export function FormAction({
+  dataTask,
+  handleSubmitGroupForm,
+}: FormActionProps) {
+  const { responsible, attach } = useActionsStore(
+    ({ responsible, attach, ...rest }) => {
+      return {
+        attach: attach?.map(({ url }) => url),
+        responsible: responsible?.map(({ login, name }) => ({
+          value: login,
+          label: name,
+        })),
+        ...rest,
+      }
+    },
+  )
+  const { toast } = useToast()
   const actionForm = useForm<ActionFormType>({
     resolver: zodResolver(actionFormSchema),
   })
@@ -54,115 +58,52 @@ export function FormAction() {
     reset,
     formState: { isSubmitting },
   } = actionForm
-  const isNewAction = !currentTask?.actionId
-  const isDone = !!currentTask?.doneAt
-
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
-
-  async function handleCreateAction(data: ActionFormType) {
-    const response: ActionItem = await api
-      .post('smart-list/action/group', {
-        itemsId: selectedTasks.map(Number),
-        ...data,
-      })
-      .then((res) => res.data)
-
-    queryClient.invalidateQueries(['action-table'])
-    updateSelectedTasks([])
-    toast({
-      title: 'Itens agrupados com sucesso!',
-      variant: 'success',
-    })
-  }
-
-  async function handleUpdateAction(data: ActionFormType) {
-    try {
-      const response = await api
-        .put('smart-list/action', {
-          itemId: currentTask?.id,
-          actionId: currentTask?.actionId,
-          ...data,
-        })
-        .then((res) => res.data)
-
-      Array.from(data.attach).forEach(async (image) => {
-        const formData = new FormData()
-        formData.append('file', image)
-        const responseAttach = await api
-          .post(
-            `smart-list/action/insert-attach/${currentTask?.actionId}`,
-            formData,
-          )
-          .then((res) => res.data)
-
-        if (responseAttach?.inserted)
-          toast({
-            title: 'Erro ao inserir imagem!',
-            description: image.name,
-            variant: 'destructive',
-          })
-      })
-
-      queryClient.invalidateQueries(['action-table'])
-
-      fetchAttach(currentTask!.actionId!)
-      setCurrentTask(response)
-      setValue('attach', [])
-      toast({
-        title: 'Ação atualizada com sucesso!',
-        variant: 'success',
-      })
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  const isNewAction = !dataTask.code
+  const isDone = !!dataTask.doneAt
 
   async function handleDeleteAttach(url: string) {
     const path = url.split('https://www.smartnewsystem.com.br/')[1]
 
-    const response = await api
-      .delete(`/smart-list/action/delete-attach/${currentTask?.actionId}`, {
-        data: {
-          urlFile: path,
-        },
-      })
-      .then((res) => res.data)
+    // const response = await api
+    //   .delete(`/smart-list/action/delete-attach/${currentTask?.actionId}`, {
+    //     data: {
+    //       urlFile: path,
+    //     },
+    //   })
+    //   .then((res) => res.data)
 
-    if (response?.delete) {
-      fetchAttach(currentTask!.actionId!)
-      toast({
-        title: 'Imagem deletada com sucesso!',
-        variant: 'success',
-      })
-    }
+    // if (response?.delete) {
+    //   // fetchAttach(currentTask!.actionId!)
+    //   toast({
+    //     title: 'Imagem deletada com sucesso!',
+    //     variant: 'success',
+    //   })
+    // }
   }
 
-  useEffect(() => {
-    reset()
-    if (!currentTask) return
-    setValue('description', currentTask.description || '')
-    setValue('descriptionAction', currentTask.descriptionAction || '')
-    setValue('responsible', currentTask?.responsible?.login || '')
-    if (currentTask.endDate)
-      setValue('deadline', dayjs(currentTask.endDate).toDate())
-    if (currentTask.doneAt)
-      setValue('doneAt', dayjs(currentTask.doneAt).toDate())
-  }, [currentTask])
+  // useEffect(() => {
+  //   reset()
+  //   if (!currentTask) return
+  //   setValue('description', currentTask.description || '')
+  //   setValue('descriptionAction', currentTask.descriptionAction || '')
+  //   setValue('responsible', currentTask?.responsible?.login || '')
+  //   if (currentTask.endDate)
+  //     setValue('deadline', dayjs(currentTask.endDate).toDate())
+  //   if (currentTask.doneAt)
+  //     setValue('doneAt', dayjs(currentTask.doneAt).toDate())
+  // }, [currentTask])
   return (
-    <div className="relative min-w-[200px]">
+    <div className="relative w-full max-w-sm">
       <span className="mb-6 flex items-center gap-1 font-medium">
         Status:
         <span className="ml-2 rounded bg-slate-200 px-2 py-1 font-semibold text-slate-700">
-          {currentTask?.status}
+          {dataTask.status}
         </span>
       </span>
       <FormProvider {...actionForm}>
         <form
           className="flex w-full flex-col gap-3"
-          onSubmit={handleSubmit(
-            isNewAction ? handleCreateAction : handleUpdateAction,
-          )}
+          onSubmit={handleSubmit(handleSubmitGroupForm)}
         >
           <Form.Field>
             <Form.Label htmlFor="description">Ação:</Form.Label>

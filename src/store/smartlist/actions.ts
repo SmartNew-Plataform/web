@@ -3,6 +3,7 @@ import { create } from 'zustand'
 
 export type ActionItem = {
   id: number
+  code: number
   actionId: number | null
   description: string | null
   equipment: string
@@ -20,9 +21,14 @@ export type ActionItem = {
   descriptionAction: string | null
 }
 
+type DataTask = {
+  taskId: number
+  code?: number
+}
+
 interface StoreData {
   actionList: Array<ActionItem> | undefined
-  currentTask: ActionItem | undefined
+  currentTask: DataTask | undefined
   responsible:
     | Array<{
         login: string
@@ -42,7 +48,7 @@ interface StoreData {
   fetchResponsible: (branchId: number) => Promise<void>
   fetchAttach: (actionId: number) => Promise<Array<{ url: string }>>
   fetchListGroup: (branchId: string) => Promise<void>
-  setCurrentTask: (task: ActionItem) => void
+  setCurrentTask: (task: DataTask) => void
   clearAttach: () => void
   updateSelectedTasks: (tasks: string[]) => void
 }
