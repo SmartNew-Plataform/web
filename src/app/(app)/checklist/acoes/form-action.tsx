@@ -2,11 +2,8 @@
 import { AttachList } from '@/components/attach-list'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
-import { useToast } from '@/components/ui/use-toast'
-import { api } from '@/lib/api'
-import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
+import { useActionsStore } from '@/store/smartlist/actions'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Save } from 'lucide-react'
 import { useEffect } from 'react'
@@ -48,10 +45,14 @@ export function FormAction({
       }
     },
   )
-  const { toast } = useToast()
   const actionForm = useForm<ActionFormType>({
     resolver: zodResolver(actionFormSchema),
+    defaultValues: {
+      description: dataTask?.description || '',
+      responsible: dataTask.responsible?.login || '',
+    },
   })
+
   const {
     handleSubmit,
     setValue,
@@ -65,7 +66,7 @@ export function FormAction({
     const path = url.split('https://www.smartnewsystem.com.br/')[1]
 
     // const response = await api
-    //   .delete(`/smart-list/action/delete-attach/${currentTask?.actionId}`, {
+    //   .delete(`/smart-list/action/delete-attach/${dataTask?.actionId}`, {
     //     data: {
     //       urlFile: path,
     //     },
@@ -73,7 +74,7 @@ export function FormAction({
     //   .then((res) => res.data)
 
     // if (response?.delete) {
-    //   // fetchAttach(currentTask!.actionId!)
+    //   // fetchAttach(dataTask!.actionId!)
     //   toast({
     //     title: 'Imagem deletada com sucesso!',
     //     variant: 'success',
@@ -81,19 +82,13 @@ export function FormAction({
     // }
   }
 
-  // useEffect(() => {
-  //   reset()
-  //   if (!currentTask) return
-  //   setValue('description', currentTask.description || '')
-  //   setValue('descriptionAction', currentTask.descriptionAction || '')
-  //   setValue('responsible', currentTask?.responsible?.login || '')
-  //   if (currentTask.endDate)
-  //     setValue('deadline', dayjs(currentTask.endDate).toDate())
-  //   if (currentTask.doneAt)
-  //     setValue('doneAt', dayjs(currentTask.doneAt).toDate())
-  // }, [currentTask])
+  useEffect(() => {
+    reset()
+    if (dataTask.endDate) setValue('deadline', dayjs(dataTask.endDate).toDate())
+    if (dataTask.doneAt) setValue('doneAt', dayjs(dataTask.doneAt).toDate())
+  }, [dataTask])
   return (
-    <div className="relative w-full max-w-sm">
+    <div className="relative h-full w-full max-w-sm overflow-auto">
       <span className="mb-6 flex items-center gap-1 font-medium">
         Status:
         <span className="ml-2 rounded bg-slate-200 px-2 py-1 font-semibold text-slate-700">
@@ -174,7 +169,11 @@ export function FormAction({
           />
 
           <div className="sticky bottom-0 bg-white py-4">
-            <Button loading={isSubmitting} disabled={isDone} className="w-full">
+            <Button
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              className="w-full"
+            >
               <Save className="h-4 w-4" />
               Salvar
             </Button>

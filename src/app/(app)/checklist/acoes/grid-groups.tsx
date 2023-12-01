@@ -2,10 +2,20 @@
 
 import { AttachThumbList } from '@/components/attach-thumb-list'
 import { DataTableServerPagination } from '@/components/data-table-server-pagination'
+import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
 import { useLoading } from '@/store/loading-store'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
+import { useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, Image, Timer } from 'lucide-react'
@@ -15,6 +25,8 @@ import { SheetAction } from './sheet-action'
 export function GridGroups() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
   const [attachModalOpen, setAttachModalOpen] = useState<boolean>(false)
+  const queryClient = useQueryClient()
+
   const { show, hide } = useLoading()
   const {
     setCurrentTask,
@@ -23,23 +35,25 @@ export function GridGroups() {
     clearAttach,
     attach,
     fetchDataTableGroups,
+    fetchDataTableUngrouped,
+    searchOption,
+    setSearchOption,
   } = useActionsStore(({ attach, ...rest }) => ({
     attach: attach?.map(({ url }) => url),
     ...rest,
   }))
+
   const { toast } = useToast()
 
   async function handleOpenSheetAction({
     taskId,
     code,
-    branchId,
   }: {
     taskId: number
     code: number
-    branchId: number
   }) {
     setCurrentTask({ taskId, code })
-    fetchResponsible(branchId)
+    fetchResponsible(taskId, searchOption)
     setSheetActionOpen(true)
   }
 
@@ -59,6 +73,12 @@ export function GridGroups() {
     })
   }
 
+  async function handleChangeGroup(value: string) {
+    const option = value as 'with-action' | 'without-action'
+    setSearchOption(option)
+    await queryClient.invalidateQueries(['grouped-table', 'ungrouped-table'])
+  }
+
   const columns: ColumnDef<ActionItem>[] = [
     {
       accessorKey: 'id',
@@ -73,7 +93,6 @@ export function GridGroups() {
                 handleOpenSheetAction({
                   taskId: task.id,
                   code: task.code,
-                  branchId: task.branchId,
                 })
               }
             >
@@ -101,6 +120,25 @@ export function GridGroups() {
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             Código
+            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const code = row.getValue('code') as number
+
+        return code || 'Sem registro'
+      },
+    },
+    {
+      accessorKey: 'task',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Verificação
             <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -206,11 +244,34 @@ export function GridGroups() {
 
   return (
     <>
-      <DataTableServerPagination
-        id="group-table"
-        columns={columns}
-        fetchData={fetchDataTableGroups}
-      />
+      <PageHeader className="p-4">
+        <div className="flex flex-col gap-2">
+          <Label>Filtrar grupos:</Label>
+          <Select value={searchOption} onValueChange={handleChangeGroup}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="with-action">Com ação</SelectItem>
+              <SelectItem value="without-action">Sem ação</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </PageHeader>
+
+      {searchOption === 'with-action' ? (
+        <DataTableServerPagination
+          id="grouped-table"
+          columns={columns}
+          fetchData={fetchDataTableGroups}
+        />
+      ) : (
+        <DataTableServerPagination
+          id="ungrouped-table"
+          columns={columns}
+          fetchData={fetchDataTableUngrouped}
+        />
+      )}
 
       <SheetAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />
 

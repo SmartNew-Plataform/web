@@ -39,13 +39,19 @@ interface StoreData {
   attach: Array<{ url: string }> | undefined
   selectedTasks: string[]
   groups: Array<{ id: number; title: string }> | undefined
+  searchOption: 'with-action' | 'without-action'
 
+  setSearchOption: (option: 'with-action' | 'without-action') => void
   fetchDataTable: (params: { index: number; perPage: number }) => Promise<any>
   fetchDataTableGroups: (params: {
     index: number
     perPage: number
   }) => Promise<any>
-  fetchResponsible: (branchId: number) => Promise<void>
+  fetchDataTableUngrouped: (params: {
+    index: number
+    perPage: number
+  }) => Promise<any>
+  fetchResponsible: (itemId: number, type: string) => Promise<void>
   fetchAttach: (actionId: number) => Promise<Array<{ url: string }>>
   fetchListGroup: (branchId: string) => Promise<void>
   setCurrentTask: (task: DataTask) => void
@@ -61,7 +67,11 @@ export const useActionsStore = create<StoreData>((set, get) => {
     attach: undefined,
     selectedTasks: [],
     groups: undefined,
+    searchOption: 'without-action',
 
+    setSearchOption: (option) => {
+      set({ searchOption: option })
+    },
     async fetchDataTable(params: { index: number; perPage: number }) {
       return api
         .get('/smart-list/action', {
@@ -78,13 +88,22 @@ export const useActionsStore = create<StoreData>((set, get) => {
         .then((res) => res.data)
     },
 
-    fetchResponsible: async (branchId) => {
+    async fetchDataTableUngrouped(params: { index: number; perPage: number }) {
+      return api
+        .get('/smart-list/action', {
+          params,
+        })
+        .then((res) => res.data)
+    },
+
+    fetchResponsible: async (itemId, type) => {
       set({ responsible: undefined })
 
       const response = await api
         .get('/smart-list/action/responsible', {
           params: {
-            branchId,
+            itemId,
+            type,
           },
         })
         .then((res) => res.data)
