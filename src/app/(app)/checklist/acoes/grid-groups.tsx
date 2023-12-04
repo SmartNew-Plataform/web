@@ -20,7 +20,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, Image, Timer } from 'lucide-react'
 import { useState } from 'react'
-import { SheetAction } from './sheet-action'
+import { DialogAction } from './dialog-action'
 
 export function GridGroups() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
@@ -273,7 +273,7 @@ export function GridGroups() {
         />
       )}
 
-      <SheetAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />
+      <DialogAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />
 
       <AttachThumbList
         images={attach || []}

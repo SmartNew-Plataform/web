@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import dayjs from 'dayjs'
-import { ItemData } from './sheet-action'
+import { ItemData } from './dialog-action'
 
 interface GroupedEquipmentsProps {
   data: Array<ItemData>

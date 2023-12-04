@@ -1,6 +1,7 @@
 'use client'
 import { Form } from '@/components/form'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Sheet } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
@@ -10,7 +11,7 @@ import { ComponentProps, useEffect, useState } from 'react'
 import { FormAction } from './form-action'
 import { GroupedEquipments } from './grouped-equipments'
 
-type SheetActionProps = ComponentProps<typeof Sheet>
+type DialogActionProps = ComponentProps<typeof Sheet>
 
 export type InfoData = {
   id: number
@@ -51,8 +52,8 @@ type AllDataType = {
   items?: Array<ItemData>
 }
 
-export function SheetAction(props: SheetActionProps) {
-  const { currentTask, setSearchOption } = useActionsStore()
+export function DialogAction(props: DialogActionProps) {
+  const { currentTask, fetchAttach } = useActionsStore()
   const [data, setData] = useState<AllDataType>()
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -62,6 +63,7 @@ export function SheetAction(props: SheetActionProps) {
       .get(`/smart-list/action/group/${taskId}`)
       .then((res) => res.data)
 
+    fetchAttach(taskId)
     setData(response)
   }
 
@@ -74,29 +76,28 @@ export function SheetAction(props: SheetActionProps) {
   }
 
   async function handleCreateAction(dataForm: ActionFormType) {
-    setSearchOption('with-action')
-    const response: ActionItem = await api
+    await api
       .post('smart-list/action/group', {
         itemsId: data?.items ? data.items.map(({ id }) => id) : [],
         ...dataForm,
       })
       .then((res) => res.data)
 
-    setSearchOption('without-action')
+    const previousGroups = queryClient.getQueryData<{
+      rows: ActionItem[]
+      pageCount: number
+    }>(['ungrouped-table'])
 
-    // const previousGroups = queryClient.getQueryData<ActionItem[]>([
-    //   'ungrouped-table',
-    // ])
-    // console.log(previousGroups)
+    if (previousGroups) {
+      const nextGroups = previousGroups.rows.filter(
+        (group) => group.id !== currentTask!.taskId,
+      )
 
-    // if (previousGroups) {
-    //   const nextGroups = previousGroups.filter(
-    //     (group) => group.id !== response.id,
-    //   )
-    //   console.log(nextGroups)
-
-    //   queryClient.setQueryData(['ungrouped-table'], nextGroups)
-    // }
+      queryClient.setQueryData(['ungrouped-table'], {
+        rows: nextGroups,
+        pageCount: previousGroups.pageCount,
+      })
+    }
 
     toast({
       title: 'Itens agrupados com sucesso!',
@@ -105,47 +106,59 @@ export function SheetAction(props: SheetActionProps) {
   }
 
   async function handleUpdateAction(data: ActionFormType) {
-    console.log(data)
+    try {
+      const response = await api
+        .put(`smart-list/action/group/${currentTask!.taskId}`, {
+          ...data,
+        })
+        .then((res) => res.data)
 
-    // try {
-    //   const response = await api
-    //     .put('smart-list/action', {
-    //       itemId: currentTask?.id,
-    //       actionId: currentTask?.actionId,
-    //       ...data,
-    //     })
-    //     .then((res) => res.data)
+      Array.from(data.attach).forEach(async (image) => {
+        const formData = new FormData()
+        formData.append('file', image)
+        const responseAttach = await api
+          .post(
+            `smart-list/action/insert-attach/${currentTask?.taskId}`,
+            formData,
+          )
+          .then((res) => res.data)
 
-    //   Array.from(data.attach).forEach(async (image) => {
-    //     const formData = new FormData()
-    //     formData.append('file', image)
-    //     const responseAttach = await api
-    //       .post(
-    //         `smart-list/action/insert-attach/${currentTask?.actionId}`,
-    //         formData,
-    //       )
-    //       .then((res) => res.data)
+        if (responseAttach?.inserted)
+          toast({
+            title: 'Erro ao inserir imagem!',
+            description: image.name,
+            variant: 'destructive',
+          })
+      })
 
-    //     if (responseAttach?.inserted)
-    //       toast({
-    //         title: 'Erro ao inserir imagem!',
-    //         description: image.name,
-    //         variant: 'destructive',
-    //       })
-    //   })
+      const previousGroups = queryClient.getQueryData<{
+        rows: ActionItem[]
+        pageCount: number
+      }>(['grouped-table'])
+      console.log(previousGroups)
 
-    //   queryClient.invalidateQueries(['action-table'])
+      if (previousGroups) {
+        const nextGroups = previousGroups.rows.map((group) => {
+          if (group.id === response.id) {
+            return response
+          } else return group
+        })
 
-    //   fetchAttach(currentTask!.actionId!)
-    //   setCurrentTask(response)
-    //   setValue('attach', [])
-    //   toast({
-    //     title: 'Ação atualizada com sucesso!',
-    //     variant: 'success',
-    //   })
-    // } catch (error) {
-    //   console.error(error)
-    // }
+        console.log(nextGroups)
+        queryClient.setQueryData(['grouped-table'], {
+          rows: nextGroups,
+          pageCount: previousGroups.pageCount,
+        })
+      }
+
+      fetchAttach(currentTask!.taskId)
+      toast({
+        title: 'Ação atualizada com sucesso!',
+        variant: 'success',
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const handleSubmit = data?.info?.code
@@ -163,12 +176,9 @@ export function SheetAction(props: SheetActionProps) {
   }, [currentTask])
 
   return (
-    <Sheet {...props}>
-      <SheetContent
-        side="bottom"
-        className="h-full max-h-[90vh] overflow-auto pb-0"
-      >
-        <div className="flex h-full  w-full justify-center gap-4">
+    <Dialog {...props}>
+      <DialogContent className="flex h-[90vh] w-full max-w-4xl flex-col overflow-auto pb-0">
+        <div className="flex h-full w-full justify-center gap-4">
           {data?.info ? (
             <FormAction
               dataTask={data.info}
@@ -191,7 +201,7 @@ export function SheetAction(props: SheetActionProps) {
             </div>
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }

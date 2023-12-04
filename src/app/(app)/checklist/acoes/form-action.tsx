@@ -2,6 +2,8 @@
 import { AttachList } from '@/components/attach-list'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/api'
 import { useActionsStore } from '@/store/smartlist/actions'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
@@ -9,7 +11,7 @@ import { Save } from 'lucide-react'
 import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { InfoData } from './sheet-action'
+import { InfoData } from './dialog-action'
 
 const actionFormSchema = z.object({
   description: z
@@ -33,7 +35,8 @@ export function FormAction({
   dataTask,
   handleSubmitGroupForm,
 }: FormActionProps) {
-  const { responsible, attach } = useActionsStore(
+  const { toast } = useToast()
+  const { responsible, attach, fetchAttach } = useActionsStore(
     ({ responsible, attach, ...rest }) => {
       return {
         attach: attach?.map(({ url }) => url),
@@ -65,21 +68,27 @@ export function FormAction({
   async function handleDeleteAttach(url: string) {
     const path = url.split('https://www.smartnewsystem.com.br/')[1]
 
-    // const response = await api
-    //   .delete(`/smart-list/action/delete-attach/${dataTask?.actionId}`, {
-    //     data: {
-    //       urlFile: path,
-    //     },
-    //   })
-    //   .then((res) => res.data)
+    const response = await api
+      .delete(`/smart-list/action/delete-attach/${dataTask?.id}`, {
+        data: {
+          urlFile: path,
+        },
+      })
+      .then((res) => res.data)
 
-    // if (response?.delete) {
-    //   // fetchAttach(dataTask!.actionId!)
-    //   toast({
-    //     title: 'Imagem deletada com sucesso!',
-    //     variant: 'success',
-    //   })
-    // }
+    if (response?.delete) {
+      fetchAttach(dataTask.id)
+      toast({
+        title: 'Imagem deletada com sucesso!',
+        variant: 'success',
+      })
+    }
+  }
+
+  async function handleMiddleSubmit(data: ActionFormType) {
+    await handleSubmitGroupForm(data)
+    await fetchAttach(dataTask.id)
+    setValue('attach', [])
   }
 
   useEffect(() => {
@@ -87,6 +96,7 @@ export function FormAction({
     if (dataTask.endDate) setValue('deadline', dayjs(dataTask.endDate).toDate())
     if (dataTask.doneAt) setValue('doneAt', dayjs(dataTask.doneAt).toDate())
   }, [dataTask])
+
   return (
     <div className="relative h-full w-full max-w-sm overflow-auto">
       <span className="mb-6 flex items-center gap-1 font-medium">
@@ -98,7 +108,7 @@ export function FormAction({
       <FormProvider {...actionForm}>
         <form
           className="flex w-full flex-col gap-3"
-          onSubmit={handleSubmit(handleSubmitGroupForm)}
+          onSubmit={handleSubmit(handleMiddleSubmit)}
         >
           <Form.Field>
             <Form.Label htmlFor="description">Ação:</Form.Label>
