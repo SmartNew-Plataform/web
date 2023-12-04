@@ -53,6 +53,7 @@ export function FormAction({
     defaultValues: {
       description: dataTask?.description || '',
       responsible: dataTask.responsible?.login || '',
+      descriptionAction: dataTask.descriptionAction || '',
     },
   })
 
