@@ -2,19 +2,31 @@
 
 import { AttachThumbList } from '@/components/attach-thumb-list'
 import { DataTableServerPagination } from '@/components/data-table-server-pagination'
+import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
 import { useLoading } from '@/store/loading-store'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
+import { useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, Image, Timer } from 'lucide-react'
 import { useState } from 'react'
-import { SheetAction } from './sheet-action'
+import { DialogAction } from './dialog-action'
 
-export function GridActions() {
+export function GridGroups() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
   const [attachModalOpen, setAttachModalOpen] = useState<boolean>(false)
+  const queryClient = useQueryClient()
+
   const { show, hide } = useLoading()
   const {
     setCurrentTask,
@@ -22,20 +34,26 @@ export function GridActions() {
     fetchAttach,
     clearAttach,
     attach,
-    fetchDataTable,
+    fetchDataTableGroups,
+    fetchDataTableUngrouped,
+    searchOption,
+    setSearchOption,
   } = useActionsStore(({ attach, ...rest }) => ({
     attach: attach?.map(({ url }) => url),
     ...rest,
   }))
+
   const { toast } = useToast()
 
-  async function handleOpenSheetAction(task: ActionItem) {
-    setCurrentTask(task)
-    fetchResponsible(task.id)
-    clearAttach()
-    if (task.actionId) {
-      fetchAttach(task.actionId)
-    }
+  async function handleOpenSheetAction({
+    taskId,
+    code,
+  }: {
+    taskId: number
+    code: number
+  }) {
+    setCurrentTask({ taskId, code })
+    fetchResponsible(taskId, searchOption)
     setSheetActionOpen(true)
   }
 
@@ -55,6 +73,12 @@ export function GridActions() {
     })
   }
 
+  async function handleChangeGroup(value: string) {
+    const option = value as 'with-action' | 'without-action'
+    setSearchOption(option)
+    await queryClient.invalidateQueries(['grouped-table', 'ungrouped-table'])
+  }
+
   const columns: ColumnDef<ActionItem>[] = [
     {
       accessorKey: 'id',
@@ -63,7 +87,15 @@ export function GridActions() {
         const task = row.original as ActionItem
         return (
           <div className="flex gap-2">
-            <Button size="icon-xs" onClick={() => handleOpenSheetAction(task)}>
+            <Button
+              size="icon-xs"
+              onClick={() =>
+                handleOpenSheetAction({
+                  taskId: task.id,
+                  code: task.code,
+                })
+              }
+            >
               <Timer className="h-3 w-3" />
             </Button>
             <Button
@@ -76,6 +108,39 @@ export function GridActions() {
               <Image className="h-3 w-3" />
             </Button>
           </div>
+        )
+      },
+    },
+    {
+      accessorKey: 'code',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Código
+            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const code = row.getValue('code') as number
+
+        return code || 'Sem registro'
+      },
+    },
+    {
+      accessorKey: 'task',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Verificação
+            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+          </Button>
         )
       },
     },
@@ -98,20 +163,6 @@ export function GridActions() {
         return createdAt
           ? dayjs(createdAt).format('DD/MM/YYYY')
           : 'Sem registro'
-      },
-    },
-    {
-      accessorKey: 'task',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Verificação
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
       },
     },
     {
@@ -193,13 +244,36 @@ export function GridActions() {
 
   return (
     <>
-      <DataTableServerPagination
-        id="action-table"
-        columns={columns}
-        fetchData={fetchDataTable}
-      />
+      <PageHeader className="p-4">
+        <div className="flex flex-col gap-2">
+          <Label>Filtrar grupos:</Label>
+          <Select value={searchOption} onValueChange={handleChangeGroup}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="with-action">Com ação</SelectItem>
+              <SelectItem value="without-action">Sem ação</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </PageHeader>
 
-      <SheetAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />
+      {searchOption === 'with-action' ? (
+        <DataTableServerPagination
+          id="grouped-table"
+          columns={columns}
+          fetchData={fetchDataTableGroups}
+        />
+      ) : (
+        <DataTableServerPagination
+          id="ungrouped-table"
+          columns={columns}
+          fetchData={fetchDataTableUngrouped}
+        />
+      )}
+
+      <DialogAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />
 
       <AttachThumbList
         images={attach || []}

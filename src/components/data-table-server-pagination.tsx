@@ -70,12 +70,8 @@ export function DataTableServerPagination<TData, TValue>({
     dateTo,
   }
 
-  const { data, isFetching, isLoading } = useQuery(
-    [id, fetchDataOptions],
-    () => fetchData(fetchDataOptions),
-    {
-      keepPreviousData: true,
-    },
+  const { data, isFetching, isLoading } = useQuery([id], () =>
+    fetchData(fetchDataOptions),
   )
 
   const defaultData = useMemo(() => [], []) as TData[]
