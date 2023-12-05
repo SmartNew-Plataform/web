@@ -17,8 +17,9 @@ import { useLoading } from '@/store/loading-store'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
 import { useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
+import CryptoJS from 'crypto-js'
 import dayjs from 'dayjs'
-import { ArrowDownWideNarrow, Image, Timer } from 'lucide-react'
+import { ArrowDownWideNarrow, FileBarChart2, Image, Timer } from 'lucide-react'
 import { useState } from 'react'
 import { DialogAction } from './dialog-action'
 
@@ -79,6 +80,13 @@ export function GridGroups() {
     await queryClient.invalidateQueries(['grouped-table', 'ungrouped-table'])
   }
 
+  function handleGeneratePdf(actionId: string) {
+    const hash = CryptoJS.AES.encrypt(actionId, 'action-item')
+    window.open(
+      `https://pdf.smartnewsistemas.com.br/generator/checklist/action?id=${hash}`,
+    )
+  }
+
   const columns: ColumnDef<ActionItem>[] = [
     {
       accessorKey: 'id',
@@ -106,6 +114,15 @@ export function GridGroups() {
             >
               {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="outline"
+              data-show={searchOption === 'with-action'}
+              size="icon-xs"
+              className="hidden data-[show=true]:flex"
+              onClick={() => handleGeneratePdf(String(task.id))}
+            >
+              <FileBarChart2 className="h-3 w-3" />
             </Button>
           </div>
         )
