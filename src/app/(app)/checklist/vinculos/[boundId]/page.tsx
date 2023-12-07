@@ -1,3 +1,4 @@
+import { PageWrapper } from '@/components/page-wrapper'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { SheetNewTask } from './sheet-new-task'
@@ -9,7 +10,7 @@ export default function TasksBoundedPage({
   params: { boundId: string }
 }) {
   return (
-    <div className="flex h-full flex-col gap-4 p-4 pt-0">
+    <PageWrapper>
       <Card className="flex justify-between p-4">
         <Input className="max-w-xs" />
 
@@ -17,6 +18,6 @@ export default function TasksBoundedPage({
       </Card>
 
       <TableTasksBounded boundId={params.boundId} />
-    </div>
+    </PageWrapper>
   )
 }

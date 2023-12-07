@@ -2,6 +2,7 @@
 import { Modules } from '@/components/modules'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useLoading } from '@/store/loading-store'
 import { useUserStore } from '@/store/user-store'
 import { AxiosError } from 'axios'
 import Image from 'next/image'
@@ -14,6 +15,7 @@ interface HeaderAppProps {
 
 export function HeaderApp({ children }: HeaderAppProps) {
   const { toast } = useToast()
+  const { hide } = useLoading()
   const searchParams = useSearchParams()
   const { fetchUserData } = useUserStore(({ fetchUserData }) => ({
     fetchUserData,
@@ -41,6 +43,7 @@ export function HeaderApp({ children }: HeaderAppProps) {
       (error) => {
         if (error.response) {
           console.error('Erro de resposta do servidor:', error)
+          hide()
           toast({
             title: error.message,
             description: error.response.data.message,

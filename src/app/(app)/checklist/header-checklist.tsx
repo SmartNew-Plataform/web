@@ -37,6 +37,7 @@ export function HeaderChecklist() {
           <DropdownMenuContent>
             <DropdownMenuItem asChild>
               <Link
+                target="_blank"
                 href={{
                   pathname: '/checklist/tarefas',
                   query: { token: searchParams.get('token') },
@@ -47,6 +48,7 @@ export function HeaderChecklist() {
             </DropdownMenuItem>
             <DropdownMenuItem disabled asChild>
               <Link
+                target="_blank"
                 href={{
                   pathname: '/checklist/controle',
                   query: { token: searchParams.get('token') },
@@ -57,6 +59,7 @@ export function HeaderChecklist() {
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link
+                target="_blank"
                 href={{
                   pathname: '/checklist/vinculos',
                   query: { token: searchParams.get('token') },
@@ -69,14 +72,20 @@ export function HeaderChecklist() {
         </DropdownMenu>
 
         <Button asChild variant="ghost">
-          <Link href={`/checklist/grid?token=${searchParams.get('token')}`}>
+          <Link
+            target="_blank"
+            href={`/checklist/grid?token=${searchParams.get('token')}`}
+          >
             <AreaChart className="h-4 w-4" />
             Checklist
           </Link>
         </Button>
 
         <Button asChild variant="ghost">
-          <Link href={`/checklist/acoes?token=${searchParams.get('token')}`}>
+          <Link
+            target="_blank"
+            href={`/checklist/acoes?token=${searchParams.get('token')}`}
+          >
             <XCircle className="h-4 w-4" />
             Ações Geradas
           </Link>

@@ -87,6 +87,31 @@ export function GridGroups() {
     )
   }
 
+  async function handleExportExcel() {
+    const currentQuery =
+      searchOption === 'with-action' ? 'grouped-table' : 'ungrouped-table'
+    const data: { rows: ActionItem[] } | undefined = queryClient.getQueryData([
+      currentQuery,
+    ])
+    console.log(data)
+
+    if (!data?.rows) return
+    show()
+    await fetch('https://excel-api.smartnewservices.com.br/exportDefault', {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        currencyFormat: [],
+        title: 'Ações',
+        data: data.rows,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    hide()
+  }
+
   const columns: ColumnDef<ActionItem>[] = [
     {
       accessorKey: 'id',
@@ -274,6 +299,11 @@ export function GridGroups() {
             </SelectContent>
           </Select>
         </div>
+
+        <Button onClick={handleExportExcel} variant="outline">
+          <FileBarChart2 className="h-4 w-4" />
+          Excel
+        </Button>
       </PageHeader>
 
       {searchOption === 'with-action' ? (
