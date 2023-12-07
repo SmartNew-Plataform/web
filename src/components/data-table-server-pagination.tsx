@@ -103,6 +103,8 @@ export function DataTableServerPagination<TData, TValue>({
     },
   })
 
+  console.log(pageSize, pageIndex)
+
   return (
     <div className="relative flex h-full flex-col gap-4 overflow-auto">
       {isLoading && (

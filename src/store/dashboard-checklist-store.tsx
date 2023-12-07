@@ -1,6 +1,10 @@
 import { api } from '@/lib/api'
 import { create } from 'zustand'
 
+type FamilyType = {
+  [key: string]: number
+}
+
 interface StoreState {
   summaryCards: Array<{
     id: number
@@ -118,7 +122,6 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
     },
     searchData: async (data) => {
       set({ loadingDashboard: true })
-      console.log(data)
 
       const response = await api
         .get(
@@ -135,22 +138,35 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
         )
         .then((res) => res.data)
 
-      const equipments = Object.fromEntries(
-        response.family.map((equipment: { name: string; quantity: string }) => {
-          return [equipment.name, equipment.quantity]
-        }),
+      const family = response.reduce(
+        (acc: FamilyType, { family }: { family: FamilyType }) => {
+          if (Object.keys(acc).length === 0) return family
+          const newFamily = acc
+          Object.entries(family).forEach(([name, value]) => {
+            newFamily[name] += value || 0
+          })
+          return newFamily
+        },
+        {},
       )
+      console.log(family)
 
-      const status = Object.fromEntries(
-        response.status.reduce((acc: string[], item: any) => {
-          return [...acc, ...Object.entries(item)]
-        }, []),
-      )
+      // const equipments = Object.fromEntries(
+      //   response.family.map((equipment: { name: string; quantity: string }) => {
+      //     return [equipment.name, equipment.quantity]
+      //   }),
+      // )
+
+      // const status = Object.fromEntries(
+      //   response.status.reduce((acc: string[], item: any) => {
+      //     return [...acc, ...Object.entries(item)]
+      //   }, []),
+      // )
 
       set({
-        status,
-        family: equipments,
-        summaryCards: response.summaryCards,
+        // status,
+        family,
+        summaryCards: response,
         loadingDashboard: false,
       })
     },
