@@ -94,8 +94,13 @@ export function HeaderDashboard() {
                 className="flex flex-col gap-4"
               >
                 <Form.Field>
-                  <Form.Label htmlFor="period">Período</Form.Label>
-                  <Form.InputDateRange id="period" name="period" />
+                  <Form.Label htmlFor="period.from">Data Inicial</Form.Label>
+                  <Form.DatePicker id="period.from" name="period.from" />
+                </Form.Field>
+
+                <Form.Field>
+                  <Form.Label htmlFor="period.to">Data Final</Form.Label>
+                  <Form.DatePicker id="period.to" name="period.to" />
                 </Form.Field>
 
                 <Form.Field>
