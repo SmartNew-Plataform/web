@@ -10,10 +10,7 @@ export function PageWrapper({
 }: PageWrapperProps) {
   return (
     <div
-      className={twMerge(
-        'flex h-full w-full flex-col gap-4 p-4 pt-0',
-        className,
-      )}
+      className={twMerge('flex h-full w-full flex-col gap-4 p-4', className)}
       {...props}
     >
       {children}

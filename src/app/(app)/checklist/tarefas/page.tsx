@@ -1,4 +1,5 @@
 'use client'
+import { PageWrapper } from '@/components/page-wrapper'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useTasksStore } from '@/store/smartlist/smartlist-task'
@@ -17,7 +18,7 @@ export default function TaskPage() {
   }, [])
 
   return (
-    <div className="flex h-full w-full flex-col gap-4 p-4 pt-0">
+    <PageWrapper>
       <Card className="flex justify-between p-4">
         <Input
           className="max-w-xs"
@@ -37,6 +38,6 @@ export default function TaskPage() {
           />
         ))}
       </div>
-    </div>
+    </PageWrapper>
   )
 }

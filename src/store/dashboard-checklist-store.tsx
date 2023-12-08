@@ -1,6 +1,10 @@
 import { api } from '@/lib/api'
 import { create } from 'zustand'
 
+type FamilyType = {
+  [key: string]: number
+}
+
 interface StoreState {
   summaryCards: Array<{
     id: number
@@ -118,7 +122,6 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
     },
     searchData: async (data) => {
       set({ loadingDashboard: true })
-      console.log(data)
 
       const response = await api
         .get(
@@ -135,22 +138,45 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
         )
         .then((res) => res.data)
 
-      const equipments = Object.fromEntries(
-        response.family.map((equipment: { name: string; quantity: string }) => {
-          return [equipment.name, equipment.quantity]
-        }),
+      const family = response.reduce(
+        (acc: FamilyType, { family }: { family: FamilyType }) => {
+          if (Object.keys(acc).length === 0) return family
+          const newFamily = acc
+          Object.entries(family).forEach(([name, value]) => {
+            if (newFamily[name]) {
+              newFamily[name] += value
+            } else {
+              newFamily[name] = value
+            }
+          })
+          return newFamily
+        },
+        {},
       )
 
-      const status = Object.fromEntries(
-        response.status.reduce((acc: string[], item: any) => {
-          return [...acc, ...Object.entries(item)]
-        }, []),
+      // const equipments = Object.fromEntries(
+      //   response.family.map((equipment: { name: string; quantity: string }) => {
+      //     return [equipment.name, equipment.quantity]
+      //   }),
+      // )
+
+      const status = response.reduce(
+        (
+          acc: FamilyType,
+          { description, quantity }: { description: string; quantity: number },
+        ) => {
+          return {
+            ...acc,
+            [description]: quantity,
+          }
+        },
+        {},
       )
 
       set({
         status,
-        family: equipments,
-        summaryCards: response.summaryCards,
+        family,
+        summaryCards: response,
         loadingDashboard: false,
       })
     },

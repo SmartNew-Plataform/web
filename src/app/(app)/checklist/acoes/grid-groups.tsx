@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/api'
 import { useLoading } from '@/store/loading-store'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
 import { useQueryClient } from '@tanstack/react-query'
@@ -85,6 +86,54 @@ export function GridGroups() {
     window.open(
       `https://pdf.smartnewsistemas.com.br/generator/checklist/action?id=${hash}`,
     )
+  }
+
+  async function handleExportExcel() {
+    const currentQuery =
+      searchOption === 'with-action' ? 'action/group' : 'action'
+
+    const data = await api
+      .get(`/smart-list/${currentQuery}`, {
+        params: { index: null, perPage: null },
+      })
+      .then((res) => res.data)
+    console.log(data)
+
+    if (!data?.rows) return
+    show()
+    await fetch('https://excel-api.smartnewsistemas.com.br/exportDefault', {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        currencyFormat: [],
+        title: 'Ações',
+        data: data.rows.map((item: ActionItem) => ({
+          código: item.code,
+          verificação: item.task,
+          'criado em': item.startDate,
+          prazo: item.endDate,
+          equipamento: item.equipment,
+          local: item.branch,
+          repensável: item.responsible?.name,
+          status: item.status,
+        })),
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob]))
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `acoes_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+      })
+      .catch((error) => console.error(error))
+    hide()
   }
 
   const columns: ColumnDef<ActionItem>[] = [
@@ -274,6 +323,11 @@ export function GridGroups() {
             </SelectContent>
           </Select>
         </div>
+
+        <Button onClick={handleExportExcel} variant="outline">
+          <FileBarChart2 className="h-4 w-4" />
+          Excel
+        </Button>
       </PageHeader>
 
       {searchOption === 'with-action' ? (
