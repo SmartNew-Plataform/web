@@ -143,13 +143,16 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
           if (Object.keys(acc).length === 0) return family
           const newFamily = acc
           Object.entries(family).forEach(([name, value]) => {
-            newFamily[name] += value || 0
+            if (newFamily[name]) {
+              newFamily[name] += value
+            } else {
+              newFamily[name] = value
+            }
           })
           return newFamily
         },
         {},
       )
-      console.log(family)
 
       // const equipments = Object.fromEntries(
       //   response.family.map((equipment: { name: string; quantity: string }) => {
@@ -157,14 +160,21 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
       //   }),
       // )
 
-      // const status = Object.fromEntries(
-      //   response.status.reduce((acc: string[], item: any) => {
-      //     return [...acc, ...Object.entries(item)]
-      //   }, []),
-      // )
+      const status = response.reduce(
+        (
+          acc: FamilyType,
+          { description, quantity }: { description: string; quantity: number },
+        ) => {
+          return {
+            ...acc,
+            [description]: quantity,
+          }
+        },
+        {},
+      )
 
       set({
-        // status,
+        status,
         family,
         summaryCards: response,
         loadingDashboard: false,

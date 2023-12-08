@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/api'
 import { useLoading } from '@/store/loading-store'
 import { ActionItem, useActionsStore } from '@/store/smartlist/actions'
 import { useQueryClient } from '@tanstack/react-query'
@@ -89,10 +90,13 @@ export function GridGroups() {
 
   async function handleExportExcel() {
     const currentQuery =
-      searchOption === 'with-action' ? 'grouped-table' : 'ungrouped-table'
-    const data: { rows: ActionItem[] } | undefined = queryClient.getQueryData([
-      currentQuery,
-    ])
+      searchOption === 'with-action' ? 'action/group' : 'action'
+
+    const data = await api
+      .get(`/smart-list/${currentQuery}`, {
+        params: { index: null, perPage: null },
+      })
+      .then((res) => res.data)
     console.log(data)
 
     if (!data?.rows) return
@@ -103,7 +107,16 @@ export function GridGroups() {
       body: JSON.stringify({
         currencyFormat: [],
         title: 'Ações',
-        data: data.rows,
+        data: data.rows.map((item: ActionItem) => ({
+          código: item.code,
+          verificação: item.task,
+          'criado em': item.startDate,
+          prazo: item.endDate,
+          equipamento: item.equipment,
+          local: item.branch,
+          repensável: item.responsible?.name,
+          status: item.status,
+        })),
       }),
       headers: {
         'Content-Type': 'application/json',
