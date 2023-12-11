@@ -4,6 +4,7 @@ import { AttachThumbList } from '@/components/attach-thumb-list'
 import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -27,6 +28,7 @@ import { DialogAction } from './dialog-action'
 export function GridGroups() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
   const [attachModalOpen, setAttachModalOpen] = useState<boolean>(false)
+  const [selectedRows, setSelectedRows] = useState<ActionItem[] | undefined>()
   const queryClient = useQueryClient()
 
   const { show, hide } = useLoading()
@@ -136,14 +138,36 @@ export function GridGroups() {
     hide()
   }
 
+  const handleSelectionChange = (selectedRows: ActionItem[]) => {
+    setSelectedRows(selectedRows)
+  }
+
+  function handleOpenAllPdf() {
+    selectedRows?.forEach(({ id }) => handleGeneratePdf(String(id)))
+  }
+
   const columns: ColumnDef<ActionItem>[] = [
     {
       accessorKey: 'id',
-      header: '',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
       cell: ({ row }) => {
         const task = row.original as ActionItem
         return (
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label="Select row"
+            />
             <Button
               size="icon-xs"
               onClick={() =>
@@ -164,15 +188,18 @@ export function GridGroups() {
               {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="h-3 w-3" />
             </Button>
-            <Button
-              variant="outline"
+            <div
               data-show={searchOption === 'with-action'}
-              size="icon-xs"
-              className="hidden data-[show=true]:flex"
-              onClick={() => handleGeneratePdf(String(task.id))}
+              className="hidden items-center gap-2 data-[show=true]:flex"
             >
-              <FileBarChart2 className="h-3 w-3" />
-            </Button>
+              <Button
+                variant="outline"
+                size="icon-xs"
+                onClick={() => handleGeneratePdf(String(task.id))}
+              >
+                <FileBarChart2 className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
         )
       },
@@ -324,10 +351,16 @@ export function GridGroups() {
           </Select>
         </div>
 
-        <Button onClick={handleExportExcel} variant="outline">
-          <FileBarChart2 className="h-4 w-4" />
-          Excel
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleExportExcel} variant="outline">
+            <FileBarChart2 className="h-4 w-4" />
+            Excel
+          </Button>
+          <Button onClick={handleOpenAllPdf}>
+            <FileBarChart2 className="h-4 w-4" />
+            PDF
+          </Button>
+        </div>
       </PageHeader>
 
       {searchOption === 'with-action' ? (
@@ -335,6 +368,7 @@ export function GridGroups() {
           id="grouped-table"
           columns={columns}
           fetchData={fetchDataTableGroups}
+          onRowSelection={handleSelectionChange}
         />
       ) : (
         <DataTableServerPagination

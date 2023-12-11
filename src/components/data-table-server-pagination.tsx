@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 'use client'
 
 import {
@@ -24,9 +25,9 @@ import {
 } from '@/components/ui/table'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-type FeactDataParamsType = {
+type ReactDataParamsType = {
   index: number
   perPage: number
   filterText?: string
@@ -36,7 +37,7 @@ type FeactDataParamsType = {
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  fetchData: (params: FeactDataParamsType) => Promise<{
+  fetchData: (params: ReactDataParamsType) => Promise<{
     rows: TData[]
     pageCount: number
   }>
@@ -44,7 +45,7 @@ export interface DataTableProps<TData, TValue> {
   dateFrom?: Date
   dateTo?: Date
   id: string
-  refetchFn?: (fn: any) => void
+  onRowSelection?: (data: TData[]) => void
 }
 
 export function DataTableServerPagination<TData, TValue>({
@@ -54,9 +55,11 @@ export function DataTableServerPagination<TData, TValue>({
   dateFrom,
   dateTo,
   id,
+  onRowSelection,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [rowSelection, setRowSelection] = useState({})
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -84,6 +87,10 @@ export function DataTableServerPagination<TData, TValue>({
     [pageIndex, pageSize],
   )
 
+  function handleRowSelection(data: any) {
+    setRowSelection(data)
+  }
+
   const table = useReactTable({
     data: data?.rows ?? defaultData,
     columns,
@@ -96,14 +103,25 @@ export function DataTableServerPagination<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
     manualPagination: true,
+    onRowSelectionChange: handleRowSelection,
     state: {
       sorting,
       columnFilters,
       pagination,
+      rowSelection,
     },
   })
 
-  console.log(pageSize, pageIndex)
+  useEffect(() => {
+    const rowsSelected = table
+      .getFilteredSelectedRowModel()
+      .rows.map(({ original }) => original)
+    console.log(rowsSelected)
+
+    if (onRowSelection) {
+      onRowSelection(rowsSelected)
+    }
+  }, [rowSelection])
 
   return (
     <div className="relative flex h-full flex-col gap-4 overflow-auto">
