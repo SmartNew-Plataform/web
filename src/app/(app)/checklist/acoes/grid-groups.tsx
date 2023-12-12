@@ -156,18 +156,32 @@ export function GridGroups() {
             (table.getIsSomePageRowsSelected() && 'indeterminate')
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
+          aria-label="Seleciona todas"
+          data-show={searchOption === 'with-action'}
+          className="hidden data-[show=true]:flex"
         />
       ),
       cell: ({ row }) => {
         const task = row.original as ActionItem
         return (
           <div className="flex items-center gap-2">
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              aria-label="Select row"
-            />
+            <div
+              data-show={searchOption === 'with-action'}
+              className="hidden items-center gap-2 data-[show=true]:flex"
+            >
+              <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Selecionar linha"
+              />
+              <Button
+                variant="outline"
+                size="icon-xs"
+                onClick={() => handleGeneratePdf(String(task.id))}
+              >
+                <FileBarChart2 className="h-3 w-3" />
+              </Button>
+            </div>
             <Button
               size="icon-xs"
               onClick={() =>
@@ -188,18 +202,6 @@ export function GridGroups() {
               {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="h-3 w-3" />
             </Button>
-            <div
-              data-show={searchOption === 'with-action'}
-              className="hidden items-center gap-2 data-[show=true]:flex"
-            >
-              <Button
-                variant="outline"
-                size="icon-xs"
-                onClick={() => handleGeneratePdf(String(task.id))}
-              >
-                <FileBarChart2 className="h-3 w-3" />
-              </Button>
-            </div>
           </div>
         )
       },
