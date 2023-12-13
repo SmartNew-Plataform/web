@@ -35,15 +35,15 @@ export function GridGroups() {
   const {
     setCurrentTask,
     fetchResponsible,
-    fetchAttach,
-    clearAttach,
-    attach,
+    groupAttach,
     fetchDataTableGroups,
     fetchDataTableUngrouped,
     searchOption,
     setSearchOption,
-  } = useActionsStore(({ attach, ...rest }) => ({
-    attach: attach?.map(({ url }) => url),
+    fetchGroupAttach,
+    clearGroupAttach,
+  } = useActionsStore(({ groupAttach, ...rest }) => ({
+    groupAttach: groupAttach?.map(({ url }) => url),
     ...rest,
   }))
 
@@ -61,11 +61,11 @@ export function GridGroups() {
     setSheetActionOpen(true)
   }
 
-  async function loadAttach(actionId: number | null) {
-    if (!actionId) return
-    clearAttach()
+  async function loadAttach(groupId: number | null) {
+    if (!groupId) return
+    clearGroupAttach()
     show()
-    const responseAttach = await fetchAttach(actionId)
+    const responseAttach = await fetchGroupAttach(groupId)
     hide()
     if (responseAttach.length > 0) {
       setAttachModalOpen(true)
@@ -195,9 +195,9 @@ export function GridGroups() {
             </Button>
             <Button
               variant="secondary"
-              disabled={!task.actionId}
+              disabled={!task.id}
               size="icon-xs"
-              onClick={() => loadAttach(task.actionId)}
+              onClick={() => loadAttach(task.id)}
             >
               {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image className="h-3 w-3" />
@@ -383,7 +383,7 @@ export function GridGroups() {
       <DialogAction open={sheetActionOpen} onOpenChange={setSheetActionOpen} />
 
       <AttachThumbList
-        images={attach || []}
+        images={groupAttach || []}
         open={attachModalOpen}
         onOpenChange={setAttachModalOpen}
       />

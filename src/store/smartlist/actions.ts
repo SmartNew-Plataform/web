@@ -37,6 +37,7 @@ interface StoreData {
     | undefined
 
   attach: Array<{ url: string }> | undefined
+  groupAttach: Array<{ url: string }> | undefined
   selectedTasks: string[]
   groups: Array<{ id: number; title: string }> | undefined
   searchOption: 'with-action' | 'without-action'
@@ -53,9 +54,11 @@ interface StoreData {
   }) => Promise<any>
   fetchResponsible: (itemId: number, type: string) => Promise<void>
   fetchAttach: (actionId: number) => Promise<Array<{ url: string }>>
+  fetchGroupAttach: (groupId: number) => Promise<Array<{ url: string }>>
   fetchListGroup: (branchId: string) => Promise<void>
   setCurrentTask: (task: DataTask) => void
   clearAttach: () => void
+  clearGroupAttach: () => void
   updateSelectedTasks: (tasks: string[]) => void
 }
 
@@ -68,6 +71,7 @@ export const useActionsStore = create<StoreData>((set, get) => {
     selectedTasks: [],
     groups: undefined,
     searchOption: 'without-action',
+    groupAttach: undefined,
 
     setSearchOption: (option) => {
       set({ searchOption: option })
@@ -125,8 +129,37 @@ export const useActionsStore = create<StoreData>((set, get) => {
       return response.img
     },
 
+    fetchGroupAttach: async (groupId) => {
+      set({ attach: undefined })
+      const withAction = get().searchOption === 'with-action'
+
+      if (withAction) {
+        const data = await api
+          .get(`/smart-list/action/list-attach-checklist-by-group/${groupId}`)
+          .then((res) => res.data)
+          .catch(() => set({ attach: [] }))
+
+        set({ groupAttach: data })
+        return data
+      } else {
+        const data = await api
+          .get(
+            `/smart-list/action/list-attach-checklist-by-periodId/${groupId}`,
+          )
+          .then((res) => res.data)
+          .catch(() => set({ attach: [] }))
+
+        set({ groupAttach: data })
+        return data
+      }
+    },
+
     clearAttach: () => {
       set({ attach: undefined })
+    },
+
+    clearGroupAttach: () => {
+      set({ groupAttach: undefined })
     },
 
     setCurrentTask: (task) => {
