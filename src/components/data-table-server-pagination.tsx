@@ -72,8 +72,9 @@ export function DataTableServerPagination<TData, TValue>({
     dateFrom,
     dateTo,
   }
+  console.log(fetchDataOptions)
 
-  const { data, isFetching, isLoading } = useQuery([id], () =>
+  const { data, isFetching, isLoading, refetch } = useQuery([id], () =>
     fetchData(fetchDataOptions),
   )
 
@@ -116,12 +117,15 @@ export function DataTableServerPagination<TData, TValue>({
     const rowsSelected = table
       .getFilteredSelectedRowModel()
       .rows.map(({ original }) => original)
-    console.log(rowsSelected)
 
     if (onRowSelection) {
       onRowSelection(rowsSelected)
     }
   }, [rowSelection])
+
+  useEffect(() => {
+    refetch()
+  }, Object.values(fetchDataOptions))
 
   return (
     <div className="relative flex h-full flex-col gap-4 overflow-auto">
