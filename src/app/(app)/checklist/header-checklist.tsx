@@ -68,6 +68,17 @@ export function HeaderChecklist() {
                 Vinculos
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
+                  pathname: '/checklist/categoria',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Categorias
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 

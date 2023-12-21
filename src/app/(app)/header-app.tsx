@@ -48,7 +48,7 @@ export function HeaderApp({ children }: HeaderAppProps) {
             title: error.message,
             description: error.response.data.message,
             variant: 'destructive',
-            duration: 1000 * 120,
+            duration: 1000 * 30, // 30 seconds
           })
         }
 
