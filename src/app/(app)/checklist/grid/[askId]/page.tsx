@@ -7,7 +7,7 @@ export default function Asks({ params }: { params: { askId: string } }) {
     <PageWrapper>
       <Header />
 
-      <main className="grid h-full w-full grid-cols-auto gap-4">
+      <main className="grid max-h-full w-full grid-cols-auto gap-4">
         <AsksList productionId={params.askId} />
       </main>
     </PageWrapper>
