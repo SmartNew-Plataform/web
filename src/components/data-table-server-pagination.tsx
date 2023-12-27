@@ -74,8 +74,12 @@ export function DataTableServerPagination<TData, TValue>({
   }
   console.log(fetchDataOptions)
 
-  const { data, isFetching, isLoading, refetch } = useQuery([id], () =>
-    fetchData(fetchDataOptions),
+  const { data, isFetching, isLoading, refetch } = useQuery(
+    [id],
+    () => fetchData(fetchDataOptions),
+    {
+      refetchInterval: 1000 * 15, // 15 seconds
+    },
   )
 
   const defaultData = useMemo(() => [], []) as TData[]
