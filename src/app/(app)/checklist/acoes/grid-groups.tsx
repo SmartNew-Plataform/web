@@ -241,6 +241,7 @@ export function GridGroups() {
     },
     {
       accessorKey: 'startDate',
+      sortingFn: 'datetime',
       header: ({ column }) => {
         return (
           <Button
@@ -262,6 +263,7 @@ export function GridGroups() {
     },
     {
       accessorKey: 'endDate',
+      sortingFn: 'datetime',
       header: ({ column }) => {
         return (
           <Button
