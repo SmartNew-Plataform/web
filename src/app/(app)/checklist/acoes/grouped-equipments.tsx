@@ -25,7 +25,7 @@ export function GroupedEquipments({ data }: GroupedEquipmentsProps) {
                 {equipment}
               </CardTitle>
               <CardDescription>
-                {dayjs(startDate).format('DD/MM/YYYY HH:mm:ss')}
+                {id} - {dayjs(startDate).format('DD/MM/YYYY HH:mm:ss')}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">

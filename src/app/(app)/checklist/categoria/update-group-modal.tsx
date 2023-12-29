@@ -8,14 +8,26 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Pencil } from 'lucide-react'
 import { FormGroup, GroupFormData } from './form-group'
 
-export function UpdateGroupModal() {
+interface UpdateGroupModalProps {
+  data: {
+    id: number
+    name: string
+    branch: number
+  }
+}
+
+export function UpdateGroupModal({ data }: UpdateGroupModalProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  const defaultValues = {
+    name: data.name,
+    branch: String(data.branch),
+  }
 
-  async function handleUpdateGroup(data: GroupFormData) {
+  async function handleUpdateGroup(dataForm: GroupFormData) {
     try {
-      await api.put('/smart-list/diverse', {
-        name: data.name,
+      await api.put(`/smart-list/diverse/${data.id}`, {
+        name: dataForm.name,
       })
 
       await queryClient.refetchQueries(['diverse:list'])
@@ -32,13 +44,17 @@ export function UpdateGroupModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="icon-sm" variant="secondary">
+        <Button size="icon-xs" variant="secondary">
           <Pencil className="h-3 w-3" />
         </Button>
       </DialogTrigger>
 
       <DialogContent>
-        <FormGroup mode="edit" handleSubmitFormGroup={handleUpdateGroup} />
+        <FormGroup
+          mode="edit"
+          handleSubmitFormGroup={handleUpdateGroup}
+          defaultValues={defaultValues}
+        />
       </DialogContent>
     </Dialog>
   )
