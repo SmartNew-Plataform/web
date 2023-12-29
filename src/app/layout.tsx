@@ -19,6 +19,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br">
+      <head>
+        <link
+          rel="icon"
+          type="favicon"
+          href="https://sistemas.smartnewsystem.com.br/favicon.ico"
+        />
+      </head>
       <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>

@@ -1,0 +1,25 @@
+name: Build & Deploy app
+
+on:
+  push:
+    branches:
+      - build
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          
+      - name: SSH into Droplet and Run Commands
+        run: |
+          ssh -i /home/davi/.ssh/id_rsa root@64.225.6.102 "touch test-conn.txt"
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          DROPLET_IP: 64.225.6.102
