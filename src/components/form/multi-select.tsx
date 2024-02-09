@@ -3,7 +3,7 @@
 import { Check, ChevronsUpDown, ListChecks } from 'lucide-react'
 import * as React from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -20,8 +20,9 @@ import { cn } from '@/lib/utils'
 import { useController, useFormContext } from 'react-hook-form'
 import { ScrollArea } from '../ui/scroll-area'
 import { Toggle } from '../ui/toggle'
+import { ComponentProps } from 'react'
 
-interface MultiSelectProps {
+interface MultiSelectProps extends ComponentProps<typeof Button> {
   name: string
   options: Array<{
     label: string
@@ -29,7 +30,7 @@ interface MultiSelectProps {
   }>
 }
 
-export function MultiSelect({ name, options }: MultiSelectProps) {
+export function MultiSelect({ name, options, ...props }: MultiSelectProps) {
   const { control } = useFormContext()
   const { field } = useController({
     control,
@@ -70,6 +71,7 @@ export function MultiSelect({ name, options }: MultiSelectProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          {...props}
           variant="outline"
           role="combobox"
           aria-expanded={open}
