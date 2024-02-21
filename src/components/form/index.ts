@@ -12,6 +12,7 @@ import { MultiSelect } from './multi-select'
 import { Select } from './select'
 import { SkeletonField } from './skeleton-field'
 import { Textarea } from './textarea'
+import { PeriodInput } from './period-input'
 
 export const Form = {
   Select,
@@ -28,4 +29,5 @@ export const Form = {
   ColorPicker,
   DatePicker,
   SkeletonField,
+  PeriodInput,
 }

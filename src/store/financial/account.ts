@@ -20,11 +20,54 @@ export type EmissionType = {
 interface StoreData {
   selectedRows: EmissionType[]
   setSelectedRows: (data: EmissionType[] | undefined) => void
+
+  columns: Array<{
+    label: string
+    value: string
+  }>
 }
 
 export const useAccountStore = create<StoreData>((set, get) => {
   return {
     selectedRows: [],
+    columns: [
+      {
+        label: 'n° fiscal',
+        value: 'fiscalNumber',
+      },
+      {
+        label: 'Emitente',
+        value: 'issue',
+      },
+      {
+        label: 'data prevista',
+        value: 'expectDate',
+      },
+      {
+        label: 'data emissão',
+        value: 'dateEmission',
+      },
+      {
+        label: 'vencimento',
+        value: 'dueDate',
+      },
+      {
+        label: 'prorrogação',
+        value: 'prorogation',
+      },
+      {
+        label: 'total',
+        value: 'totalItem',
+      },
+      {
+        label: 'valor a pagar',
+        value: 'valueToPay',
+      },
+      {
+        label: 'valor parcela',
+        value: 'valuePay',
+      },
+    ],
 
     setSelectedRows: (data) => {
       set({

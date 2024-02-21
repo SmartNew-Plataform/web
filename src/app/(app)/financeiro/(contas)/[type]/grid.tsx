@@ -2,34 +2,64 @@
 
 import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { EmissionType, useAccountStore } from '@/store/financial/account'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { useParams, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
 
 export function Grid() {
-  const searchParams = useSearchParams()
   const routeParams = useParams()
-  const { selectedRows, setSelectedRows } = useAccountStore()
+  const { setSelectedRows } = useAccountStore()
+  const searchParams = useSearchParams()
+  const { toast } = useToast()
 
-  useEffect(() => {
-    console.log(searchParams.toString())
-  }, [searchParams])
+  const filterText = searchParams.get('filterText')
+  const column = searchParams.get('column')
+  const value = searchParams.get('value')
+  const from = searchParams.get('from')
+  const to = searchParams.get('to')
+  const status = searchParams.getAll('status') || ''
+  const paymentMethod = searchParams.getAll('paymentMethod') || ''
+
+  const hasFilters =
+    searchParams.has('filterText') ||
+    searchParams.has('column') ||
+    searchParams.has('value') ||
+    searchParams.has('status') ||
+    searchParams.has('paymentMethod')
 
   async function fetchDataTableFinanceEmission(params: {
     index: number
     perPage: number
   }) {
-    return api
+    const response = await api
       .get('/financial/account/', {
         params: {
           ...params,
           type: routeParams.type,
+          filterText,
+          [column || 'value']:
+            from && to
+              ? {
+                  start: from || undefined,
+                  end: to || undefined,
+                }
+              : value ?? '',
+          status,
+          paymentMethod,
         },
       })
       .then((res) => res.data)
+
+    if (hasFilters) {
+      toast({
+        title: 'Filtros aplicados com sucesso!',
+      })
+    }
+
+    return response
   }
 
   const columns: ColumnDef<EmissionType>[] = [
@@ -57,7 +87,7 @@ export function Grid() {
     },
     {
       accessorKey: 'process',
-      header: 'N° prorrogação',
+      header: 'proc.',
     },
     {
       accessorKey: 'number',
@@ -132,7 +162,7 @@ export function Grid() {
     },
     {
       accessorKey: 'numberSplit',
-      header: 'n° parcela',
+      header: 'n° prc.',
     },
     {
       accessorKey: 'status',
@@ -140,12 +170,25 @@ export function Grid() {
     },
   ]
 
+  function handleSelectRows(rows: EmissionType[]) {
+    setSelectedRows(rows)
+  }
+
   return (
     <DataTableServerPagination
-      id="finance-emission-table"
+      id={[
+        'finance-emission-table',
+        filterText || '',
+        column || '',
+        value || '',
+        from || '',
+        to || '',
+        ...status,
+        ...paymentMethod,
+      ]}
       columns={columns}
       fetchData={fetchDataTableFinanceEmission}
-      onRowSelection={(rows: EmissionType[]) => setSelectedRows(rows)}
+      onRowSelection={handleSelectRows}
     />
   )
 }

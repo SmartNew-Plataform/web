@@ -44,7 +44,7 @@ export interface DataTableProps<TData, TValue> {
   filterText?: string
   dateFrom?: Date
   dateTo?: Date
-  id: string
+  id: string | string[]
   onRowSelection?: (data: TData[]) => void
 }
 
@@ -72,10 +72,9 @@ export function DataTableServerPagination<TData, TValue>({
     dateFrom,
     dateTo,
   }
-  console.log(fetchDataOptions)
 
   const { data, isFetching, isLoading, refetch } = useQuery(
-    [id],
+    typeof id === 'object' ? id : [id],
     () => fetchData(fetchDataOptions),
     {
       refetchInterval: 1000 * 15, // 15 seconds

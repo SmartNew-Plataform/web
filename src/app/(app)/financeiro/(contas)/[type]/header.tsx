@@ -1,7 +1,7 @@
 'use client'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
-import { FileUp, Plus, Search, Wallet2, X } from 'lucide-react'
+import { FileUp, Plus, Search, X } from 'lucide-react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { FilterModal } from './filter-modal'
 import { Input } from '@/components/ui/input'
@@ -10,11 +10,21 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAccountStore } from '@/store/financial/account'
 import { EmissionModal } from './emission-modal'
+import dayjs from 'dayjs'
+import { useToast } from '@/components/ui/use-toast'
 
 const filterFormSchema = z.object({
   filterText: z.string().optional(),
   column: z.string().optional(),
-  columnText: z.string().optional(),
+  value: z.union([
+    z.number(),
+    z.string(),
+    z.object({
+      from: z.string(),
+      to: z.string(),
+    }),
+  ]),
+  emitted: z.boolean().optional(),
   status: z.array(z.string()).optional(),
   paymentMethod: z.array(z.string()).optional(),
 })
@@ -29,14 +39,16 @@ export function Header() {
 
   const filterText = searchParams.get('filterText')
   const column = searchParams.get('column')
-  const columnText = searchParams.get('columnText')
+  const value = searchParams.get('value')
+  const from = searchParams.get('from')
+  const to = searchParams.get('to')
   const status = searchParams.getAll('status') || ''
   const paymentMethod = searchParams.getAll('paymentMethod') || ''
 
   const hasFilters =
     searchParams.has('filterText') ||
     searchParams.has('column') ||
-    searchParams.has('columnText') ||
+    searchParams.has('value') ||
     searchParams.has('status') ||
     searchParams.has('paymentMethod')
 
@@ -45,7 +57,13 @@ export function Header() {
     defaultValues: {
       filterText: filterText ?? '',
       column: column ?? '',
-      columnText: columnText ?? '',
+      value:
+        from && to
+          ? {
+              from: from || undefined,
+              to: to || undefined,
+            }
+          : value ?? '',
       status: status ?? [''],
       paymentMethod: paymentMethod ?? [''],
     },
@@ -56,11 +74,18 @@ export function Header() {
   function handleFilter({
     filterText,
     column,
-    columnText,
+    value,
     paymentMethod,
     status,
   }: FilterFormType) {
     const url = new URLSearchParams(searchParams.toString())
+    console.log({
+      filterText,
+      column,
+      value,
+      paymentMethod,
+      status,
+    })
 
     if (filterText) {
       url.set('filterText', filterText)
@@ -74,10 +99,19 @@ export function Header() {
       url.delete('column')
     }
 
-    if (columnText) {
-      url.set('columnText', columnText)
+    if (value) {
+      if (typeof value === 'object') {
+        url.set('from', dayjs(value.from).format('YYYY-MM-DD'))
+        url.set('to', dayjs(value.to).format('YYYY-MM-DD'))
+      } else {
+        url.delete('from')
+        url.delete('to')
+        url.set('value', String(value))
+      }
     } else {
-      url.delete('columnText')
+      url.delete('value')
+      url.delete('from')
+      url.delete('to')
     }
 
     url.delete('paymentMethod')
@@ -98,13 +132,15 @@ export function Header() {
 
     url.delete('filterText')
     url.delete('column')
-    url.delete('columnText')
+    url.delete('value')
+    url.delete('from')
+    url.delete('to')
     url.delete('status')
     url.delete('paymentMethod')
 
     reset({
       column: '',
-      columnText: '',
+      value: '',
       filterText: '',
       paymentMethod: [],
       status: [],
@@ -159,7 +195,7 @@ export function Header() {
               Excel
             </Button>
 
-            {selectedRows?.length > 0 && <EmissionModal />}
+            {selectedRows.length > 0 && <EmissionModal />}
           </div>
         </form>
       </FormProvider>
