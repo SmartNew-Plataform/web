@@ -80,7 +80,7 @@ export function FilterModal() {
           <Form.MultiSelect
             name="status"
             id="status-select"
-            options={data?.status}
+            options={data?.status || []}
           />
           <Form.ErrorMessage field="status" />
         </Form.Field>
@@ -98,7 +98,7 @@ export function FilterModal() {
           <Form.MultiSelect
             name="paymentMethod"
             id="payment-method-select"
-            options={data?.paymentType}
+            options={data?.paymentType || []}
           />
           <Form.ErrorMessage field="paymentMethod" />
         </Form.Field>
