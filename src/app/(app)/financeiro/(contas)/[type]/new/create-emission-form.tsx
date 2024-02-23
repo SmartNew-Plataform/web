@@ -20,8 +20,11 @@ export function CreateEmissionForm() {
 
   return (
     <FormProvider {...createEmissionForm}>
-      <form className="mx-auto flex h-full w-96 flex-col py-4" onSubmit={handleSubmit(handleNewEmission)}>
-        <div className="flex items-center gap-4 mb-4">
+      <form
+        className="mx-auto flex h-full w-96 flex-col py-4"
+        onSubmit={handleSubmit(handleNewEmission)}
+      >
+        <div className="mb-4 flex items-center gap-4">
           <Button variant="outline" size="icon">
             <ChevronLeft size={16} />
           </Button>
@@ -34,56 +37,95 @@ export function CreateEmissionForm() {
           <WizardFormStep>
             <Form.Field>
               <Form.Label>N° Processo:</Form.Label>
-              <Form.Input type='number' disabled name='processNumber' placeholder='O numero de processo e gerado automaticamente' />
+              <Form.Input
+                type="number"
+                disabled
+                name="processNumber"
+                placeholder="O numero de processo e gerado automaticamente"
+              />
             </Form.Field>
             <Form.Field>
-              <Form.Label htmlFor="document-type-input">Tipo de documento:</Form.Label>
-              <Form.Select name='documentType' id="document-type-input" options={[{ label: '', value: ''}]}/>
-              <Form.ErrorMessage field='documentType' />
+              <Form.Label htmlFor="document-type-input">
+                Tipo de documento:
+              </Form.Label>
+              <Form.Select
+                name="documentType"
+                id="document-type-input"
+                options={[{ label: '', value: '' }]}
+              />
+              <Form.ErrorMessage field="documentType" />
             </Form.Field>
             <Form.Field>
-              <Form.Label htmlFor="document-number-input">N° Documento:</Form.Label>
-              <Form.Input name='documentNumber' id="document-number-input" />
-              <Form.ErrorMessage field='documentNumber' />
+              <Form.Label htmlFor="document-number-input">
+                N° Documento:
+              </Form.Label>
+              <Form.Input name="documentNumber" id="document-number-input" />
+              <Form.ErrorMessage field="documentNumber" />
             </Form.Field>
             <Form.Field>
-              <Form.Label htmlFor="sender-input">Identificação do emitente:</Form.Label>
-              <Form.Select name='sender' id="sender-input" options={[{ label: '', value: ''}]}/>
-              <Form.ErrorMessage field='sender' />
+              <Form.Label htmlFor="sender-input">
+                Identificação do emitente:
+              </Form.Label>
+              <Form.Select
+                name="sender"
+                id="sender-input"
+                options={[{ label: '', value: '' }]}
+              />
+              <Form.ErrorMessage field="sender" />
             </Form.Field>
           </WizardFormStep>
 
           <WizardFormStep>
             <Form.Field>
-              <Form.Label htmlFor="issuer-input">Destinatário/Remetente:</Form.Label>
-              <Form.Select name='issuer' id="issuer-input" options={[{ label: '', value: ''}]}/>
-              <Form.ErrorMessage field='issuer' />
+              <Form.Label htmlFor="issuer-input">
+                Destinatário/Remetente:
+              </Form.Label>
+              <Form.Select
+                name="issuer"
+                id="issuer-input"
+                options={[{ label: '', value: '' }]}
+              />
+              <Form.ErrorMessage field="issuer" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="emission-date-input">Data de emissão:</Form.Label>
-              <Form.Input type='date' name='emissionDate' id="emission-date-input" />
-              <Form.ErrorMessage field='emissionDate' />
+              <Form.Label htmlFor="emission-date-input">
+                Data de emissão:
+              </Form.Label>
+              <Form.Input
+                type="date"
+                name="emissionDate"
+                id="emission-date-input"
+              />
+              <Form.ErrorMessage field="emissionDate" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="launch-date-input">Data de laçamento:</Form.Label>
-              <Form.Input type='date' name='launchDate' id="launch-date-input" />
-              <Form.ErrorMessage field='launchDate' />
+              <Form.Label htmlFor="launch-date-input">
+                Data de laçamento:
+              </Form.Label>
+              <Form.Input
+                type="date"
+                name="launchDate"
+                id="launch-date-input"
+              />
+              <Form.ErrorMessage field="launchDate" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="access-key-input">Chave de acesso:</Form.Label>
-              <Form.Input type='date' name='accessKey' id="access-key-input" />
-              <Form.ErrorMessage field='accessKey' />
+              <Form.Label htmlFor="access-key-input">
+                Chave de acesso:
+              </Form.Label>
+              <Form.Input type="date" name="accessKey" id="access-key-input" />
+              <Form.ErrorMessage field="accessKey" />
             </Form.Field>
           </WizardFormStep>
 
           <WizardFormStep>
             <Form.Field>
               <Form.Label htmlFor="observation-input">Obervação:</Form.Label>
-              <Form.Textarea name='observation' id="observation-input" />
-              <Form.ErrorMessage field='observation' />
+              <Form.Textarea name="observation" id="observation-input" />
+              <Form.ErrorMessage field="observation" />
             </Form.Field>
           </WizardFormStep>
         </WizardForm>
@@ -113,14 +155,13 @@ export function CreateEmissionForm() {
           )}
         </div>
 
-        <div className='w-full bg-zinc-200 rounded-full h-2 overflow-hidden'>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200">
           <motion.div
             animate={{ width: `${percentSteps}%` }}
-            className='bg-violet-500 h-2'
+            className="h-2 bg-violet-500"
             transition={{ duration: 0.4 }}
           />
         </div>
-
       </form>
     </FormProvider>
   )
