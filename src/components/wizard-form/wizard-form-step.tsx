@@ -1,7 +1,7 @@
 import { ComponentProps } from 'react'
 import { motion } from 'framer-motion'
 
-export interface AnimatedContainerProps
+export interface WizardFormStepProps
   extends ComponentProps<typeof motion.div> {
   direction?: number
 }
@@ -27,10 +27,10 @@ const variants = {
   },
 }
 
-export function AnimatedContainer({
+export function WizardFormStep({
   direction = 1,
   ...props
-}: AnimatedContainerProps) {
+}: WizardFormStepProps) {
   return (
     <motion.div
       key="sliders"
@@ -43,7 +43,7 @@ export function AnimatedContainer({
         x: { type: 'spring', stiffness: 300, damping: 30 },
         opacity: { duration: 0.2 },
       }}
-      className="flex w-96 flex-col gap-3 bg-red-300"
+      className="absolute top-0 flex w-96 flex-col gap-4"
       {...props}
     />
   )

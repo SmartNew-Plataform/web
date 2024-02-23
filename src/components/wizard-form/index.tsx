@@ -1,9 +1,9 @@
 import { ReactElement, useEffect } from 'react'
-import { AnimatedContainerProps, AnimatedContainer } from './animated-container'
+import { WizardFormStepProps, WizardFormStep } from './wizard-form-step'
 import { AnimatePresence } from 'framer-motion'
 
 interface ContainerProps {
-  children: ReactElement<AnimatedContainerProps>[]
+  children: ReactElement<WizardFormStepProps>[]
   direction: number
   step: string
   setSteps: (param: string[]) => void
@@ -25,13 +25,13 @@ export function WizardForm({
   }, [])
 
   return (
-    <div className="flex h-full w-96">
+    <div className="relative h-full w-96">
       {items.map((item, index) => {
         const currentStep = steps[index]
         return (
           <AnimatePresence key={index}>
             {step === currentStep && (
-              <AnimatedContainer {...item.props} direction={direction} />
+              <WizardFormStep {...item.props} direction={direction} />
             )}
           </AnimatePresence>
         )
