@@ -17,32 +17,25 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
-import { useController, useFormContext } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
 import { ScrollArea } from '../ui/scroll-area'
 
-interface SelectProps extends React.ComponentProps<typeof Button> {
-  name: string
+interface ComboboxProps extends React.ComponentProps<typeof Button> {
   options: Array<{
     label: string
     value: string
   }>
   value?: string
+  onValueChange?: (value: string) => void
 }
 
-export function Select({
-  name,
+export function Combobox({
   options = [],
-  value = undefined,
+  value,
+  onValueChange = () => {},
   className,
   ...props
-}: SelectProps) {
-  const { control } = useFormContext()
-  const { field } = useController({
-    control,
-    name,
-    defaultValue: value,
-  })
+}: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -56,8 +49,8 @@ export function Select({
           className={twMerge('justify-between normal-case', className)}
         >
           <span className="flex-1 truncate text-left font-normal">
-            {field.value ? (
-              options.find((option) => option.value === field.value)?.label
+            {value ? (
+              options.find((option) => option.value === value)?.label
             ) : (
               <span className="font-medium text-zinc-500">Selecione...</span>
             )}
@@ -75,16 +68,14 @@ export function Select({
                 <CommandItem
                   key={option.value}
                   onSelect={() => {
-                    field.onChange(option.value)
+                    onValueChange(option.value)
                     setOpen(false)
                   }}
                 >
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      field.value === option.value
-                        ? 'opacity-100'
-                        : 'opacity-0',
+                      value === option.value ? 'opacity-100' : 'opacity-0',
                     )}
                   />
                   {option.label}

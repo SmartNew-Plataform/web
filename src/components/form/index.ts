@@ -13,6 +13,7 @@ import { Select } from './select'
 import { SkeletonField } from './skeleton-field'
 import { Textarea } from './textarea'
 import { PeriodInput } from './period-input'
+import { CostCenterPicker } from './cost-center-picker'
 
 export const Form = {
   Select,
@@ -30,4 +31,5 @@ export const Form = {
   DatePicker,
   SkeletonField,
   PeriodInput,
+  CostCenterPicker,
 }

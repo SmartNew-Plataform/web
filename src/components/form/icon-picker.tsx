@@ -11,7 +11,7 @@ interface IconPickerProps extends ComponentProps<typeof Button> {
   name: string
 }
 
-export function IconPicker({ name, className, ...props }: IconPickerProps) {
+export function IconPicker({ name }: IconPickerProps) {
   const { control } = useFormContext()
   const {
     field: { value, onChange, ref },
