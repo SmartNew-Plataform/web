@@ -27,8 +27,8 @@ import {
 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
-import { CreateProductModal } from './create-product-modal'
 import { EditEmissionModal } from './edit-emission-modal'
+import { ProductModal } from './product-modal'
 
 export function HeaderEmissionPage() {
   const [editModal, setEditModal] = useState(false)
@@ -49,8 +49,6 @@ export function HeaderEmissionPage() {
       return response.data
     },
   })
-
-  console.log(data)
 
   return (
     <PageHeader>
@@ -105,7 +103,7 @@ export function HeaderEmissionPage() {
               </DropdownMenu>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="grid-cols-auto-md mb-0 mt-4 grid w-full gap-4">
+          <AccordionContent className="mb-0 mt-4 grid w-full grid-cols-auto-md gap-4">
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 N° Processo:
@@ -165,7 +163,11 @@ export function HeaderEmissionPage() {
       </Accordion>
 
       <EditEmissionModal open={editModal} onOpenChange={setEditModal} />
-      <CreateProductModal open={createModal} onOpenChange={setCreateModal} />
+      <ProductModal
+        mode="create"
+        open={createModal}
+        onOpenChange={setCreateModal}
+      />
     </PageHeader>
   )
 }

@@ -1,8 +1,5 @@
 'use client'
 
-import { Check, ChevronsUpDown, ListChecks } from 'lucide-react'
-import * as React from 'react'
-
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -17,31 +14,33 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
-import { ComponentProps } from 'react'
-import { useController, useFormContext } from 'react-hook-form'
+import { Check, ChevronsUpDown, ListChecks } from 'lucide-react'
+import { ComponentProps, useState } from 'react'
+import { twMerge } from 'tailwind-merge'
 import { ScrollArea } from '../ui/scroll-area'
 import { Toggle } from '../ui/toggle'
 
 interface MultiSelectProps extends ComponentProps<typeof Button> {
-  name: string
   options: Array<{
     label: string
     value: string
   }>
+  value: string[] | undefined
+  onValueChange: (arg: string[]) => void
 }
 
-export function MultiSelect({ name, options, ...props }: MultiSelectProps) {
-  const { control } = useFormContext()
-  const { field } = useController({
-    control,
-    name,
-    defaultValue: [],
-  })
-  const [open, setOpen] = React.useState(false)
+export function ComboboxMulti({
+  options,
+  value = [],
+  onValueChange,
+  className,
+  ...props
+}: MultiSelectProps) {
+  const [open, setOpen] = useState(false)
 
   function getLabelValues() {
     const labels = options
-      .filter(({ value }) => field.value.includes(value))
+      .filter(({ value: valueItem }) => value.includes(valueItem))
       .map((item) => item.label)
 
     return labels.join(', ')
@@ -49,22 +48,22 @@ export function MultiSelect({ name, options, ...props }: MultiSelectProps) {
 
   function handleSelect({ currentValue }: { currentValue: string }) {
     let newValue = []
-    if (field.value.includes(currentValue)) {
-      newValue = field.value.filter((value: string) => value !== currentValue)
+    if (value.includes(currentValue)) {
+      newValue = value.filter((item: string) => item !== currentValue)
     } else {
-      newValue = field.value ? [...field.value, currentValue] : [currentValue]
+      newValue = value ? [...value, currentValue] : [currentValue]
     }
 
-    field.onChange(newValue)
+    onValueChange(newValue)
   }
 
   function handleToggleOptions(pressed: boolean) {
     if (pressed) {
-      field.onChange(options.map((option) => option.value))
+      onValueChange(options.map((option) => option.value))
       return
     }
 
-    field.onChange([])
+    onValueChange([])
   }
 
   return (
@@ -75,10 +74,10 @@ export function MultiSelect({ name, options, ...props }: MultiSelectProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="justify-between"
+          className={twMerge('justify-between', className)}
         >
-          <span className="flex flex-1 justify-start truncate">
-            {field.value.length ? getLabelValues() : 'Selecione...'}
+          <span className="flex flex-1 justify-start truncate font-semibold normal-case">
+            {value.length ? getLabelValues() : 'Selecione...'}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -105,7 +104,7 @@ export function MultiSelect({ name, options, ...props }: MultiSelectProps) {
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4 flex-shrink-0',
-                      field.value.includes(option.value)
+                      value.includes(option.value)
                         ? 'opacity-100'
                         : 'opacity-0',
                     )}
