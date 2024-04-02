@@ -9,6 +9,8 @@ interface HeaderProps extends HTMLAttributes<HTMLHeadingElement> {
 
 export function Header({ children, ...props }: HeaderProps) {
   const { user } = useUserStore()
+  console.log(user)
+
   return (
     <header
       {...props}
@@ -23,7 +25,9 @@ export function Header({ children, ...props }: HeaderProps) {
         <span className="text-xs text-zinc-600">{user?.name}</span>
 
         <div className="flex h-[35px] w-[35px] items-center justify-center rounded bg-violet-200 text-violet-600">
-          <span className="uppercase">{user?.name.split('')[0]}</span>
+          <span className="uppercase">
+            {user?.name && user?.name.split('')[0]}
+          </span>
         </div>
       </div>
     </header>

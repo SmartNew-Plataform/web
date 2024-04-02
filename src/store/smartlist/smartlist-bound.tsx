@@ -10,6 +10,12 @@ interface BoundType {
 
 interface SmartListBoundStoreData {
   bounds: BoundType[] | undefined
+  diverse:
+    | Array<{
+        value: string
+        label: string
+      }>
+    | undefined
   family:
     | Array<{
         branchId: number
@@ -22,6 +28,7 @@ interface SmartListBoundStoreData {
 
   loadBounds: () => Promise<void>
   loadFamily: () => Promise<void>
+  loadDiverse: () => Promise<void>
 }
 
 type ErrorMessage = { message: string }
@@ -29,6 +36,7 @@ type ErrorMessage = { message: string }
 export const useBoundStore = create<SmartListBoundStoreData>((set) => {
   return {
     bounds: undefined,
+    diverse: undefined,
     family: undefined,
 
     async loadBounds() {
@@ -50,6 +58,19 @@ export const useBoundStore = create<SmartListBoundStoreData>((set) => {
 
       set({
         family: response,
+      })
+    },
+
+    async loadDiverse() {
+      const response = await api
+        .get('/system/list-diverse')
+        .then((res) => res.data)
+        .catch((err: AxiosError<ErrorMessage>) => console.error(err))
+
+      console.log(response)
+
+      set({
+        diverse: response,
       })
     },
   }

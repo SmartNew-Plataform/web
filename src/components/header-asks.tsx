@@ -83,6 +83,10 @@ export function Header() {
             <strong className="uppercase text-slate-700">Condutor:</strong>
             <span className="text-slate-800">{checklistAsksScreen.user}</span>
           </div>
+          <div className="flex flex-col gap-1 pl-2">
+            <strong className="uppercase text-slate-700">Modelo:</strong>
+            <span className="text-slate-800">{checklistAsksScreen.model}</span>
+          </div>
         </div>
       </div>
 
