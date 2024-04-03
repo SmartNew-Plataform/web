@@ -1,42 +1,27 @@
 'use client'
 
+import { EmissionProduct } from '@/@types/finance-emission'
 import { AlertModal } from '@/components/alert-modal'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
 import { currencyFormat } from '@/lib/currencyFormat'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
-import { ProductData, ProductModal } from './product-modal'
-
-interface CompositionItem {
-  value: number
-  label: string
-}
-
-interface LaunchItemType {
-  id: number
-  item: string
-  bound: 'stock' | 'equipment' | 'order'
-  total: string
-  compositionItem: CompositionItem
-  input: string
-  material: string
-  equipment: string[]
-  order: string[]
-  quantity: string
-  price: string
-}
+import { ProductModal } from './product-modal'
 
 export function Grid() {
   const routeParams = useParams()
   const [deleteItemId, setDeleteItemId] = useState<string | undefined>(
     undefined,
   )
-  const [editData, setEditData] = useState<ProductData | undefined>(undefined)
+  const queryClient = useQueryClient()
+  const [editData, setEditData] = useState<EmissionProduct | undefined>(
+    undefined,
+  )
 
   async function fetchData() {
     const response = await api
@@ -50,12 +35,14 @@ export function Grid() {
     return response.data
   }
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['financial/account/launch/grid'],
+  const { data, isLoading } = useQuery<EmissionProduct[]>({
+    queryKey: [
+      `financial/account/launch/${routeParams.type}/${routeParams.emissionId}`,
+    ],
     queryFn: fetchData,
   })
 
-  const columns: ColumnDef<LaunchItemType>[] = [
+  const columns: ColumnDef<EmissionProduct>[] = [
     {
       accessorKey: 'id',
       header: '',
@@ -75,11 +62,7 @@ export function Grid() {
             <Button
               variant="secondary"
               size="icon-xs"
-              // onClick={() =>
-              //   setEditData({
-              //     bound: data.bound,
-              //   })
-              // }
+              onClick={() => setEditData(data)}
             >
               <Pencil size={12} />
             </Button>
@@ -132,12 +115,40 @@ export function Grid() {
     {
       accessorKey: 'total',
       header: 'total (R$)',
+      cell: (value) => {
+        return currencyFormat(Number(value.getValue()))
+      },
     },
   ]
 
-  function deleteProduct() {}
+  async function deleteProduct() {
+    const response = await api.delete(
+      `financial/account/finance/${routeParams.emissionId}/item/${deleteItemId}`,
+      {
+        params: {
+          application: `blank_financeiro_emissao_${routeParams.type}`,
+        },
+      },
+    )
 
-  console.log(deleteItemId)
+    // eslint-disable-next-line no-useless-return
+    if (response.status !== 200) return
+
+    const data =
+      (await queryClient.getQueryData<EmissionProduct[]>([
+        `financial/account/launch/${routeParams.type}/${routeParams.emissionId}`,
+      ])) || []
+
+    const updatedData = data.filter((item) => item.id !== Number(deleteItemId))
+    console.log(updatedData)
+
+    queryClient.setQueryData(
+      [
+        `financial/account/launch/${routeParams.type}/${routeParams.emissionId}`,
+      ],
+      updatedData,
+    )
+  }
 
   return (
     <>
@@ -152,6 +163,7 @@ export function Grid() {
       <ProductModal
         mode="edit"
         open={!!editData}
+        editData={editData}
         onOpenChange={(isOpen) => setEditData(isOpen ? editData : undefined)}
       />
     </>

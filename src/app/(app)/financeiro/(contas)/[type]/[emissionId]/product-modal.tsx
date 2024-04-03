@@ -1,24 +1,26 @@
 'use client'
 
+import { EmissionProduct } from '@/@types/finance-emission'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { ComponentProps, Suspense } from 'react'
+import { ComponentProps, Suspense, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 interface ProductModalProps extends ComponentProps<typeof Dialog> {
   mode: 'create' | 'edit'
+  editData?: EmissionProduct
 }
 
 const schemaProduct = z.object({
-  bound: z.enum(['equipment', 'stock', 'order'], {
+  bound: z.enum(['EQUIPMENT', 'STOCK', 'ORDER'], {
     required_error: 'Este campo e obrigatório',
   }),
   itemBounded: z.array(z.coerce.number()).optional(),
@@ -36,13 +38,21 @@ const schemaProduct = z.object({
 
 export type ProductData = z.infer<typeof schemaProduct>
 
-export function ProductModal({ mode, ...props }: ProductModalProps) {
+export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
   const createProductForm = useForm<ProductData>({
     resolver: zodResolver(schemaProduct),
   })
-  const { handleSubmit, watch, reset } = createProductForm
+
+  const {
+    handleSubmit,
+    watch,
+    reset,
+    setValue,
+    formState: { isSubmitting },
+  } = createProductForm
   const routeParams = useParams()
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   async function handleCreateProduct({
     bound,
@@ -52,11 +62,10 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
     unityValue,
     itemBounded,
   }: ProductData) {
-    const boundUpper = (bound !== 'stock' ? 'bound' : bound).toUpperCase()
     const response = await api.post(
       `financial/account/finance/${routeParams.emissionId}/item`,
       {
-        bound: boundUpper,
+        bound,
         [bound]: itemBounded,
         inputId: Number(item),
         compositionItemId: Number(costCenter),
@@ -68,6 +77,20 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
 
     if (response.status !== 201) return
 
+    const data =
+      (await queryClient.getQueryData<EmissionProduct[]>([
+        `financial/account/launch/${routeParams.type}/${routeParams.emissionId}`,
+      ])) || []
+
+    const updatedData = [...data, response.data.item]
+
+    queryClient.setQueryData(
+      [
+        `financial/account/launch/${routeParams.type}/${routeParams.emissionId}`,
+      ],
+      updatedData,
+    )
+
     toast({
       title: 'Item inserido com sucesso!',
       variant: 'success',
@@ -78,8 +101,8 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
       costCenter: undefined,
       item: undefined,
       itemBounded: undefined,
-      quantity: undefined,
-      unityValue: undefined,
+      quantity: 0,
+      unityValue: 0,
     })
   }
 
@@ -88,7 +111,7 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
   }
 
   const boundValue = watch('bound')
-  const showItemBounded = boundValue === 'order' || boundValue === 'equipment'
+  const showItemBounded = boundValue === 'ORDER' || boundValue === 'EQUIPMENT'
 
   const { data } = useQuery({
     queryKey: ['financial/accounts/launch/selects'],
@@ -125,6 +148,30 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
     },
   })
 
+  useEffect(() => {
+    // {
+    //   bound: editData?.bound,
+    //   costCenter: editData?.costCenter,
+    //   item: editData?.item,
+    //   itemBounded: '',
+    //   quantity: Number(editData?.quantity),
+    //   unityValue: Number(editData?.price),
+    // }
+    if (!editData?.bound) return
+    const bound = editData?.bound
+    setValue('bound', bound)
+
+    if (editData.bound !== 'STOCK') {
+      const boundKey = editData.bound.toLowerCase() as 'equipment' | 'order'
+      console.log(boundKey, editData[boundKey])
+
+      // setValue(
+      //   'itemBounded',
+      //   editData[boundKey].map(({ value }) => value),
+      // )
+    }
+  }, [mode, editData])
+
   return (
     <Dialog {...props}>
       <DialogContent>
@@ -141,9 +188,9 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
                 name="bound"
                 id="bound-input"
                 options={[
-                  { label: 'OS', value: 'order' },
-                  { label: 'Equipamento', value: 'equipment' },
-                  { label: 'Estoque', value: 'stock' },
+                  { label: 'OS', value: 'ORDER' },
+                  { label: 'Equipamento', value: 'EQUIPMENT' },
+                  { label: 'Estoque', value: 'STOCK' },
                 ]}
               />
               <Form.ErrorMessage field="bound" />
@@ -159,7 +206,7 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
                     name="itemBounded"
                     id="item-bounded-input"
                     options={
-                      boundValue === 'equipment' ? data?.equipment : data?.order
+                      boundValue === 'EQUIPMENT' ? data?.equipment : data?.order
                     }
                   />
                   <Form.ErrorMessage field="itemBounded" />
@@ -212,7 +259,7 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
               <Form.ErrorMessage field="quantity" />
             </Form.Field>
 
-            <Button>
+            <Button loading={isSubmitting} disabled={isSubmitting}>
               <Save size={16} />
               Salvar
             </Button>

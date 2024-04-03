@@ -1,4 +1,5 @@
 'use client'
+import { EmissionData } from '@/@types/finance-emission'
 import { PageHeader } from '@/components/page-header'
 import {
   Accordion,
@@ -15,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import {
   ChevronLeft,
   File,
@@ -35,7 +37,7 @@ export function HeaderEmissionPage() {
   const [createModal, setCreateModal] = useState(false)
   const routeParams = useParams()
 
-  const { data } = useQuery({
+  const { data } = useQuery<EmissionData>({
     queryKey: ['financial/account/emission/data'],
     queryFn: async () => {
       const response = await api
@@ -108,61 +110,75 @@ export function HeaderEmissionPage() {
               <span className="text-xs font-bold uppercase text-slate-600">
                 N° Processo:
               </span>
-              <span className="text-zinc-500">0002034</span>
+              <span className="text-zinc-500">
+                {data?.processNumber.toString().padStart(6, '0')}
+              </span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 Tipo de documento:
               </span>
-              <span className="text-zinc-500">NOTA FISCAL</span>
+              <span className="text-zinc-500">{data?.documentType}</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 N° Documento:
               </span>
-              <span className="text-zinc-500">003045</span>
+              <span className="text-zinc-500">
+                {data?.fiscalNumber.toString().padStart(6, '0')}
+              </span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 Identificação do emitente:
               </span>
-              <span className="text-zinc-500">SMARTNEW SYSTEM</span>
+              <span className="text-zinc-500">{data?.issue}</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 Destinatário/Remetente:
               </span>
-              <span className="text-zinc-500">Fulano de tal</span>
+              <span className="text-zinc-500">{data?.sender}</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 Data emissão:
               </span>
-              <span className="text-zinc-500">04/10/2023</span>
+              <span className="text-zinc-500">
+                {dayjs(data?.dateEmission).format('DD/MM/YYYY')}
+              </span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 Data lançamento:
               </span>
-              <span className="text-zinc-500">17/10/2023</span>
+              <span className="text-zinc-500">
+                {dayjs(data?.dateLaunch).format('DD/MM/YYYY')}
+              </span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 Chave de acesso:
               </span>
-              <span className="text-zinc-500">00002030</span>
+              <span className="text-zinc-500">{data?.key}</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold uppercase text-slate-600">
                 Observação:
               </span>
-              <span className="text-zinc-500">Itens pra Wesley</span>
+              <span className="text-zinc-500">{data?.description}</span>
             </div>
           </AccordionContent>
         </AccordionItem>
       </Accordion>
 
-      <EditEmissionModal open={editModal} onOpenChange={setEditModal} />
+      {data && (
+        <EditEmissionModal
+          data={data}
+          open={editModal}
+          onOpenChange={setEditModal}
+        />
+      )}
       <ProductModal
         mode="create"
         open={createModal}
