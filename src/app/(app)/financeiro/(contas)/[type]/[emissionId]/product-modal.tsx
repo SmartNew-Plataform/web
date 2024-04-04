@@ -1,6 +1,7 @@
 'use client'
 
 import { EmissionProduct } from '@/@types/finance-emission'
+import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
@@ -16,14 +17,16 @@ import { z } from 'zod'
 
 interface ProductModalProps extends ComponentProps<typeof Dialog> {
   mode: 'create' | 'edit'
-  editData?: EmissionProduct
+  editData?: Omit<EmissionProduct, 'compositionItem'> & {
+    compositionItem: SelectData
+  }
 }
 
 const schemaProduct = z.object({
-  bound: z.enum(['EQUIPMENT', 'STOCK', 'ORDER'], {
+  bound: z.enum(['EQUIPMENT', 'STOCK', 'OS'], {
     required_error: 'Este campo e obrigatório',
   }),
-  itemBounded: z.array(z.coerce.number()).optional(),
+  itemBounded: z.array(z.coerce.string()).optional(),
   costCenter: z.coerce.string({ required_error: 'Este campo e obrigatório' }),
   item: z.string({ required_error: 'Este campo e obrigatório' }),
   unityValue: z.coerce.number({
@@ -66,7 +69,7 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
       `financial/account/finance/${routeParams.emissionId}/item`,
       {
         bound,
-        [bound]: itemBounded,
+        [bound.toLowerCase()]: itemBounded,
         inputId: Number(item),
         compositionItemId: Number(costCenter),
         price: unityValue,
@@ -111,7 +114,7 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
   }
 
   const boundValue = watch('bound')
-  const showItemBounded = boundValue === 'ORDER' || boundValue === 'EQUIPMENT'
+  const showItemBounded = boundValue === 'OS' || boundValue === 'EQUIPMENT'
 
   const { data } = useQuery({
     queryKey: ['financial/accounts/launch/selects'],
@@ -149,28 +152,40 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
   })
 
   useEffect(() => {
-    // {
-    //   bound: editData?.bound,
-    //   costCenter: editData?.costCenter,
-    //   item: editData?.item,
-    //   itemBounded: '',
-    //   quantity: Number(editData?.quantity),
-    //   unityValue: Number(editData?.price),
-    // }
-    if (!editData?.bound) return
+    console.log(editData)
+
+    if (!editData?.bound) {
+      console.log('create')
+
+      reset({
+        bound: undefined,
+        costCenter: undefined,
+        item: undefined,
+        itemBounded: undefined,
+        quantity: 0,
+        unityValue: 0,
+      })
+      return
+    }
     const bound = editData?.bound
     setValue('bound', bound)
 
     if (editData.bound !== 'STOCK') {
-      const boundKey = editData.bound.toLowerCase() as 'equipment' | 'order'
-      console.log(boundKey, editData[boundKey])
-
-      // setValue(
-      //   'itemBounded',
-      //   editData[boundKey].map(({ value }) => value),
-      // )
+      const boundKey =
+        editData.bound.toLowerCase() !== 'equipment' ? 'order' : 'equipment'
+      setValue(
+        'itemBounded',
+        editData[boundKey].map(({ value }) => value),
+      )
     }
-  }, [mode, editData])
+
+    const currentItemKey = routeParams.type === 'pagar' ? 'material' : 'input'
+
+    setValue('item', editData[currentItemKey]?.value.toString() || '')
+    setValue('costCenter', editData.compositionItem.value)
+    setValue('unityValue', Number(editData.price))
+    setValue('quantity', Number(editData.quantity))
+  }, [mode, editData, props.open])
 
   return (
     <Dialog {...props}>
@@ -188,7 +203,7 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
                 name="bound"
                 id="bound-input"
                 options={[
-                  { label: 'OS', value: 'ORDER' },
+                  { label: 'OS', value: 'OS' },
                   { label: 'Equipamento', value: 'EQUIPMENT' },
                   { label: 'Estoque', value: 'STOCK' },
                 ]}
@@ -233,7 +248,11 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
               <Form.Label htmlFor="cost-center-input">
                 Centro de custo:
               </Form.Label>
-              <Form.CostCenterPicker name="costCenter" id="cost-center-input" />
+              <Form.CostCenterPicker
+                name="costCenter"
+                id="cost-center-input"
+                defaultLabel={editData?.compositionItem.label}
+              />
               <Form.ErrorMessage field="costCenter" />
             </Form.Field>
             <Form.Field>

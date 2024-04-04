@@ -1,4 +1,4 @@
 export interface SelectData {
-  value: number
+  value: string
   label: string
 }

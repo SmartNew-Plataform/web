@@ -1,7 +1,7 @@
 'use client'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
-import { Check } from 'lucide-react'
+import { Check, SquareArrowOutUpRight } from 'lucide-react'
 import { ComponentProps, useState } from 'react'
 import { useController, useFormContext } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
@@ -17,6 +17,8 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '../ui/sheet'
 
 interface CostCenterPickerProps extends ComponentProps<typeof Button> {
   name: string
+  value?: string
+  defaultLabel?: string
 }
 
 type NodeData = {
@@ -28,15 +30,20 @@ type NodeData = {
 export function CostCenterPicker({
   name,
   className,
+  value,
+  defaultLabel,
   ...props
 }: CostCenterPickerProps) {
   const { control } = useFormContext()
   const { field } = useController({
     name,
     control,
+    defaultValue: value,
   })
   const [branch, setBranch] = useState<string[]>([''])
-  const [currentLabel, setCurrentLabel] = useState<string | undefined>()
+  const [currentLabel, setCurrentLabel] = useState<string | undefined>(
+    defaultLabel,
+  )
 
   const { data: listBranch } = useQuery({
     queryKey: ['list-branch'],
@@ -80,12 +87,16 @@ export function CostCenterPicker({
           {...props}
         >
           {field.value ? (
-            <span className="font-normal normal-case">{currentLabel}</span>
+            <span className="flex-1 text-left font-normal normal-case">
+              {currentLabel}
+            </span>
           ) : (
-            <span className="font-medium normal-case text-zinc-500">
+            <span className="flex-1 text-left font-medium normal-case text-zinc-500">
               Selecione...
             </span>
           )}
+
+          <SquareArrowOutUpRight size={12} className="text-zinc-500" />
         </Button>
       </SheetTrigger>
 

@@ -30,12 +30,17 @@ interface MultiSelectProps extends ComponentProps<typeof Button> {
   }>
 }
 
-export function MultiSelect({ name, options, ...props }: MultiSelectProps) {
+export function MultiSelect({
+  name,
+  options,
+  value,
+  ...props
+}: MultiSelectProps) {
   const { control } = useFormContext()
   const { field } = useController({
     control,
     name,
-    defaultValue: [],
+    defaultValue: value || [],
   })
   const [open, setOpen] = React.useState(false)
 
@@ -77,7 +82,7 @@ export function MultiSelect({ name, options, ...props }: MultiSelectProps) {
           aria-expanded={open}
           className="justify-between"
         >
-          <span className="flex flex-1 justify-start truncate">
+          <span className="flex flex-1 justify-start truncate font-normal normal-case">
             {field.value.length ? getLabelValues() : 'Selecione...'}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

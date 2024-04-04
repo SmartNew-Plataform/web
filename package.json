@@ -49,7 +49,7 @@
     "graphql": "^16.8.0",
     "keen-slider": "^6.8.6",
     "lottie-react": "^2.4.0",
-    "lucide-react": "^0.268.0",
+    "lucide-react": "^0.364.0",
     "next": "14.0.1",
     "node": "^18.14.0",
     "postcss": "8.4.28",

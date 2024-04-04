@@ -4,11 +4,11 @@ export interface EmissionProduct {
   id: number
   item: string
   total: string
-  bound: 'STOCK' | 'EQUIPMENT' | 'ORDER'
+  bound: 'STOCK' | 'EQUIPMENT' | 'OS'
   costCenter: string
-  compositionItem: SelectData[]
-  input: string | null
-  material: string | null
+  compositionItem: SelectData
+  input: SelectData | null
+  material: SelectData | null
   equipment: SelectData[]
   order: SelectData[]
   quantity: string
