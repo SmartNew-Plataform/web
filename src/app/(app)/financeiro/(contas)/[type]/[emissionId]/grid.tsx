@@ -89,7 +89,7 @@ export function Grid() {
     // },
     {
       accessorFn: ({ material, input }) => {
-        return routeParams.type === 'pagar' ? material : input
+        return routeParams.type === 'pagar' ? material?.label : input?.label
       },
       header: routeParams.type === 'pagar' ? 'Material' : 'Insumo',
     },

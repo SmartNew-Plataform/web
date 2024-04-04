@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import {
   ChevronLeft,
+  CreditCard,
   File,
   MoreVertical,
   Pencil,
@@ -29,12 +30,14 @@ import {
 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
+import { InstallmentSheet } from './(installments)/installment-sheet'
 import { EditEmissionModal } from './edit-emission-modal'
 import { ProductModal } from './product-modal'
 
 export function HeaderEmissionPage() {
   const [editModal, setEditModal] = useState(false)
   const [createModal, setCreateModal] = useState(false)
+  const [detailsPaymentSheet, setDetailsPaymentSheet] = useState(false)
   const routeParams = useParams()
 
   const { data } = useQuery<EmissionData>({
@@ -65,6 +68,14 @@ export function HeaderEmissionPage() {
             </div>
 
             <div className="ml-auto flex items-center gap-4">
+              <Button
+                variant="secondary"
+                onClick={() => setDetailsPaymentSheet(true)}
+              >
+                <CreditCard size={16} />
+                Detalhes de pagamento
+              </Button>
+
               <Button onClick={() => setCreateModal(true)}>
                 <Plus size={16} />
                 Adicionar
@@ -183,6 +194,11 @@ export function HeaderEmissionPage() {
         mode="create"
         open={createModal}
         onOpenChange={setCreateModal}
+      />
+
+      <InstallmentSheet
+        open={detailsPaymentSheet}
+        onOpenChange={setDetailsPaymentSheet}
       />
     </PageHeader>
   )
