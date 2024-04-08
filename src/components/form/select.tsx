@@ -3,6 +3,7 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
 import * as React from 'react'
 
+import { SelectData } from '@/@types/select-data'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -23,10 +24,7 @@ import { ScrollArea } from '../ui/scroll-area'
 
 interface SelectProps extends React.ComponentProps<typeof Button> {
   name: string
-  options: Array<{
-    label: string
-    value: string
-  }>
+  options?: Array<SelectData>
   value?: string
 }
 

@@ -1,28 +1,45 @@
+'use client'
+import { Form } from '@/components/form'
 import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, Pencil, Save } from 'lucide-react'
+import { currencyFormat } from '@/lib/currencyFormat'
+import { useEmissionStore } from '@/store/financial/emission'
+import { useParams } from 'next/navigation'
+import { FormInstallments } from './form-installments'
+import { TributesModal } from './tributes-modal'
 
 export function HeaderInstallment() {
+  const { installmentsData } = useEmissionStore(({ installmentsData }) => ({
+    installmentsData: {
+      ...installmentsData,
+      taxation:
+        (installmentsData?.totalDiscount || 0) +
+        (installmentsData?.totalAddition || 0),
+    },
+  }))
+  const params = useParams()
   return (
     <PageHeader>
-      <div className="flex items-center gap-4">
-        <Button variant="secondary">
-          <ChevronLeft size={16} />
-        </Button>
-        <h2 className="text-xl font-bold text-zinc-700">
-          Detalhes do Pagamento
-        </h2>
+      <div className="grid flex-1 grid-cols-auto-md gap-4">
+        <Form.Field>
+          <Form.Label>Total</Form.Label>
+          <span>{currencyFormat(installmentsData?.totalGross ?? 0)}</span>
+        </Form.Field>
+
+        <Form.Field>
+          <Form.Label>Taxas:</Form.Label>
+          <TributesModal
+            emissionId={Number(params.emissionId)}
+            totalTributes={installmentsData.taxation}
+          />
+        </Form.Field>
+
+        <Form.Field>
+          <Form.Label>Total liquido:</Form.Label>
+          <span>{currencyFormat(installmentsData?.totalLiquid ?? 0)}</span>
+        </Form.Field>
       </div>
-      <div className="flex items-center gap-4">
-        <Button>
-          <Save size={16} />
-          Salvar
-        </Button>
-        <Button variant="secondary">
-          <Pencil size={16} />
-          Editar
-        </Button>
-      </div>
+
+      <FormInstallments />
     </PageHeader>
   )
 }

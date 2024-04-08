@@ -6,40 +6,33 @@ import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
 import { currencyFormat } from '@/lib/currencyFormat'
+import { useEmissionStore } from '@/store/financial/emission'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { useState } from 'react'
 import { ProductModal } from './product-modal'
 
 export function Grid() {
+  const {
+    fetchProductsData,
+    editData,
+    setEditData,
+    deleteItemId,
+    setDeleteItemId,
+  } = useEmissionStore()
   const routeParams = useParams()
-  const [deleteItemId, setDeleteItemId] = useState<string | undefined>(
-    undefined,
-  )
   const queryClient = useQueryClient()
-  const [editData, setEditData] = useState<EmissionProduct | undefined>(
-    undefined,
-  )
-
-  async function fetchData() {
-    const response = await api
-      .get(`financial/account/finance/${routeParams.emissionId}/item`, {
-        params: {
-          application: `blank_financeiro_emissao_${routeParams.type}`,
-        },
-      })
-      .then((res) => res.data)
-
-    return response.data
-  }
 
   const { data, isLoading } = useQuery<EmissionProduct[]>({
     queryKey: [
       `financial/account/launch/${routeParams.type}/${routeParams.emissionId}`,
     ],
-    queryFn: fetchData,
+    queryFn: () =>
+      fetchProductsData({
+        emissionId: routeParams.emissionId as string,
+        type: routeParams.type as string,
+      }),
   })
 
   const columns: ColumnDef<EmissionProduct>[] = [
@@ -163,7 +156,6 @@ export function Grid() {
       <ProductModal
         mode="edit"
         open={!!editData}
-        editData={editData}
         onOpenChange={(isOpen) => setEditData(isOpen ? editData : undefined)}
       />
     </>

@@ -1,20 +1,5 @@
 import { SelectData } from './select-data'
 
-export interface EmissionProduct {
-  id: number
-  item: string
-  total: string
-  bound: 'STOCK' | 'EQUIPMENT' | 'OS'
-  costCenter: string
-  compositionItem: SelectData
-  input: SelectData | null
-  material: SelectData | null
-  equipment: SelectData[]
-  order: SelectData[]
-  quantity: string
-  price: string
-}
-
 export interface EmissionData {
   id: number
   documentType: string
@@ -38,4 +23,46 @@ export interface EmissionData {
   discountTotal: number
   additionDiscount: number
   liquidTotal: number
+}
+
+export interface EmissionProduct {
+  id: number
+  item: string
+  total: string
+  bound: 'STOCK' | 'EQUIPMENT' | 'OS'
+  costCenter: string
+  compositionItem: SelectData
+  input: SelectData | null
+  material: SelectData | null
+  equipment: SelectData[]
+  order: SelectData[]
+  quantity: string
+  price: string
+}
+
+export interface Installment {
+  id: number
+  dueDate: string
+  split: number
+  prorogation: string
+  status: string
+  addition: number
+  discount: number
+  valuePay: number
+  valueSplit: number
+  paymentDate: string
+}
+
+export interface InstallmentData {
+  paymentType: SelectData
+  split: boolean
+  quantitySplit: number
+  dueDate: string
+  totalGross: number
+  totalLiquid: number
+  fixedFrequency: boolean
+  paymentFrequency: number
+  totalAddition: number
+  totalDiscount: number
+  installment: Installment[]
 }

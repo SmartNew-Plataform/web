@@ -8,7 +8,8 @@ import { api } from '@/lib/api'
 import { currencyFormat } from '@/lib/currencyFormat'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { SlidersHorizontal, Trash2 } from 'lucide-react'
+import { SquareArrowOutUpRight, Trash2 } from 'lucide-react'
+import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -17,7 +18,7 @@ interface TaxationData {
   taxation: Array<{
     id: number
     observation: string
-    taxation: string
+    tribute: string
     value: number
     type: string
   }>
@@ -31,8 +32,8 @@ interface TaxationData {
 }
 
 interface TributesModal {
-  splitId: number
   emissionId: number
+  totalTributes: number
 }
 
 const tributesFormSchema = z.object({
@@ -44,7 +45,7 @@ const tributesFormSchema = z.object({
 
 type TributesFormSchema = z.infer<typeof tributesFormSchema>
 
-export function TributesModal({ splitId, emissionId }: TributesModal) {
+export function TributesModal({ emissionId, totalTributes }: TributesModal) {
   const [taxationInLoading, setTaxationInLoading] = useState(false)
   const tributesForm = useForm<TributesFormSchema>({
     resolver: zodResolver(tributesFormSchema),
@@ -55,13 +56,16 @@ export function TributesModal({ splitId, emissionId }: TributesModal) {
     reset,
   } = tributesForm
   const { toast } = useToast()
+  const params = useParams()
 
   async function fetchData() {
     const [responseTributes, responseTaxation] = await Promise.all([
       api
         .get<{
           data: TaxationData['taxation']
-        }>(`financial/account/split/${splitId}/taxation`)
+        }>(`financial/account/finance/${emissionId}/register`, {
+          params: { application: `blank_financeiro_emissao_${params.type}` },
+        })
         .then((res) => res.data),
       api.get(`financial/account/list-taxation`).then((res) => res.data),
     ])
@@ -94,15 +98,17 @@ export function TributesModal({ splitId, emissionId }: TributesModal) {
   }
 
   const { data, isLoading, isFetching, refetch } = useQuery<TaxationData>({
-    queryKey: [`financial/account/tributes/${splitId}`],
+    queryKey: [`financial/account/tributes`],
     queryFn: fetchData,
   })
 
   async function handleNewTribute(data: TributesFormSchema) {
     const response = await api
-      .post(`financial/account/split/${splitId}/taxation`, {
+      .post(`financial/account/finance/${emissionId}/register`, {
         ...data,
+        tributeId: data.taxation,
         emissionId,
+        application: `blank_financeiro_emissao_${params.type}`,
       })
       .then((res) => res.data)
 
@@ -124,7 +130,11 @@ export function TributesModal({ splitId, emissionId }: TributesModal) {
   async function handleDeleteTaxation(id: number) {
     setTaxationInLoading(true)
     const response = await api
-      .delete(`financial/account/split/${splitId}/taxation/${id}`)
+      .delete(`financial/account/finance/${emissionId}/register/${id}`, {
+        params: {
+          application: `blank_financeiro_emissao_${params.type}`,
+        },
+      })
       .then((res) => res.data)
 
     setTaxationInLoading(false)
@@ -141,8 +151,9 @@ export function TributesModal({ splitId, emissionId }: TributesModal) {
   return (
     <Dialog>
       <DialogTrigger>
-        <Button size="icon-xs" variant="secondary">
-          <SlidersHorizontal className="w-4" />
+        <Button variant="outline" className="justify-between">
+          {currencyFormat(totalTributes)}
+          <SquareArrowOutUpRight size={12} />
         </Button>
       </DialogTrigger>
 
@@ -200,7 +211,7 @@ export function TributesModal({ splitId, emissionId }: TributesModal) {
                 <LoadingWithBg />
               )}
               {data?.taxation.map(
-                ({ taxation, value, observation, type, id }) => (
+                ({ value, observation, type, id, tribute }) => (
                   <div
                     key={id}
                     className="flex justify-between rounded bg-slate-200 p-3"
@@ -218,7 +229,7 @@ export function TributesModal({ splitId, emissionId }: TributesModal) {
                         >
                           <Trash2 width={12} />
                         </Button>
-                        <strong className="text-slate-700">{taxation}</strong>
+                        <strong className="text-slate-700">{tribute}</strong>
                       </div>
                       <span>{observation}</span>
                     </div>

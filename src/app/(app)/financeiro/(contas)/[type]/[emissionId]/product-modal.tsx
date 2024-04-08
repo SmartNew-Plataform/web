@@ -1,12 +1,12 @@
 'use client'
 
 import { EmissionProduct } from '@/@types/finance-emission'
-import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useEmissionStore } from '@/store/financial/emission'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
@@ -17,9 +17,6 @@ import { z } from 'zod'
 
 interface ProductModalProps extends ComponentProps<typeof Dialog> {
   mode: 'create' | 'edit'
-  editData?: Omit<EmissionProduct, 'compositionItem'> & {
-    compositionItem: SelectData
-  }
 }
 
 const schemaProduct = z.object({
@@ -41,7 +38,7 @@ const schemaProduct = z.object({
 
 export type ProductData = z.infer<typeof schemaProduct>
 
-export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
+export function ProductModal({ mode, ...props }: ProductModalProps) {
   const createProductForm = useForm<ProductData>({
     resolver: zodResolver(schemaProduct),
   })
@@ -53,6 +50,7 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
     setValue,
     formState: { isSubmitting },
   } = createProductForm
+  const { editData } = useEmissionStore(({ editData }) => ({ editData }))
   const routeParams = useParams()
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -69,7 +67,7 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
       `financial/account/finance/${routeParams.emissionId}/item`,
       {
         bound,
-        [bound.toLowerCase()]: itemBounded,
+        [bound === 'OS' ? 'order' : bound.toLowerCase()]: itemBounded,
         inputId: Number(item),
         compositionItemId: Number(costCenter),
         price: unityValue,
@@ -109,8 +107,56 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
     })
   }
 
-  async function handleEditProduct(data: ProductData) {
-    console.log(data)
+  async function handleEditProduct({
+    bound,
+    itemBounded,
+    item,
+    costCenter,
+    unityValue,
+    quantity,
+  }: ProductData) {
+    const updatedProduct = {
+      bound,
+      [bound === 'OS' ? 'order' : bound.toLowerCase()]: itemBounded,
+      inputId: Number(item),
+      compositionItemId: Number(costCenter),
+      price: unityValue,
+      quantity,
+    }
+    const response = await api.put(
+      `financial/account/finance/${routeParams.emissionId}/item/${editData?.id}`,
+      {
+        ...updatedProduct,
+        application: `blank_financeiro_emissao_${routeParams.type}`,
+      },
+    )
+
+    if (response.status !== 200) return
+
+    const data =
+      (await queryClient.getQueryData<EmissionProduct[]>([
+        `financial/account/launch/${routeParams.type}/${routeParams.emissionId}`,
+      ])) || []
+
+    const updatedData = data.map((item) => {
+      if (item.id === editData?.id) {
+        return response.data.item
+      }
+
+      return item
+    })
+
+    queryClient.setQueryData(
+      [
+        `financial/account/launch/${routeParams.type}/${routeParams.emissionId}`,
+      ],
+      updatedData,
+    )
+
+    toast({
+      title: 'Produto atualizado com sucesso!',
+      variant: 'success',
+    })
   }
 
   const boundValue = watch('bound')
@@ -149,14 +195,12 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
         inputTypes: responseInput.data,
       }
     },
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   })
 
   useEffect(() => {
-    console.log(editData)
-
     if (!editData?.bound) {
-      console.log('create')
-
       reset({
         bound: undefined,
         costCenter: undefined,
@@ -175,7 +219,7 @@ export function ProductModal({ mode, editData, ...props }: ProductModalProps) {
         editData.bound.toLowerCase() !== 'equipment' ? 'order' : 'equipment'
       setValue(
         'itemBounded',
-        editData[boundKey].map(({ value }) => value),
+        editData[boundKey].map(({ value }) => value.toString()),
       )
     }
 
