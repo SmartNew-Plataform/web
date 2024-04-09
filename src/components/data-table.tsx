@@ -22,11 +22,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  footer?: ReactNode
   globalFilter?: string
   isLoading?: boolean
 }
@@ -34,6 +35,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  footer,
   globalFilter = '',
   isLoading = false,
 }: DataTableProps<TData, TValue>) {
@@ -117,6 +119,8 @@ export function DataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
+
+          {footer && footer}
         </Table>
       </div>
 

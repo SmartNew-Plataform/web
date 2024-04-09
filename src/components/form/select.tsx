@@ -69,7 +69,7 @@ export function Select({
           <CommandEmpty>Nenhum item encontrado.</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="max-h-[30vh] overflow-auto">
-              {options.map((option) => (
+              {options?.map((option) => (
                 <CommandItem
                   key={option.value}
                   onSelect={() => {

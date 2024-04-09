@@ -33,11 +33,13 @@ import { useState } from 'react'
 import { InstallmentSheet } from './(installments)/installment-sheet'
 import { EditEmissionModal } from './edit-emission-modal'
 import { ProductModal } from './product-modal'
+import { SearchEmissionModal } from './search-emission-modal'
 
 export function HeaderEmissionPage() {
   const [editModal, setEditModal] = useState(false)
   const [createModal, setCreateModal] = useState(false)
   const [detailsPaymentSheet, setDetailsPaymentSheet] = useState(false)
+  const [searchEmissionModal, setSearchEmissionModal] = useState(false)
   const routeParams = useParams()
 
   const { data } = useQuery<EmissionData>({
@@ -89,7 +91,10 @@ export function HeaderEmissionPage() {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="mr-5">
-                  <DropdownMenuItem className="flex items-center gap-3">
+                  <DropdownMenuItem
+                    onClick={() => setSearchEmissionModal(true)}
+                    className="flex items-center gap-3"
+                  >
                     <Search size={12} />
                     Buscar lançamento
                   </DropdownMenuItem>
@@ -200,6 +205,13 @@ export function HeaderEmissionPage() {
         open={detailsPaymentSheet}
         onOpenChange={setDetailsPaymentSheet}
       />
+
+      <SearchEmissionModal
+        open={searchEmissionModal}
+        onOpenChange={setSearchEmissionModal}
+      />
+
+      {/* <AlertModal /> */}
     </PageHeader>
   )
 }

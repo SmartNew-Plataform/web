@@ -4,6 +4,7 @@ import { EmissionProduct } from '@/@types/finance-emission'
 import { AlertModal } from '@/components/alert-modal'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
+import { TableCell, TableFooter, TableRow } from '@/components/ui/table'
 import { api } from '@/lib/api'
 import { currencyFormat } from '@/lib/currencyFormat'
 import { useEmissionStore } from '@/store/financial/emission'
@@ -23,6 +24,9 @@ export function Grid() {
   } = useEmissionStore()
   const routeParams = useParams()
   const queryClient = useQueryClient()
+  const { totalProducts } = useEmissionStore(({ totalProducts }) => ({
+    totalProducts,
+  }))
 
   const { data, isLoading } = useQuery<EmissionProduct[]>({
     queryKey: [
@@ -145,7 +149,19 @@ export function Grid() {
 
   return (
     <>
-      <DataTable columns={columns} data={data || []} isLoading={isLoading} />
+      <DataTable
+        columns={columns}
+        data={data || []}
+        isLoading={isLoading}
+        footer={
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={8}>Total:</TableCell>
+              <TableCell>{currencyFormat(totalProducts)}</TableCell>
+            </TableRow>
+          </TableFooter>
+        }
+      />
       <AlertModal
         open={!!deleteItemId}
         onOpenChange={(isOpen) =>

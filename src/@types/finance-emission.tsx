@@ -66,3 +66,12 @@ export interface InstallmentData {
   totalDiscount: number
   installment: Installment[]
 }
+
+export interface SearchEmission {
+  id: number
+  numberFiscal: string
+  numberProcess: string
+  emissionDate: string
+  issue: string
+  sender: string
+}

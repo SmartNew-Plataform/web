@@ -20,6 +20,9 @@ interface EmissionStore {
         valuePay: number
       }
     | undefined
+  documentTypeData: SelectData[] | undefined
+  providerData: SelectData[] | undefined
+  branchData: SelectData[] | undefined
 
   setDeleteItemId: (id: string | undefined) => void
   setEditData: (data: EmissionProduct | undefined) => void
@@ -39,6 +42,7 @@ interface EmissionStore {
   }) => Promise<Installment[]>
 
   fetchInstallmentsSelects: (param: { type: string }) => Promise<SelectData[]>
+  fetchEmissionSelects: (param: { type: string }) => Promise<void>
 }
 
 export const useEmissionStore = create<EmissionStore>((set, get) => {
@@ -49,6 +53,9 @@ export const useEmissionStore = create<EmissionStore>((set, get) => {
     installmentsData: undefined,
     paymentTypes: undefined,
     dataInstallmentEditing: undefined,
+    documentTypeData: undefined,
+    providerData: undefined,
+    branchData: undefined,
 
     setDeleteItemId(id) {
       set({ deleteItemId: id })
@@ -121,6 +128,31 @@ export const useEmissionStore = create<EmissionStore>((set, get) => {
       set({ paymentTypes: response })
 
       return response
+    },
+
+    async fetchEmissionSelects({ type }) {
+      const params = {
+        params: {
+          application: `blank_financeiro_emissao_${type}`,
+        },
+      }
+      const [documentTypeData, providerData, branchData] = await Promise.all([
+        get().fetchInstallmentsSelects({ type }),
+        api
+          .get<{
+            data: SelectData[]
+          }>('financial/account/list-provider', params)
+          .then((res) => res.data.data),
+        api
+          .get<{ data: SelectData[] }>('financial/account/list-branch', params)
+          .then((res) => res.data.data),
+      ])
+
+      set({
+        branchData,
+        providerData,
+        documentTypeData,
+      })
     },
   }
 })

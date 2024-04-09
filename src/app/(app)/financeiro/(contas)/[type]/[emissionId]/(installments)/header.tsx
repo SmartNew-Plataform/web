@@ -19,7 +19,7 @@ export function HeaderInstallment() {
   const params = useParams()
   return (
     <PageHeader>
-      <div className="grid flex-1 grid-cols-auto-md gap-4">
+      <div className="grid flex-1 grid-cols-auto-sm gap-4">
         <Form.Field>
           <Form.Label>Total</Form.Label>
           <span>{currencyFormat(installmentsData?.totalGross ?? 0)}</span>

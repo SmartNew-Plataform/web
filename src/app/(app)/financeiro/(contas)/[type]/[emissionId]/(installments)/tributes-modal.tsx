@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { currencyFormat } from '@/lib/currencyFormat'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { SquareArrowOutUpRight, Trash2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
@@ -57,6 +57,7 @@ export function TributesModal({ emissionId, totalTributes }: TributesModal) {
   } = tributesForm
   const { toast } = useToast()
   const params = useParams()
+  const queryClient = useQueryClient()
 
   async function fetchData() {
     const [responseTributes, responseTaxation] = await Promise.all([
@@ -114,6 +115,7 @@ export function TributesModal({ emissionId, totalTributes }: TributesModal) {
 
     if (!response.inserted) return
 
+    queryClient.refetchQueries(['finance/account/launch/installments'])
     refetch()
     reset({
       description: '',
@@ -140,6 +142,7 @@ export function TributesModal({ emissionId, totalTributes }: TributesModal) {
     setTaxationInLoading(false)
 
     if (!response.deleted) return
+    queryClient.refetchQueries(['finance/account/launch/installments'])
 
     toast({
       title: 'Deletado com sucesso!',
