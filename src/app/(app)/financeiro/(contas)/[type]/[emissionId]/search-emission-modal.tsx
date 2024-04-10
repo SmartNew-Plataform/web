@@ -8,7 +8,8 @@ import { api } from '@/lib/api'
 import { useEmissionStore } from '@/store/financial/emission'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight, Search } from 'lucide-react'
-import { useParams } from 'next/navigation'
+import Link from 'next/link'
+import { useParams, useSearchParams } from 'next/navigation'
 import { ComponentProps, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -33,6 +34,7 @@ export function SearchEmissionModal({ ...props }: SearchEmissionModalProps) {
   })
   const { handleSubmit } = searchEmissionForm
   const params = useParams()
+  const searchParams = useSearchParams()
   const [data, setData] = useState<SearchEmission[] | undefined>([])
   const { fetchEmissionSelects, documentTypeData, providerData, branchData } =
     useEmissionStore(
@@ -55,7 +57,6 @@ export function SearchEmissionModal({ ...props }: SearchEmissionModalProps) {
     issuer,
     sender,
   }: SearchEmissionData) {
-    console.log({ documentType, fiscalNumber, issuer, sender })
     const response = await api
       .get('/financial/account/finance/filter', {
         params: {
@@ -84,7 +85,7 @@ export function SearchEmissionModal({ ...props }: SearchEmissionModalProps) {
 
   return (
     <Dialog {...props}>
-      <DialogContent className="flex max-w-2xl gap-4">
+      <DialogContent className="flex max-h-full max-w-2xl gap-4">
         <FormProvider {...searchEmissionForm}>
           <form
             onSubmit={handleSubmit(searchEmission)}
@@ -146,7 +147,7 @@ export function SearchEmissionModal({ ...props }: SearchEmissionModalProps) {
             </Button>
           </form>
         </FormProvider>
-        <div className="flex flex-1 flex-col gap-4">
+        <div className="flex max-h-full flex-1 flex-col gap-4 overflow-auto">
           {data?.map(({ id, issue, numberFiscal, sender }) => {
             return (
               <Card key={id}>
@@ -168,9 +169,19 @@ export function SearchEmissionModal({ ...props }: SearchEmissionModalProps) {
                       <span className="text-zinc-500">{sender}</span>
                     </div>
                   </div>
-                  <Button variant="outline">
-                    <ChevronRight size={16} />
-                  </Button>
+                  <Link
+                    href={{
+                      pathname: `../${params.type}/${id}`,
+                      query: {
+                        h: 'hidden',
+                        token: searchParams.get('token'),
+                      },
+                    }}
+                  >
+                    <Button variant="outline">
+                      <ChevronRight size={16} />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             )

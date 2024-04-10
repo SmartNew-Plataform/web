@@ -30,23 +30,35 @@ const installmentFormSchema = z.object({
 type InstallmentFormData = z.infer<typeof installmentFormSchema>
 
 export function FormInstallments() {
-  const { fetchInstallmentsSelects, installmentsData, typePaymentCanSplit } =
-    useEmissionStore(
-      ({
-        fetchInstallmentsSelects,
-        installmentsData,
-        typePaymentCanSplit,
-      }) => ({
-        fetchInstallmentsSelects,
-        installmentsData,
-        typePaymentCanSplit,
-      }),
-    )
+  const {
+    fetchInstallmentsSelects,
+    installmentsData,
+    typePaymentCanSplit,
+    editable,
+  } = useEmissionStore(
+    ({
+      fetchInstallmentsSelects,
+      installmentsData,
+      typePaymentCanSplit,
+      editable,
+    }) => ({
+      fetchInstallmentsSelects,
+      installmentsData,
+      typePaymentCanSplit,
+      editable,
+    }),
+  )
   const installmentForm = useForm<InstallmentFormData>({
     resolver: zodResolver(installmentFormSchema),
   })
 
-  const { handleSubmit, watch, reset, setError } = installmentForm
+  const {
+    handleSubmit,
+    watch,
+    reset,
+    setError,
+    formState: { isSubmitting },
+  } = installmentForm
 
   const params = useParams()
   const { toast } = useToast()
@@ -60,6 +72,7 @@ export function FormInstallments() {
     quantitySplit,
     split,
   }: InstallmentFormData) {
+    if (!editable) return
     if (split && !paymentFrequency) {
       setError('paymentFrequency', {
         message: 'Este campo e obrigatório',
@@ -183,7 +196,7 @@ export function FormInstallments() {
               </fieldset>
             )}
 
-            <Button>
+            <Button disabled={isSubmitting || !editable}>
               <Save size={16} />
               Salvar
             </Button>

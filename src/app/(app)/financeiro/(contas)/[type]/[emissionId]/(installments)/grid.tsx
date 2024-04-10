@@ -16,16 +16,19 @@ export function GridInstallment() {
   const {
     fetchInstallmentsData,
     setDataInstallmentEditing,
+    editable,
     dataInstallmentEditing,
   } = useEmissionStore(
     ({
       fetchInstallmentsData,
       setDataInstallmentEditing,
       dataInstallmentEditing,
+      editable,
     }) => ({
       fetchInstallmentsData,
       setDataInstallmentEditing,
       dataInstallmentEditing,
+      editable,
     }),
   )
   const routeParams = useParams()
@@ -43,6 +46,7 @@ export function GridInstallment() {
             <Button
               variant="secondary"
               size="icon-xs"
+              disabled={!editable}
               onClick={() =>
                 setDataInstallmentEditing({
                   dueDate,

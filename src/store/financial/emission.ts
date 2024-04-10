@@ -1,4 +1,5 @@
 import {
+  EmissionData,
   EmissionProduct,
   Installment,
   InstallmentData,
@@ -23,13 +24,21 @@ interface EmissionStore {
   documentTypeData: SelectData[] | undefined
   providerData: SelectData[] | undefined
   branchData: SelectData[] | undefined
+  canFinalize: boolean
+  editable: boolean
 
   setDeleteItemId: (id: string | undefined) => void
   setEditData: (data: EmissionProduct | undefined) => void
   setDataInstallmentEditing: (
     params: EmissionStore['dataInstallmentEditing'] | undefined,
   ) => void
+  setTotalProducts: (total: number) => void
   typePaymentCanSplit: (id: string) => boolean
+
+  fetchEmissionData: (params: {
+    emissionId: string
+    type: string
+  }) => Promise<EmissionData>
 
   fetchProductsData: (params: {
     emissionId: string
@@ -56,6 +65,8 @@ export const useEmissionStore = create<EmissionStore>((set, get) => {
     documentTypeData: undefined,
     providerData: undefined,
     branchData: undefined,
+    canFinalize: true,
+    editable: true,
 
     setDeleteItemId(id) {
       set({ deleteItemId: id })
@@ -67,6 +78,10 @@ export const useEmissionStore = create<EmissionStore>((set, get) => {
 
     setDataInstallmentEditing(data) {
       set({ dataInstallmentEditing: data })
+    },
+
+    setTotalProducts(total) {
+      set({ totalProducts: total })
     },
 
     typePaymentCanSplit(id) {
@@ -99,6 +114,29 @@ export const useEmissionStore = create<EmissionStore>((set, get) => {
 
       return response.data
     },
+
+    async fetchEmissionData({ emissionId, type }) {
+      const response = await api
+        .get<{ data: EmissionData }>(
+          `financial/account/finance/${emissionId}`,
+          {
+            params: {
+              application: `blank_financeiro_emissao_${type}`,
+            },
+          },
+        )
+        .then((res) => {
+          return res.data
+        })
+
+      set({
+        canFinalize: response.data.status === 'ABERTO',
+        editable: response.data.editable,
+      })
+
+      return response.data
+    },
+
     async fetchInstallmentsData({ emissionId, type }) {
       const response = await api
         .get<{ data: InstallmentData }>(

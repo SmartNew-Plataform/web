@@ -50,7 +50,13 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
     setValue,
     formState: { isSubmitting },
   } = createProductForm
-  const { editData } = useEmissionStore(({ editData }) => ({ editData }))
+  const { editData, totalProducts, setTotalProducts } = useEmissionStore(
+    ({ editData, totalProducts, setTotalProducts }) => ({
+      editData,
+      totalProducts,
+      setTotalProducts,
+    }),
+  )
   const routeParams = useParams()
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -96,6 +102,8 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
       title: 'Item inserido com sucesso!',
       variant: 'success',
     })
+
+    setTotalProducts(unityValue * quantity + totalProducts)
 
     reset({
       bound: undefined,
@@ -157,6 +165,8 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
       title: 'Produto atualizado com sucesso!',
       variant: 'success',
     })
+
+    setTotalProducts(unityValue * quantity + totalProducts)
   }
 
   const boundValue = watch('bound')

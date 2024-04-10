@@ -24,9 +24,13 @@ export function Grid() {
   } = useEmissionStore()
   const routeParams = useParams()
   const queryClient = useQueryClient()
-  const { totalProducts } = useEmissionStore(({ totalProducts }) => ({
-    totalProducts,
-  }))
+  const { totalProducts, setTotalProducts, editable } = useEmissionStore(
+    ({ totalProducts, setTotalProducts, editable }) => ({
+      totalProducts,
+      setTotalProducts,
+      editable,
+    }),
+  )
 
   const { data, isLoading } = useQuery<EmissionProduct[]>({
     queryKey: [
@@ -53,6 +57,7 @@ export function Grid() {
               variant="destructive"
               size="icon-xs"
               onClick={() => setDeleteItemId(id)}
+              disabled={!editable}
             >
               <Trash2 size={12} />
             </Button>
@@ -60,6 +65,7 @@ export function Grid() {
               variant="secondary"
               size="icon-xs"
               onClick={() => setEditData(data)}
+              disabled={!editable}
             >
               <Pencil size={12} />
             </Button>
@@ -137,7 +143,9 @@ export function Grid() {
       ])) || []
 
     const updatedData = data.filter((item) => item.id !== Number(deleteItemId))
-    console.log(updatedData)
+    const productDeleted = data.find(({ id }) => id === Number(deleteItemId))
+
+    setTotalProducts(totalProducts - (Number(productDeleted?.total) || 0))
 
     queryClient.setQueryData(
       [

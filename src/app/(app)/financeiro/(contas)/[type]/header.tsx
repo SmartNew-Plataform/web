@@ -1,17 +1,17 @@
 'use client'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
-import { FileUp, Plus, Search, X } from 'lucide-react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { FilterModal } from './filter-modal'
 import { Input } from '@/components/ui/input'
-import { z } from 'zod'
-import { FormProvider, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useAccountStore } from '@/store/financial/account'
-import { EmissionModal } from './emission-modal'
+import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { useToast } from '@/components/ui/use-toast'
+import { FileUp, Plus, Search, X } from 'lucide-react'
+import Link from 'next/link'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { FormProvider, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { EmissionModal } from './emission-modal'
+import { FilterModal } from './filter-modal'
 
 const filterFormSchema = z.object({
   filterText: z.string().optional(),
@@ -186,10 +186,17 @@ export function Header() {
                 Limpar filtros
               </Button>
             )}
-            <Button>
-              <Plus width={16} />
-              Novo
-            </Button>
+            <Link
+              href={{
+                pathname: `../financeiro/${params.type}/new`,
+                query: { token: searchParams.get('token'), h: 'hidden' },
+              }}
+            >
+              <Button>
+                <Plus width={16} />
+                Novo
+              </Button>
+            </Link>
             <Button variant="secondary">
               <FileUp width={16} />
               Excel

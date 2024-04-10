@@ -23,6 +23,7 @@ export interface EmissionData {
   discountTotal: number
   additionDiscount: number
   liquidTotal: number
+  editable: boolean
 }
 
 export interface EmissionProduct {
@@ -74,4 +75,12 @@ export interface SearchEmission {
   emissionDate: string
   issue: string
   sender: string
+}
+
+export interface AttachResponse {
+  url: string
+}
+
+export interface AttachData extends AttachResponse {
+  name: string
 }

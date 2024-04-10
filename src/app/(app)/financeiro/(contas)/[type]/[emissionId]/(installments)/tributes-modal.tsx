@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { currencyFormat } from '@/lib/currencyFormat'
+import { useEmissionStore } from '@/store/financial/emission'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { SquareArrowOutUpRight, Trash2 } from 'lucide-react'
@@ -58,6 +59,7 @@ export function TributesModal({ emissionId, totalTributes }: TributesModal) {
   const { toast } = useToast()
   const params = useParams()
   const queryClient = useQueryClient()
+  const { editable } = useEmissionStore(({ editable }) => ({ editable }))
 
   async function fetchData() {
     const [responseTributes, responseTaxation] = await Promise.all([
@@ -104,6 +106,7 @@ export function TributesModal({ emissionId, totalTributes }: TributesModal) {
   })
 
   async function handleNewTribute(data: TributesFormSchema) {
+    if (!editable) return
     const response = await api
       .post(`financial/account/finance/${emissionId}/register`, {
         ...data,
@@ -200,7 +203,7 @@ export function TributesModal({ emissionId, totalTributes }: TributesModal) {
               </Form.Field>
               <Button
                 loading={isSubmitting}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !editable}
                 type="submit"
               >
                 Enviar
@@ -229,6 +232,7 @@ export function TributesModal({ emissionId, totalTributes }: TributesModal) {
                           size="icon-xs"
                           variant="destructive"
                           onClick={() => handleDeleteTaxation(id)}
+                          disabled={!editable}
                         >
                           <Trash2 width={12} />
                         </Button>
