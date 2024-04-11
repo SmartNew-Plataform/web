@@ -72,9 +72,8 @@ export function Status({ name, data, onChange }: StatusProps) {
   }
 
   useEffect(() => {
-    const children = data.find(
-      (option) => option.id === Number(field.value),
-    )?.children
+    const children = data.find((option) => option.id === Number(field.value))
+      ?.children
     onChange(children || null)
   }, [field.value])
 

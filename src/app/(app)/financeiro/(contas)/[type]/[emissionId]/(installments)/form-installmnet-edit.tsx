@@ -14,7 +14,7 @@ import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-interface FormInstallmentEditProps extends ComponentProps<typeof Dialog> {}
+type FormInstallmentEditProps = ComponentProps<typeof Dialog>
 
 const formInstallmentSchema = z.object(
   {
