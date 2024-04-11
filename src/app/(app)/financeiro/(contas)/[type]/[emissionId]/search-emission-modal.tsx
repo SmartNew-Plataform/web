@@ -14,7 +14,7 @@ import { ComponentProps, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-interface SearchEmissionModalProps extends ComponentProps<typeof Dialog> {}
+type SearchEmissionModalProps = ComponentProps<typeof Dialog>
 
 const searchEmissionSchema = z.object(
   {

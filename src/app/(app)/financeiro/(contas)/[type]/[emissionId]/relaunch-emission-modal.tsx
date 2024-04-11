@@ -8,7 +8,7 @@ import { SendHorizonal } from 'lucide-react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { ComponentProps, useState } from 'react'
 
-interface RelaunchEmissionModalProps extends ComponentProps<typeof Dialog> {}
+type RelaunchEmissionModalProps = ComponentProps<typeof Dialog>
 
 export function RelaunchEmissionModal({
   ...props
@@ -47,7 +47,9 @@ export function RelaunchEmissionModal({
     })
 
     router.push(
-      `../${routeParams.type}/${response.data.id}?h=hidden&token=${searchParams.get('token')}`,
+      `../${routeParams.type}/${
+        response.data.id
+      }?h=hidden&token=${searchParams.get('token')}`,
     )
   }
 

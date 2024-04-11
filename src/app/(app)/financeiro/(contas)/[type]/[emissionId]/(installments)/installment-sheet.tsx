@@ -3,7 +3,7 @@ import { ComponentProps } from 'react'
 import { GridInstallment } from './grid'
 import { HeaderInstallment } from './header'
 
-interface InstallmentSheetProps extends ComponentProps<typeof Sheet> {}
+type InstallmentSheetProps = ComponentProps<typeof Sheet>
 
 export function InstallmentSheet({ ...props }: InstallmentSheetProps) {
   return (
