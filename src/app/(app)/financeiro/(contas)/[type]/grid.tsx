@@ -1,12 +1,15 @@
 'use client'
 
 import { DataTableServerPagination } from '@/components/data-table-server-pagination'
+import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { EmissionType, useAccountStore } from '@/store/financial/account'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
 
 export function Grid() {
@@ -75,13 +78,28 @@ export function Grid() {
           aria-label="Select all"
         />
       ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
+      cell: ({ row }) => {
+        const id = row.getAllCells()[0].row.original.financeId
+        return (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label="Select row"
+            />
+            <Link
+              href={{
+                pathname: `${routeParams.type}/${id}`,
+                query: { token: searchParams.get('token'), h: 'hidden' },
+              }}
+            >
+              <Button size="icon-xs">
+                <ExternalLink size={12} />
+              </Button>
+            </Link>
+          </div>
+        )
+      },
       enableSorting: false,
       enableHiding: false,
     },

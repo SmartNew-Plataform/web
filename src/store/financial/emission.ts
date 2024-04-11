@@ -32,6 +32,7 @@ interface EmissionStore {
   setDataInstallmentEditing: (
     params: EmissionStore['dataInstallmentEditing'] | undefined,
   ) => void
+  setCanFinalize: (param: boolean) => void
   setTotalProducts: (total: number) => void
   typePaymentCanSplit: (id: string) => boolean
 
@@ -84,6 +85,10 @@ export const useEmissionStore = create<EmissionStore>((set, get) => {
       set({ totalProducts: total })
     },
 
+    setCanFinalize(canFinalize) {
+      set({ canFinalize })
+    },
+
     typePaymentCanSplit(id) {
       const paymentTypes = get().paymentTypes
       if (!paymentTypes) return false
@@ -130,7 +135,8 @@ export const useEmissionStore = create<EmissionStore>((set, get) => {
         })
 
       set({
-        canFinalize: response.data.status === 'ABERTO',
+        canFinalize:
+          response.data.status === 'ABERTO' && response.data.total !== 0,
         editable: response.data.editable,
       })
 

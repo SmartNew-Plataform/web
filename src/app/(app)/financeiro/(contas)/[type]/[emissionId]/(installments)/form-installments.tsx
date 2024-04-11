@@ -19,10 +19,7 @@ const installmentFormSchema = z.object({
   paymentType: z.string({ required_error: 'Este campo e obrigatório' }),
   dueDate: z.string({ required_error: 'Este campo e obrigatório' }),
   split: z.boolean().default(false),
-  quantitySplit: z.coerce
-    .number()
-    .min(1, { message: 'O mínimo e 1' })
-    .optional(),
+  quantitySplit: z.coerce.number().optional().default(1),
   paymentFrequency: z.coerce.number().optional(),
   fixedFrequency: z.boolean().default(false),
 })
@@ -35,21 +32,27 @@ export function FormInstallments() {
     installmentsData,
     typePaymentCanSplit,
     editable,
+    setCanFinalize,
   } = useEmissionStore(
     ({
       fetchInstallmentsSelects,
       installmentsData,
       typePaymentCanSplit,
       editable,
+      setCanFinalize,
     }) => ({
       fetchInstallmentsSelects,
       installmentsData,
       typePaymentCanSplit,
       editable,
+      setCanFinalize,
     }),
   )
   const installmentForm = useForm<InstallmentFormData>({
     resolver: zodResolver(installmentFormSchema),
+    defaultValues: {
+      quantitySplit: 1,
+    },
   })
 
   const {
@@ -94,6 +97,8 @@ export function FormInstallments() {
     )
 
     if (response.status !== 200) return
+
+    setCanFinalize(true)
 
     queryClient.refetchQueries(['finance/account/launch/installments'])
 

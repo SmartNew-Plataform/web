@@ -15,6 +15,7 @@ export type EmissionType = {
   totalLiquid: number
   numberSplit: number
   status: string
+  financeId: number
 }
 
 interface StoreData {
@@ -27,7 +28,7 @@ interface StoreData {
   }>
 }
 
-export const useAccountStore = create<StoreData>((set, get) => {
+export const useAccountStore = create<StoreData>((set) => {
   return {
     selectedRows: [],
     columns: [
