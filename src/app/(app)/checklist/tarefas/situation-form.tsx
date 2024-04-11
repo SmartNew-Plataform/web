@@ -188,7 +188,7 @@ export function SituationForm({ taskId }: SituationForm) {
           <div className="flex h-full flex-1 flex-col gap-3 overflow-auto">
             {actions.length > 0 ? (
               actions.map((action) => {
-                const { id, description, control, impediment } = action
+                const { id, description, control } = action
                 return (
                   <div
                     key={id}

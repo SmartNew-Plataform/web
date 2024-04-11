@@ -1,6 +1,6 @@
 'use client'
 import { SchemaAskType } from '@/store/smartlist/checklist-types'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import { Form } from '../form'
 import { Label } from '../ui/label'
@@ -87,6 +87,6 @@ export function AnswerModels({ data }: AnswerModelsProps) {
   )
 }
 
-const modelType: { [key: string]: ({ name }: StatusProps) => any } = {
+const modelType: { [key: string]: ({ name }: StatusProps) => ReactNode } = {
   STATUS: Status,
 }

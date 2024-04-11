@@ -1,8 +1,7 @@
 import { ComponentProps } from 'react'
 import { motion } from 'framer-motion'
 
-export interface WizardFormStepProps
-  extends ComponentProps<typeof motion.div> {
+export interface WizardFormStepProps extends ComponentProps<typeof motion.div> {
   direction?: number
 }
 

@@ -20,9 +20,9 @@ export function IconPicker({ name }: IconPickerProps) {
     control,
   })
   const icons: IconData[] = [
-    'x-circle',
-    'check-circle-2',
-    'help-circle',
+    'circle-x',
+    'circle-check',
+    'circle-help',
     'info',
     'thumbs-up',
     'thumbs-down',

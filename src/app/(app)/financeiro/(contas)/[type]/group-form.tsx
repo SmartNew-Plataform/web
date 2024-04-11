@@ -1,16 +1,16 @@
 'use client'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/api'
+import { currencyFormat } from '@/lib/currencyFormat'
+import { useAccountStore } from '@/store/financial/account'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { useParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { currencyFormat } from '@/lib/currencyFormat'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { api } from '@/lib/api'
-import dayjs from 'dayjs'
-import { useParams, usePathname } from 'next/navigation'
-import { useAccountStore } from '@/store/financial/account'
-import { useToast } from '@/components/ui/use-toast'
 
 const groupFormSchema = z.object({
   bank: z.string({ required_error: 'Este campo e obrigatório!' }),

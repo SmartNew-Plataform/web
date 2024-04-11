@@ -10,7 +10,7 @@ export function NavigationBar() {
   const listPaths = pathname.split('/')
   listPaths.shift()
 
-  function handleNavigationToPath(path: string, isHome: boolean) {
+  function handleNavigationToPath(path: string) {
     // if (isHome) {
     //   return
     // }
@@ -36,7 +36,7 @@ export function NavigationBar() {
               key={index}
               className="capitalize text-slate-700 hover:text-violet-600"
               variant="link"
-              onClick={() => handleNavigationToPath(currentPath, false)}
+              onClick={() => handleNavigationToPath(currentPath)}
             >
               {/* {isHome && <Home className="h-3 w-3" />} */}
               {path}

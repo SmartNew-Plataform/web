@@ -44,8 +44,8 @@ export function GridSubtasks() {
     {
       accessorKey: 'id',
       header: '',
-      cell({ row }) {
-        const id = row.getValue('id') as number
+      cell() {
+        // const id = row.getValue('id') as number
 
         return (
           <div className="flex gap-2">

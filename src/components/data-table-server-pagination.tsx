@@ -93,6 +93,7 @@ export function DataTableServerPagination<TData, TValue>({
     [pageIndex, pageSize],
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handleRowSelection(data: any) {
     setRowSelection(data)
   }

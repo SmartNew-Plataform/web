@@ -4,13 +4,15 @@ import { PageWrapper } from '@/components/page-wrapper'
 import { GridSubtasks } from './grid-subtasks'
 import { HeaderSubtasks } from './header-subtasks'
 
-interface TaskpageProps {
+interface TaskPageProps {
   params: {
     taskId: string
   }
 }
 
-export default function TaskPage({ params }: TaskpageProps) {
+export default function TaskPage({ params }: TaskPageProps) {
+  console.log(params)
+
   return (
     <PageWrapper>
       <HeaderSubtasks />
