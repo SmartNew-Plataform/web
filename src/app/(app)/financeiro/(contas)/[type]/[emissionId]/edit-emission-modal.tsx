@@ -27,7 +27,12 @@ interface EditEmissionModalProps extends ComponentProps<typeof Dialog> {
 
 export function EditEmissionModal({ data, ...props }: EditEmissionModalProps) {
   const editEmissionForm = useForm<EditEmissionType>()
-  const { handleSubmit, setValue, reset } = editEmissionForm
+  const {
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { isSubmitting },
+  } = editEmissionForm
   const routeParams = useParams()
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -135,7 +140,7 @@ export function EditEmissionModal({ data, ...props }: EditEmissionModalProps) {
 
             <AttachList data={attachments || []} onDelete={deleteAttach} />
 
-            <Button>
+            <Button disabled={isSubmitting} loading={isSubmitting}>
               <Save size={16} />
               Salvar
             </Button>

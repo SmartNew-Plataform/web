@@ -30,7 +30,11 @@ export function FormInstallmentEdit({ ...props }: FormInstallmentEditProps) {
   const installmentForm = useForm<FormInstallmentData>({
     resolver: zodResolver(formInstallmentSchema),
   })
-  const { reset, handleSubmit } = installmentForm
+  const {
+    reset,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = installmentForm
   const { dataInstallmentEditing } = useEmissionStore(
     ({ dataInstallmentEditing }) => ({ dataInstallmentEditing }),
   )
@@ -94,7 +98,7 @@ export function FormInstallmentEdit({ ...props }: FormInstallmentEditProps) {
               <Form.ErrorMessage field="dueDate" />
             </Form.Field>
 
-            <Button>
+            <Button loading={isSubmitting} disabled={isSubmitting}>
               <Save size={16} />
               Salvar
             </Button>

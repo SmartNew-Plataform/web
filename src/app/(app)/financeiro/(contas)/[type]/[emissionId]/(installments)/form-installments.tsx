@@ -201,7 +201,7 @@ export function FormInstallments() {
               </fieldset>
             )}
 
-            <Button disabled={isSubmitting || !editable}>
+            <Button disabled={isSubmitting || !editable} loading={isSubmitting}>
               <Save size={16} />
               Salvar
             </Button>
