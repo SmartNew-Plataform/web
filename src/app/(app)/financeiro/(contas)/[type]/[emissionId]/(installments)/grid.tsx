@@ -10,7 +10,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Pencil } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { FormInstallmentEdit } from './form-installmnet-edit'
+import { FormInstallmentEdit } from './form-installment-edit'
 
 export function GridInstallment() {
   const {
@@ -124,7 +124,7 @@ export function GridInstallment() {
     },
   ]
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['finance/account/launch/installments'],
     queryFn: () =>
       fetchInstallmentsData({
@@ -135,7 +135,7 @@ export function GridInstallment() {
 
   return (
     <>
-      <DataTable columns={columns} data={data || []} />
+      <DataTable isLoading={isLoading} columns={columns} data={data || []} />
       <FormInstallmentEdit
         open={!!dataInstallmentEditing}
         onOpenChange={(open) =>

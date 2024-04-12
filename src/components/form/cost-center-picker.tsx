@@ -14,6 +14,7 @@ import {
 import { Button } from '../ui/button'
 import { ComboboxMulti } from '../ui/combobox-multi'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '../ui/sheet'
+import { Skeleton } from '../ui/skeleton'
 
 interface CostCenterPickerProps extends ComponentProps<typeof Button> {
   name: string
@@ -56,7 +57,7 @@ export function CostCenterPicker({
     },
   })
 
-  const { data } = useQuery<NodeData[]>({
+  const { data, isLoading } = useQuery<NodeData[]>({
     queryKey: ['cost-center-combobox', ...branch],
     queryFn: async () => {
       if (!branch.length) return []
@@ -111,94 +112,98 @@ export function CostCenterPicker({
         />
 
         <div className="flex h-full w-full flex-col gap-4 overflow-auto">
-          <Accordion type="single" collapsible>
-            {data ? (
-              data.map((description) => {
-                return (
-                  <AccordionItem
-                    key={description.value}
-                    value={description.value}
-                  >
-                    <AccordionTrigger>{description.label}</AccordionTrigger>
-                    <AccordionContent>
-                      <Accordion type="single" collapsible>
-                        {description.children &&
-                          description.children.map((costCenter: NodeData) => {
-                            return (
-                              <AccordionItem
-                                key={costCenter.value}
-                                value={costCenter.value}
-                                className="mb-2 rounded bg-slate-200 px-2"
-                              >
-                                <AccordionTrigger>
-                                  {costCenter.label}
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                  <Accordion type="single" collapsible>
-                                    {costCenter?.children &&
-                                      costCenter?.children.map(
-                                        (compositionGroup) => {
-                                          return (
-                                            <AccordionItem
-                                              key={compositionGroup.value}
-                                              value={compositionGroup.value}
-                                              className="mb-2 rounded bg-slate-300/80 px-2"
-                                            >
-                                              <AccordionTrigger className="w-full justify-between gap-4">
-                                                {compositionGroup.label}
-                                              </AccordionTrigger>
-                                              <AccordionContent>
-                                                {compositionGroup.children &&
-                                                  compositionGroup.children.map(
-                                                    (compositionItem) => {
-                                                      return (
-                                                        <button
-                                                          type="button"
-                                                          className="group flex w-full items-center justify-between gap-2 p-2 transition-colors hover:bg-slate-400/30 data-[checked=true]:bg-slate-400/30"
-                                                          onClick={() =>
-                                                            handleSelectItem(
-                                                              compositionItem,
-                                                            )
-                                                          }
-                                                          key={
-                                                            compositionItem.value
-                                                          }
-                                                          data-checked={
-                                                            field.value ===
-                                                            compositionItem.value
-                                                          }
-                                                        >
-                                                          {
-                                                            compositionItem.label
-                                                          }
+          {isLoading ? (
+            <Skeleton className="h-12 w-full rounded" />
+          ) : (
+            <Accordion type="single" collapsible>
+              {data ? (
+                data.map((description) => {
+                  return (
+                    <AccordionItem
+                      key={description.value}
+                      value={description.value}
+                    >
+                      <AccordionTrigger>{description.label}</AccordionTrigger>
+                      <AccordionContent>
+                        <Accordion type="single" collapsible>
+                          {description.children &&
+                            description.children.map((costCenter: NodeData) => {
+                              return (
+                                <AccordionItem
+                                  key={costCenter.value}
+                                  value={costCenter.value}
+                                  className="mb-2 rounded bg-slate-200 px-2"
+                                >
+                                  <AccordionTrigger>
+                                    {costCenter.label}
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                    <Accordion type="single" collapsible>
+                                      {costCenter?.children &&
+                                        costCenter?.children.map(
+                                          (compositionGroup) => {
+                                            return (
+                                              <AccordionItem
+                                                key={compositionGroup.value}
+                                                value={compositionGroup.value}
+                                                className="mb-2 rounded bg-slate-300/80 px-2"
+                                              >
+                                                <AccordionTrigger className="w-full justify-between gap-4">
+                                                  {compositionGroup.label}
+                                                </AccordionTrigger>
+                                                <AccordionContent>
+                                                  {compositionGroup.children &&
+                                                    compositionGroup.children.map(
+                                                      (compositionItem) => {
+                                                        return (
+                                                          <button
+                                                            type="button"
+                                                            className="group flex w-full items-center justify-between gap-2 p-2 transition-colors hover:bg-slate-400/30 data-[checked=true]:bg-slate-400/30"
+                                                            onClick={() =>
+                                                              handleSelectItem(
+                                                                compositionItem,
+                                                              )
+                                                            }
+                                                            key={
+                                                              compositionItem.value
+                                                            }
+                                                            data-checked={
+                                                              field.value ===
+                                                              compositionItem.value
+                                                            }
+                                                          >
+                                                            {
+                                                              compositionItem.label
+                                                            }
 
-                                                          <Check
-                                                            size={16}
-                                                            className="hidden group-data-[checked=true]:inline"
-                                                          />
-                                                        </button>
-                                                      )
-                                                    },
-                                                  )}
-                                              </AccordionContent>
-                                            </AccordionItem>
-                                          )
-                                        },
-                                      )}
-                                  </Accordion>
-                                </AccordionContent>
-                              </AccordionItem>
-                            )
-                          })}
-                      </Accordion>
-                    </AccordionContent>
-                  </AccordionItem>
-                )
-              })
-            ) : (
-              <span>sem centro de custo</span>
-            )}
-          </Accordion>
+                                                            <Check
+                                                              size={16}
+                                                              className="hidden group-data-[checked=true]:inline"
+                                                            />
+                                                          </button>
+                                                        )
+                                                      },
+                                                    )}
+                                                </AccordionContent>
+                                              </AccordionItem>
+                                            )
+                                          },
+                                        )}
+                                    </Accordion>
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )
+                            })}
+                        </Accordion>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )
+                })
+              ) : (
+                <span>Nenhum centro de custo encontrado nessa filial!</span>
+              )}
+            </Accordion>
+          )}
         </div>
       </SheetContent>
     </Sheet>

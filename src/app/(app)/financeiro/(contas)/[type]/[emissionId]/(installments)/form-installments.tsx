@@ -152,7 +152,12 @@ export function FormInstallments() {
 
             <Form.Field>
               <Form.Label htmlFor="dueDate">Data de vencimento</Form.Label>
-              <Form.Input type="date" name="dueDate" id="dueDate" />
+              <Form.Input
+                min={dayjs().format('YYYY-MM-DD')}
+                type="date"
+                name="dueDate"
+                id="dueDate"
+              />
               <Form.ErrorMessage field="dueDate" />
             </Form.Field>
 

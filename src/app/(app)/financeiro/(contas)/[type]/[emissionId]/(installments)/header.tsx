@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { currencyFormat } from '@/lib/currencyFormat'
 import { useEmissionStore } from '@/store/financial/emission'
+import { useLoading } from '@/store/loading-store'
 import { CheckCircle } from 'lucide-react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
@@ -31,6 +32,9 @@ export function HeaderInstallment() {
   const { toast } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const loading = useLoading()
+
+  console.log(canFinalize)
 
   async function handleFinalizeEmission() {
     if (totalProducts !== installmentsData.totalGross) {
@@ -42,6 +46,7 @@ export function HeaderInstallment() {
       return
     }
 
+    loading.show()
     const response = await api.get(
       `financial/account/finance/${params.emissionId}/finalize`,
       {
@@ -50,6 +55,7 @@ export function HeaderInstallment() {
         },
       },
     )
+    loading.hide()
 
     if (response.status !== 200) return
 

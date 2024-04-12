@@ -148,6 +148,10 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
 
     const updatedData = data.map((item) => {
       if (item.id === editData?.id) {
+        const currentTotal = unityValue * quantity
+        const total = Number(item.total) - totalProducts
+        setTotalProducts(total + currentTotal)
+
         return response.data.item
       }
 
@@ -165,8 +169,6 @@ export function ProductModal({ mode, ...props }: ProductModalProps) {
       title: 'Produto atualizado com sucesso!',
       variant: 'success',
     })
-
-    setTotalProducts(unityValue * quantity + totalProducts)
   }
 
   const boundValue = watch('bound')

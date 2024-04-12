@@ -8,6 +8,7 @@ import { TableCell, TableFooter, TableRow } from '@/components/ui/table'
 import { api } from '@/lib/api'
 import { currencyFormat } from '@/lib/currencyFormat'
 import { useEmissionStore } from '@/store/financial/emission'
+import { useLoading } from '@/store/loading-store'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Trash2 } from 'lucide-react'
@@ -31,6 +32,7 @@ export function Grid() {
       editable,
     }),
   )
+  const loading = useLoading()
 
   const { data, isLoading } = useQuery<EmissionProduct[]>({
     queryKey: [
@@ -125,6 +127,7 @@ export function Grid() {
   ]
 
   async function deleteProduct() {
+    loading.show()
     const response = await api.delete(
       `financial/account/finance/${routeParams.emissionId}/item/${deleteItemId}`,
       {
@@ -133,6 +136,7 @@ export function Grid() {
         },
       },
     )
+    loading.hide()
 
     // eslint-disable-next-line no-useless-return
     if (response.status !== 200) return
