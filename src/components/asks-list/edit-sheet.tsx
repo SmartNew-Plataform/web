@@ -65,19 +65,23 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
     images: z
       .instanceof(File)
       .array()
-      .refine((images) => {
-        if (!checklistAsksScreen?.editingAsk) return
+      .refine(
+        (images) => {
+          if (!checklistAsksScreen?.editingAsk) return
 
-        const allImages = checklistAsksScreen?.editingAsk?.images
-        const hasChild = checklistAsksScreen?.editingAsk?.currentAnswerHasChild
-        const hasImages = allImages && images.length > 0
+          const allImages = checklistAsksScreen?.editingAsk?.images
+          const hasChild =
+            checklistAsksScreen?.editingAsk?.currentAnswerHasChild
+          const hasImages = allImages && images.length > 0
 
-        if (hasChild && !hasImages) {
-          return images.length !== 0
-        } else {
-          return true
-        }
-      }, 'A imagem é obrigatória'),
+          if (hasChild && !hasImages) {
+            return images.length !== 0
+          } else {
+            return true
+          }
+        },
+        { message: 'A imagem é obrigatória' },
+      ),
     observation: z.string().refine((observation) => {
       const hasChild = checklistAsksScreen?.editingAsk?.currentAnswerHasChild
 
@@ -86,8 +90,9 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
       } else {
         return true
       }
-    }, 'A observação e obrigatoria'),
+    }, 'A observação e obrigatória'),
   })
+
   type EditFormData = z.infer<typeof editFormSchema>
   const { toast } = useToast()
   const editAskForm = useForm<EditFormData>({
@@ -95,7 +100,7 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
   })
   const [isUpdating, setIsUpdating] = useState(false)
   const [confirmModal, setConfirmModal] = useState<number | null>(null)
-  const { handleSubmit, setValue, reset } = editAskForm
+  const { handleSubmit, setValue, setError, reset, watch } = editAskForm
 
   useEffect(() => {
     reset()
@@ -109,8 +114,22 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checklistAsksScreen?.editingAsk?.answer])
 
+  const answer = watch('answer')
+  const currentOption = checklistAsksScreen?.editingAsk?.options?.find(
+    ({ id }) => id === Number(answer),
+  )
+
   async function handleEditAsk(data: EditFormData) {
     const taskId = checklistAsksScreen?.editingAsk?.id
+
+    if (
+      currentOption?.action &&
+      data.images.length === 0 &&
+      checklistAsksScreen?.editingAsk?.images?.length === 0
+    ) {
+      setError('images', { message: 'Anexe pelo menos uma imagem!' })
+      return
+    }
 
     Array.from(data.images).forEach(async (image) => {
       const formData = new FormData()
@@ -190,7 +209,7 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
 
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-      <SheetContent className="max-h-screen w-[500px] max-w-4xl">
+      <SheetContent className="max-h-screen">
         {!checklistAsksScreen?.editingAsk ? (
           <div className="flex w-full flex-col gap-4">
             <Skeleton className="h-8" />
@@ -219,48 +238,52 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
               >
                 <AnswerModels data={checklistAsksScreen.editingAsk.options} />
 
-                {checklistAsksScreen.editingAsk.currentAnswerHasChild && (
-                  <Form.ImagePicker name="images" multiple />
-                )}
+                {currentOption?.action && (
+                  <>
+                    <Form.ImagePicker name="images" multiple />
 
-                <div className="flex flex-wrap gap-2">
-                  {checklistAsksScreen.editingAsk.images?.map((src, index) => (
-                    <Dialog key={src.url}>
-                      <div className="relative border">
-                        <Button
-                          size="icon-xs"
-                          variant="destructive"
-                          className="absolute right-1 top-1"
-                          type="button"
-                          onClick={() => setConfirmModal(index)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                        <DialogTrigger asChild>
-                          <Image
-                            className="h-[80px] rounded object-cover"
-                            objectFit="cover"
-                            height={80}
-                            width={80}
-                            src={src.url}
-                            alt={src.url}
-                          />
-                        </DialogTrigger>
-                      </div>
-                      <DialogContent className="p-0">
-                        <Image
-                          className="rounded"
-                          objectFit="cover"
-                          width={510}
-                          height={680}
-                          src={src.url}
-                          alt={src.url}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  ))}
-                  <Form.ErrorMessage field="images" />
-                </div>
+                    <div className="flex flex-wrap gap-2">
+                      {checklistAsksScreen.editingAsk.images?.map(
+                        (src, index) => (
+                          <Dialog key={src.url}>
+                            <div className="relative border">
+                              <Button
+                                size="icon-xs"
+                                variant="destructive"
+                                className="absolute right-1 top-1"
+                                type="button"
+                                onClick={() => setConfirmModal(index)}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                              <DialogTrigger asChild>
+                                <Image
+                                  className="h-[80px] rounded object-cover"
+                                  objectFit="cover"
+                                  height={80}
+                                  width={80}
+                                  src={src.url}
+                                  alt={src.url}
+                                />
+                              </DialogTrigger>
+                            </div>
+                            <DialogContent className="p-0">
+                              <Image
+                                className="rounded"
+                                objectFit="cover"
+                                width={510}
+                                height={680}
+                                src={src.url}
+                                alt={src.url}
+                              />
+                            </DialogContent>
+                          </Dialog>
+                        ),
+                      )}
+                      <Form.ErrorMessage field="images" />
+                    </div>
+                  </>
+                )}
 
                 <Form.Field>
                   <Form.Label htmlFor="observation-checklist">
