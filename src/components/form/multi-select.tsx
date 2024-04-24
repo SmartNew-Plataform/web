@@ -17,11 +17,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { ComponentProps } from 'react'
 import { useController, useFormContext } from 'react-hook-form'
 import { ScrollArea } from '../ui/scroll-area'
 import { Toggle } from '../ui/toggle'
 
-interface MultiSelectProps {
+interface MultiSelectProps extends ComponentProps<typeof Button> {
   name: string
   options: Array<{
     label: string
@@ -29,12 +30,17 @@ interface MultiSelectProps {
   }>
 }
 
-export function MultiSelect({ name, options }: MultiSelectProps) {
+export function MultiSelect({
+  name,
+  options,
+  value,
+  ...props
+}: MultiSelectProps) {
   const { control } = useFormContext()
   const { field } = useController({
     control,
     name,
-    defaultValue: [],
+    defaultValue: value || [],
   })
   const [open, setOpen] = React.useState(false)
 
@@ -70,12 +76,13 @@ export function MultiSelect({ name, options }: MultiSelectProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          {...props}
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className="justify-between"
         >
-          <span className="flex flex-1 justify-start truncate">
+          <span className="flex flex-1 justify-start truncate font-normal normal-case">
             {field.value.length ? getLabelValues() : 'Selecione...'}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
+import { twMerge } from 'tailwind-merge'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,7 +27,7 @@ export default function RootLayout({
           href="https://sistemas.smartnewsystem.com.br/favicon.ico"
         />
       </head>
-      <body className={inter.className}>
+      <body className={twMerge(inter.className, 'antialiased')}>
         <Providers>{children}</Providers>
       </body>
     </html>

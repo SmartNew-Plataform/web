@@ -1,7 +1,5 @@
 'use client'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Plus } from 'lucide-react'
 import { SheetNewTaskControl } from './sheet-new-taskcontrol'
 
 export function HeaderNewTask() {

@@ -6,14 +6,22 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+const newTaskSchema = z.object({})
+
+type NewTaskData = z.infer<typeof newTaskSchema>
 
 export function SheetNewTaskControl() {
-  const newTaskForm = useForm()
+  const newTaskForm = useForm<NewTaskData>({
+    resolver: zodResolver(newTaskSchema),
+  })
   const { handleSubmit } = newTaskForm
 
-  async function handleCreateTask(data: any) {
+  async function handleCreateTask(data: NewTaskData) {
     console.log(data)
   }
 

@@ -11,7 +11,7 @@ interface IconPickerProps extends ComponentProps<typeof Button> {
   name: string
 }
 
-export function IconPicker({ name, className, ...props }: IconPickerProps) {
+export function IconPicker({ name }: IconPickerProps) {
   const { control } = useFormContext()
   const {
     field: { value, onChange, ref },
@@ -20,9 +20,9 @@ export function IconPicker({ name, className, ...props }: IconPickerProps) {
     control,
   })
   const icons: IconData[] = [
-    'x-circle',
-    'check-circle-2',
-    'help-circle',
+    'circle-x',
+    'circle-check',
+    'circle-help',
     'info',
     'thumbs-up',
     'thumbs-down',

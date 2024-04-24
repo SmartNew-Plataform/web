@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sheet'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { validateMultipleOptions } from '@/lib/validate-multiple-options'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AxiosError } from 'axios'
@@ -18,46 +19,62 @@ import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const newBoundSchema = z.object({
-  family: z
-    .string({
-      required_error: 'A família e obrigatoria!',
-      invalid_type_error: 'Você não selecionou nada!',
-    })
-    .nonempty({ message: 'Selecione uma família' }),
-  description: z
-    .string({ required_error: 'A descrição e obrigatoria!' })
-    .nonempty({ message: 'Preencha a descrição' }),
-})
+const newBoundSchema = z
+  .object({
+    type: z.enum(['family', 'diverse'], { required_error: 'Escolha um tipo!' }),
+    family: z
+      .string({
+        invalid_type_error: 'Você não selecionou nada!',
+      })
+      .optional(),
+    diverse: z
+      .string({
+        required_error: 'A família e obrigatória!',
+      })
+      .optional(),
+    description: z
+      .string({ required_error: 'A descrição e obrigatória!' })
+      .nonempty({ message: 'Preencha a descrição' }),
+  })
+  .superRefine((data, ctx) =>
+    validateMultipleOptions<typeof data>(data, ctx, data.type),
+  )
 
 type NewBoundData = z.infer<typeof newBoundSchema>
 
 export function SheetNewBound() {
   const newBoundForm = useForm<NewBoundData>({
     resolver: zodResolver(newBoundSchema),
+    defaultValues: {
+      type: 'family',
+    },
   })
   const {
     handleSubmit,
     formState: { isSubmitting },
     reset,
+    watch,
   } = newBoundForm
 
-  const { loadFamily, family, loadBounds } = useBoundStore(
-    ({ loadFamily, family, loadBounds }) => {
-      const familyFormatted = family
-        ? family?.map((item) => ({
-            value: item.id.toString(),
-            label: item.family,
-          }))
-        : []
+  const { loadFamily, family, loadBounds, diverse, loadDiverse } =
+    useBoundStore(
+      ({ loadFamily, family, loadBounds, diverse, loadDiverse }) => {
+        const familyFormatted = family
+          ? family?.map((item) => ({
+              value: item.id.toString(),
+              label: item.family,
+            }))
+          : []
 
-      return {
-        loadFamily,
-        family: familyFormatted,
-        loadBounds,
-      }
-    },
-  )
+        return {
+          loadFamily,
+          family: familyFormatted,
+          loadBounds,
+          loadDiverse,
+          diverse,
+        }
+      },
+    )
 
   const { toast } = useToast()
 
@@ -67,16 +84,18 @@ export function SheetNewBound() {
       .post('/smart-list/bound', {
         ...data,
         familyId: Number(data.family),
+        diverseId: Number(data.diverse),
       })
       .then((res) => res.data)
-      .catch((err: AxiosError<{ message: string }>) =>
+      .catch((err: AxiosError<{ message: string }>) => {
         toast({
           title: err.response?.data.message,
           description: err.message,
           variant: 'destructive',
           duration: 1000 * 10,
-        }),
-      )
+        })
+        throw new Error('Insert bound error')
+      })
 
     if (response?.error) return
 
@@ -84,14 +103,19 @@ export function SheetNewBound() {
       title: 'Vinculo criado com sucesso!',
       variant: 'success',
     })
-    reset({ description: '', family: '' })
+    reset({ description: '', family: '', diverse: '', type: 'family' })
     loadBounds()
   }
 
   useEffect(() => {
     loadFamily()
+    loadDiverse()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const type = watch('type')
+
+  console.log(diverse)
 
   return (
     <Sheet>
@@ -109,10 +133,29 @@ export function SheetNewBound() {
             onSubmit={handleSubmit(handleCreateNewBound)}
           >
             <Form.Field>
-              <Form.Label>Família:</Form.Label>
-              <Form.Select name="family" options={family} />
-              <Form.ErrorMessage field="family" />
+              <Form.Label>Tipo:</Form.Label>
+              <Form.Select
+                name="type"
+                options={[
+                  { label: 'Familia', value: 'family' },
+                  { label: 'Diverso', value: 'diverse' },
+                ]}
+              />
             </Form.Field>
+
+            {type === 'family' ? (
+              <Form.Field>
+                <Form.Label>Família:</Form.Label>
+                <Form.Select name="family" options={family} />
+                <Form.ErrorMessage field="family" />
+              </Form.Field>
+            ) : (
+              <Form.Field>
+                <Form.Label>Diverso:</Form.Label>
+                <Form.Select name="diverse" options={diverse || []} />
+                <Form.ErrorMessage field="diverse" />
+              </Form.Field>
+            )}
 
             <Form.Field>
               <Form.Label>Descrição:</Form.Label>

@@ -7,11 +7,9 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { ClipboardList, Save } from 'lucide-react'
-import { useParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 
 export function SheetEditTask() {
-  const params = useParams()
   const editTaskForm = useForm()
 
   return (

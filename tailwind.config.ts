@@ -73,6 +73,7 @@ const config: Config = {
       },
       gridTemplateColumns: {
         auto: 'repeat(auto-fit, minmax(300px, 1fr))',
+        'auto-md': 'repeat(auto-fit, minmax(130px, 200px))',
         'auto-sm': 'repeat(auto-fit, minmax(80px, 100px))',
       },
     },

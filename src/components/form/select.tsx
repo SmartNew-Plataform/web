@@ -3,6 +3,7 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
 import * as React from 'react'
 
+import { SelectData } from '@/@types/select-data'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -23,16 +24,13 @@ import { ScrollArea } from '../ui/scroll-area'
 
 interface SelectProps extends React.ComponentProps<typeof Button> {
   name: string
-  options: Array<{
-    label: string
-    value: string
-  }>
+  options?: Array<SelectData>
   value?: string
 }
 
 export function Select({
   name,
-  options,
+  options = [],
   value = undefined,
   className,
   ...props
@@ -53,12 +51,14 @@ export function Select({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={twMerge('justify-between', className)}
+          className={twMerge('justify-between normal-case', className)}
         >
           <span className="flex-1 truncate text-left font-normal">
-            {field.value
-              ? options.find((option) => option.value === field.value)?.label
-              : 'Selecione...'}
+            {field.value ? (
+              options.find((option) => option.value === field.value)?.label
+            ) : (
+              <span className="font-medium text-zinc-500">Selecione...</span>
+            )}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -69,7 +69,7 @@ export function Select({
           <CommandEmpty>Nenhum item encontrado.</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="max-h-[30vh] overflow-auto">
-              {options.map((option) => (
+              {options?.map((option) => (
                 <CommandItem
                   key={option.value}
                   onSelect={() => {

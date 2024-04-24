@@ -7,14 +7,22 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+const newControlSchema = z.object({})
+
+type NewControlSchemaData = z.infer<typeof newControlSchema>
 
 export function SheetNewControl() {
-  const newControlForm = useForm()
+  const newControlForm = useForm({
+    resolver: zodResolver(newControlSchema),
+  })
   const { handleSubmit } = newControlForm
 
-  async function handleCreateControl(data: any) {
+  async function handleCreateControl(data: NewControlSchemaData) {
     console.log(data)
   }
 

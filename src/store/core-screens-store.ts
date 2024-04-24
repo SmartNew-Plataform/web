@@ -26,6 +26,7 @@ interface CoreScreensData {
     id: number
     status: string
     startDate: string
+    model: string
     endDate: string
     equipment: string
     user: string
