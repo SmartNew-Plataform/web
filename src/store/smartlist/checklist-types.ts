@@ -38,6 +38,7 @@ export type AnswerType = {
   icon: 'close-circle' | 'checkmark-circle' | 'remove-circle'
   id: number
   type: string
+  action: boolean
   child: {
     id: number
     description: string
@@ -59,4 +60,5 @@ export type SchemaAskType = {
   images?: Array<{ url: string }>
   options?: Array<OptionsType>
   answer?: AnswerType
+  action: boolean
 }
