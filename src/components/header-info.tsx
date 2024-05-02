@@ -25,12 +25,8 @@ import { z } from 'zod'
 
 const filterFormSchema = z.object({
   filterText: z.string().optional(),
-  period: z
-    .object({
-      from: z.date().optional(),
-      to: z.date().optional(),
-    })
-    .optional(),
+  dateFrom: z.date().optional(),
+  dateTo: z.date().optional(),
 })
 
 type FilterFormData = z.infer<typeof filterFormSchema>
@@ -53,7 +49,7 @@ export function HeaderInfo() {
 
   function handleResetFilters() {
     changeFilter({})
-    reset({ filterText: '', period: undefined })
+    reset({ filterText: '', dateFrom: undefined, dateTo: undefined })
   }
 
   async function fetchDataTable(params: {
@@ -155,8 +151,13 @@ export function HeaderInfo() {
                 </Form.Field>
 
                 <Form.Field>
-                  <Form.Label>Período:</Form.Label>
-                  <Form.InputDateRange name="period" />
+                  <Form.Label>Data inicial:</Form.Label>
+                  <Form.Input type="date" name="dateFrom" />
+                </Form.Field>
+
+                <Form.Field>
+                  <Form.Label>Data final:</Form.Label>
+                  <Form.Input type="date" name="dateTo" />
                 </Form.Field>
 
                 <Button type="submit" variant="secondary">
