@@ -10,7 +10,7 @@ export type InfoData = {
   id: number
   status: string
   startDate: string | null
-  equipment: string
+  item: string
   user: string
   period: string
 }
@@ -96,14 +96,14 @@ export const columns: ColumnDef<InfoData>[] = [
     },
   },
   {
-    accessorKey: 'equipment',
+    accessorKey: 'item',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Equipamento
+          Ativo/Diversos
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
       )

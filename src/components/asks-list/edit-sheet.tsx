@@ -62,26 +62,7 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
         return true
       }
     }, 'A justificativa é obrigatória'),
-    images: z
-      .instanceof(File)
-      .array()
-      .refine(
-        (images) => {
-          if (!checklistAsksScreen?.editingAsk) return
-
-          const allImages = checklistAsksScreen?.editingAsk?.images
-          const hasChild =
-            checklistAsksScreen?.editingAsk?.currentAnswerHasChild
-          const hasImages = allImages && images.length > 0
-
-          if (hasChild && !hasImages) {
-            return images.length !== 0
-          } else {
-            return true
-          }
-        },
-        { message: 'A imagem é obrigatória' },
-      ),
+    images: z.instanceof(File).array().optional(),
     observation: z.string().refine((observation) => {
       const hasChild = checklistAsksScreen?.editingAsk?.currentAnswerHasChild
 
@@ -121,17 +102,18 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
 
   async function handleEditAsk(data: EditFormData) {
     const taskId = checklistAsksScreen?.editingAsk?.id
+    console.log(data)
 
     if (
       currentOption?.action &&
-      data.images.length === 0 &&
+      data.images?.length === 0 &&
       checklistAsksScreen?.editingAsk?.images?.length === 0
     ) {
       setError('images', { message: 'Anexe pelo menos uma imagem!' })
       return
     }
 
-    Array.from(data.images).forEach(async (image) => {
+    Array.from(data.images || []).forEach(async (image) => {
       const formData = new FormData()
       formData.append('file', image)
       const response = await api
