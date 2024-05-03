@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { Skeleton } from '../ui/skeleton'
 import { CardAsk } from './card-ask'
 import { EditSheet } from './edit-sheet'
+import { useQuery } from '@tanstack/react-query'
 
 interface AsksListProps {
   productionId: string
@@ -27,6 +28,12 @@ export function AsksList({ productionId }: AsksListProps) {
     loadChecklistAsks(productionId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useQuery([productionId], () => loadChecklistAsks(productionId), {
+    refetchInterval: 1000 * 30, // 30 seconds
+    retry: 8,
+    retryDelay: 8000,
+  })
 
   function handleOpenEditAskSheet(ask: AskType) {
     changeAskEditing(ask)
