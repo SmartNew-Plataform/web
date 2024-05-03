@@ -99,6 +99,7 @@ export const useDashboardChecklistStore = create<StoreState>((set, get) => {
       ])
 
       const allBranches = branch?.map((item) => String(item.id))
+      // console.log(allBranches)
       fillEquipmentsByBranch(allBranches || [])
 
       searchData({
