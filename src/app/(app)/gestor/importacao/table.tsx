@@ -23,7 +23,7 @@ type IColumn = {
 
 interface ITabelExcel {
   model: 'data' | 'children'
-  item:
+  item?:
     | {
         [key: string]: string
       }[]
