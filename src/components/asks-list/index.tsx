@@ -4,7 +4,7 @@ import 'keen-slider/keen-slider.min.css'
 
 import { AskType } from '@/store/smartlist/checklist-types'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Skeleton } from '../ui/skeleton'
 import { CardAsk } from './card-ask'
 import { EditSheet } from './edit-sheet'
@@ -22,11 +22,6 @@ export function AsksList({ productionId }: AsksListProps) {
       changeAskEditing,
     }),
   )
-
-  useEffect(() => {
-    loadChecklistAsks(productionId)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const { data, isLoading } = useQuery({
     queryKey: ['checklist-asks', productionId],
