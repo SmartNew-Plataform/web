@@ -29,6 +29,13 @@ export function AsksList({ productionId }: AsksListProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+
+  // useQuery([productionId], () => loadChecklistAsks(productionId), {
+  //   refetchInterval: 1000 * 30, // 30 seconds
+  //   retry: 8,
+  //   retryDelay: 8000,
+  // })
+  
   const { data, isLoading } = useQuery<AskType[]>({
     queryKey: ['checklist-asks', productionId],
     queryFn: () => loadChecklistAsks(productionId),
