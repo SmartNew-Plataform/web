@@ -6,7 +6,7 @@ export default function ImportationPage() {
   return (
     <PageWrapper>
       <Header />
-      <TableExcel model={'data'} item={undefined} />
+      <TableExcel model={'data'} />
     </PageWrapper>
   )
 }
