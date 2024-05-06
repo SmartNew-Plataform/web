@@ -15,21 +15,20 @@ interface AsksListProps {
 
 export function AsksList({ productionId }: AsksListProps) {
   const [sheetEditIsOpen, setSheetEditIsOpen] = useState<boolean>(false)
-  const { checklistAsksScreen, loadChecklistAsks, changeAskEditing } =
-    useCoreScreensStore(
-      ({ checklistAsksScreen, loadChecklistAsks, changeAskEditing }) => ({
-        checklistAsksScreen,
-        loadChecklistAsks,
-        changeAskEditing,
-      }),
-    )
+  const { loadChecklistAsks, changeAskEditing } = useCoreScreensStore(
+    ({ checklistAsksScreen, loadChecklistAsks, changeAskEditing }) => ({
+      checklistAsksScreen,
+      loadChecklistAsks,
+      changeAskEditing,
+    }),
+  )
 
   useEffect(() => {
     loadChecklistAsks(productionId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const { data, isLoading } = useQuery<AskType[]>({
+  const { data, isLoading } = useQuery({
     queryKey: ['checklist-asks', productionId],
     queryFn: () => loadChecklistAsks(productionId),
     refetchInterval: 1000 * 30, // 30 seconds

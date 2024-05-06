@@ -1,21 +1,6 @@
+import { StatusType, TaskType, Types } from '@/@types/smartlist-tasks'
 import { api } from '@/lib/api'
 import { create } from 'zustand'
-
-type TaskType = {
-  id: string
-  description: string
-}
-
-type StatusType = {
-  description: string
-  id: number
-  type: string
-}
-
-type Types = {
-  description: string
-  id: number
-}
 
 interface StoreData {
   allTasks: TaskType[] | undefined
@@ -23,7 +8,7 @@ interface StoreData {
   status: StatusType[] | undefined
   types: Types[] | undefined
 
-  loadTasks: () => Promise<void>
+  loadTasks: () => Promise<TaskType[] | undefined>
   loadStatus: () => Promise<void>
   loadTypes: () => Promise<void>
   filterTasks: (text: string) => void
@@ -41,6 +26,7 @@ export const useTasksStore = create<StoreData>((set, get) => {
       const response = await api.get('/smart-list/task').then((res) => res.data)
 
       set({ tasks: response.task, allTasks: response.task })
+      return response.task
     },
 
     async loadStatus() {

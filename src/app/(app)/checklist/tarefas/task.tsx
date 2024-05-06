@@ -1,3 +1,4 @@
+'use client'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -21,6 +22,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog'
+import { useQueryClient } from '@tanstack/react-query'
 import { Pencil, Save, Trash, Trash2, Undo } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -30,16 +32,15 @@ import { SituationForm } from './situation-form'
 interface TaskProps {
   id: string
   description: string
-  loadTasks: () => Promise<void>
 }
 
 const taskFormSchema = z.object({
-  description: z.string().nonempty({ message: 'A descrição e obrigatoria!' }),
+  description: z.string().nonempty({ message: 'A descrição e obrigatória!' }),
 })
 
 type TaskFormData = z.infer<typeof taskFormSchema>
 
-export function Task({ id, description, loadTasks }: TaskProps) {
+export function Task({ id, description }: TaskProps) {
   const {
     register,
     handleSubmit,
@@ -50,18 +51,19 @@ export function Task({ id, description, loadTasks }: TaskProps) {
   const [loadingDelete, setLoadingDelete] = useState(false)
 
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   async function handleEditTask(data: TaskFormData) {
     await api.put(`/smart-list/task/${id}`, data).then((res) => res.data)
     toast({ variant: 'success', title: 'Task atualizada com sucesso!' })
-    loadTasks()
+    queryClient.refetchQueries(['checklist-task'])
   }
 
   async function handleDeleteTask() {
     setLoadingDelete(true)
     await api.delete(`/smart-list/task/${id}`)
     toast({ variant: 'success', title: 'Task deletada com sucesso!' })
-    loadTasks()
+    queryClient.refetchQueries(['checklist-task'])
     setLoadingDelete(false)
   }
 
