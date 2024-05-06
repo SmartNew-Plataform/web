@@ -49,8 +49,7 @@ interface CoreScreensData {
   loadInfo: () => Promise<void | Array<InfoData> | AxiosError | null>
   loadChecklistAsks: (
     productionId: string,
-    resetData?: boolean,
-  ) => Promise<void>
+  ) => Promise<Array<AskType> | undefined>
 }
 
 export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
@@ -190,10 +189,7 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
       return response
     },
 
-    loadChecklistAsks: async (productionId, resetData = true) => {
-      if (resetData) {
-        set({ checklistAsksScreen: null })
-      }
+    loadChecklistAsks: async (productionId) => {
       const asks = await api
         .get('smart-list/check-list/find-by-id', {
           params: {
@@ -221,6 +217,8 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
           allDataTable: asks.tasks,
         },
       })
+
+      return asks.tasks
     },
   }
 })
