@@ -46,6 +46,17 @@ export function HeaderChecklist() {
                 Tarefas
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
+                  pathname: '/checklist/diverse',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Diversos
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem disabled asChild>
               <Link
                 target="_blank"

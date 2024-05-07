@@ -3,19 +3,23 @@ import { PageWrapper } from '@/components/page-wrapper'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useTasksStore } from '@/store/smartlist/smartlist-task'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { FormNewTask } from './form-new-task'
 import { Task } from './task'
 
 export default function TaskPage() {
-  const { loadTasks, tasks, loadStatus, loadTypes, filterTasks } =
-    useTasksStore()
+  const { loadTasks, loadStatus, loadTypes, filterTasks } = useTasksStore()
 
   useEffect(() => {
-    loadTasks()
     loadStatus()
     loadTypes()
   }, [])
+
+  const { data } = useQuery({
+    queryKey: ['checklist-task'],
+    queryFn: loadTasks,
+  })
 
   return (
     <PageWrapper>
@@ -29,13 +33,8 @@ export default function TaskPage() {
       </Card>
 
       <div className="grid max-h-full grid-cols-auto gap-4 overflow-auto">
-        {tasks?.map(({ id, description }) => (
-          <Task
-            key={id}
-            id={id}
-            loadTasks={loadTasks}
-            description={description}
-          />
+        {data?.map(({ id, description }) => (
+          <Task key={id} id={id} description={description} />
         ))}
       </div>
     </PageWrapper>

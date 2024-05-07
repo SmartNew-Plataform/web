@@ -1,8 +1,13 @@
 {
   "cSpell.words": [
+    "camelcase",
+    "dayjs",
     "emissao",
+    "hookform",
     "smartlist",
-    "taskcontrol"
+    "tanstack",
+    "taskcontrol",
+    "zustand"
   ],
   "cSpell.language": "en,pt,pt-BR"
 }

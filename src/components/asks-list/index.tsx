@@ -3,7 +3,8 @@ import { useCoreScreensStore } from '@/store/core-screens-store'
 import 'keen-slider/keen-slider.min.css'
 
 import { AskType } from '@/store/smartlist/checklist-types'
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { Skeleton } from '../ui/skeleton'
 import { CardAsk } from './card-ask'
 import { EditSheet } from './edit-sheet'
@@ -14,26 +15,26 @@ interface AsksListProps {
 
 export function AsksList({ productionId }: AsksListProps) {
   const [sheetEditIsOpen, setSheetEditIsOpen] = useState<boolean>(false)
-  const { checklistAsksScreen, loadChecklistAsks, changeAskEditing } =
-    useCoreScreensStore(
-      ({ checklistAsksScreen, loadChecklistAsks, changeAskEditing }) => ({
-        checklistAsksScreen,
-        loadChecklistAsks,
-        changeAskEditing,
-      }),
-    )
+  const { loadChecklistAsks, changeAskEditing } = useCoreScreensStore(
+    ({ checklistAsksScreen, loadChecklistAsks, changeAskEditing }) => ({
+      checklistAsksScreen,
+      loadChecklistAsks,
+      changeAskEditing,
+    }),
+  )
 
-  useEffect(() => {
-    loadChecklistAsks(productionId)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const { data, isLoading } = useQuery({
+    queryKey: ['checklist-asks', productionId],
+    queryFn: () => loadChecklistAsks(productionId),
+    refetchInterval: 1000 * 30, // 30 seconds
+  })
 
   function handleOpenEditAskSheet(ask: AskType) {
     changeAskEditing(ask)
     setSheetEditIsOpen(true)
   }
 
-  if (!checklistAsksScreen?.table)
+  if (isLoading && !data)
     return (
       <div className="flex flex-wrap gap-4">
         <Skeleton className="h-[150px] w-[370px] rounded-md" />
@@ -44,7 +45,7 @@ export function AsksList({ productionId }: AsksListProps) {
 
   return (
     <>
-      {checklistAsksScreen?.table.map((ask) => {
+      {data?.map((ask) => {
         return (
           <div key={ask.id} onClick={() => handleOpenEditAskSheet(ask)}>
             <CardAsk
