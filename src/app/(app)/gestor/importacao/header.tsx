@@ -1,22 +1,21 @@
 'use client'
+import { Form } from '@/components/form'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
-import { Form } from '@/components/form'
-import { FormProvider, useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { FolderSync, Upload } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useImportation } from '@/store/manager/importation'
-
-const importationFormSchema = z.object({
-  file: z.instanceof(FileList),
-  template: z.string({ required_error: 'Este campo é obrigatório' }),
-})
-
-type ImportationFormData = z.infer<typeof importationFormSchema>
+import { zodResolver } from '@hookform/resolvers/zod'
+import { FolderSync, Upload } from 'lucide-react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 export function Header() {
+  const importationFormSchema = z.object({
+    file: z.instanceof(FileList),
+    template: z.string({ required_error: 'Este campo é obrigatório' }),
+  })
+  type ImportationFormData = z.infer<typeof importationFormSchema>
+
   const importationForm = useForm<ImportationFormData>({
     resolver: zodResolver(importationFormSchema),
   })

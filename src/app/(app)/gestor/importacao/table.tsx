@@ -1,6 +1,8 @@
-/* eslint-disable camelcase */
 'use client'
 import { DataTable } from '@/components/data-table'
+/* eslint-disable camelcase */
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -10,12 +12,9 @@ import {
 } from '@/components/ui/select'
 import { useImportation } from '@/store/manager/importation'
 import { ColumnDef } from '@tanstack/react-table'
-import { CircleAlert, CircleCheck, CircleX, Expand } from 'lucide-react'
-import { Input } from '@/components/ui/input'
 import dayjs from 'dayjs'
+import { CircleAlert, CircleCheck, CircleX, Expand } from 'lucide-react'
 import { ChildrenModal } from './children-modal'
-import { Button } from '@/components/ui/button'
-// import { useState } from 'react'
 
 type IColumn = {
   typeColumn: string | []
@@ -174,7 +173,7 @@ export function TableExcel({ model, item }: ITabelExcel) {
     }
   })
 
-  if (!columns) return
+  if (!columns) return <div></div>
 
   async function handleChange(
     line: { id: number; id_pai?: number | undefined },
@@ -230,11 +229,13 @@ export function TableExcel({ model, item }: ITabelExcel) {
 
   return (
     <>
-      <ChildrenModal
-        data={children || []}
-        onOpenChange={(e) => setChildren(e ? children : undefined)}
-        open={!!children}
-      />
+      {children && (
+        <ChildrenModal
+          data={children || []}
+          onOpenChange={(e) => setChildren(e ? children : undefined)}
+          open={!!children}
+        />
+      )}
       <DataTable
         columns={columns}
         data={model === 'data' ? data : item || []}
