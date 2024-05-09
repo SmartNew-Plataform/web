@@ -14,7 +14,6 @@ import { useImportation } from '@/store/manager/importation'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { CircleAlert, CircleCheck, CircleX, Expand } from 'lucide-react'
-import { ChildrenModal } from './children-modal'
 
 type IColumn = {
   typeColumn: string | []
@@ -22,20 +21,13 @@ type IColumn = {
 
 interface ITabelExcel {
   model: 'data' | 'children'
-  item?:
-    | {
-        [key: string]: string
-      }[]
-    | undefined
 }
 
 // type IChildrenData = { [key: string]: string }
 
-export function TableExcel({ model, item }: ITabelExcel) {
-  const { data, setData, children, setChildren } = useImportation()
-  // const [childrenData, setChildrenData] = useState<IChildrenData[] | undefined>(
-  //   undefined,
-  // )
+export function TableExcel({ model }: ITabelExcel) {
+  const { data, setData, setChildren, children } = useImportation()
+
   const { columns } = useImportation(({ columns, rows, columnItem }) => {
     const tableColumn =
       model === 'data' ? (columns as IColumn[]) : (columnItem as IColumn[])
@@ -228,18 +220,9 @@ export function TableExcel({ model, item }: ITabelExcel) {
   }
 
   return (
-    <>
-      {children && (
-        <ChildrenModal
-          data={children || []}
-          onOpenChange={(e) => setChildren(e ? children : undefined)}
-          open={!!children}
-        />
-      )}
-      <DataTable
-        columns={columns}
-        data={model === 'data' ? data : item || []}
-      />
-    </>
+    <DataTable
+      columns={columns}
+      data={model === 'data' ? data : children || []}
+    />
   )
 }
