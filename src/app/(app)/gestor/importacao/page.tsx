@@ -1,12 +1,12 @@
 import { PageWrapper } from '@/components/page-wrapper'
 import { Header } from './header'
-import { TableExcel } from './table'
+import { Main } from './main'
 
 export default function ImportationPage() {
   return (
     <PageWrapper>
       <Header />
-      <TableExcel model={'data'} />
+      <Main />
     </PageWrapper>
   )
 }
