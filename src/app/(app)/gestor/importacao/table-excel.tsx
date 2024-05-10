@@ -211,9 +211,9 @@ export function TableExcel({ model }: ITabelExcel) {
         console.log(childrenIndex)
 
         console.log(childrenArray[childrenIndex][type], value)
-
+        setChildren(undefined)
         childrenArray[childrenIndex][type] = value
-        setChildren(childrenArray)
+        // setChildren(childrenArray)
         // newData[index].children = childrenArray
       }
 
@@ -221,7 +221,7 @@ export function TableExcel({ model }: ITabelExcel) {
     }
   }
 
-  // console.log(children)
+  console.log(children)
 
   return (
     <DataTable
