@@ -205,19 +205,23 @@ export function TableExcel({ model }: ITabelExcel) {
           [key: string]: string
         }>
 
-        const childToUpdate = childrenArray.find(
+        const childrenIndex = childrenArray.findIndex(
           (data) => Number(data.id) === line.id,
         )
+        console.log(childrenIndex)
 
-        if (childToUpdate) {
-          childToUpdate[type] = value
-          // newData[index].children = childrenArray
-        }
+        console.log(childrenArray[childrenIndex][type], value)
+
+        childrenArray[childrenIndex][type] = value
+        setChildren(childrenArray)
+        // newData[index].children = childrenArray
       }
 
       setData(newData)
     }
   }
+
+  // console.log(children)
 
   return (
     <DataTable

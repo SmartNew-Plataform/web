@@ -16,12 +16,14 @@ interface IImportationData {
   }
   indexModal: number | undefined
   children: { [key: string]: string }[] | undefined
+  childrenIndex: number | undefined
   columnItem: undefined | Array<object>
   setIndexModal: (Params: number | undefined) => void
   setData: (Params: { [key: string]: string }[]) => void
   setColumns: (Params: { [key: string]: string }) => void
   setRows: (Params: undefined | Array<object>) => void
   setChildren: (Params: { [key: string]: string }[] | undefined) => void
+  setChildrenIndex: (index: number | undefined) => void
   setColumnItem: (Params: { [key: string]: string }) => void
 }
 
@@ -33,6 +35,12 @@ export const useImportation = create<IImportationData>((set) => {
     columnItem: [],
     indexModal: undefined,
     rows: undefined,
+    childrenIndex: undefined,
+
+    setChildrenIndex(index) {
+      set({ childrenIndex: index })
+    },
+
     setIndexModal: (value: number | undefined) => {
       set({ indexModal: value })
     },
@@ -51,13 +59,13 @@ export const useImportation = create<IImportationData>((set) => {
       set({ rows })
     },
     setData: (data) => {
-      console.log('nova data')
-      console.log(data)
+      // console.log('nova data')
+      // console.log(data)
       set({ data })
     },
     setChildren: (children) => {
-      console.log('novo filho')
-      console.log(children)
+      // console.log('novo filho')
+      // console.log(children)
       set({ children })
     },
     setColumnItem: (columns) => {
