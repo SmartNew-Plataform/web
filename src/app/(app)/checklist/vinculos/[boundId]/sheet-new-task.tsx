@@ -75,7 +75,7 @@ export function SheetNewTask({ boundId }: SheetNewTask) {
     await api
       .post(`/smart-list/bound/${boundId}/item`, {
         controlId: Number(data.control),
-        taskId: Number(data.task),
+        task: data.task,
       })
       .then((res) => res.data)
       .catch((err: AxiosError<{ message: string }>) =>

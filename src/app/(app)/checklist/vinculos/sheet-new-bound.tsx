@@ -13,6 +13,7 @@ import { api } from '@/lib/api'
 import { validateMultipleOptions } from '@/lib/validate-multiple-options'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { Plus } from 'lucide-react'
 import { useEffect } from 'react'
@@ -56,25 +57,24 @@ export function SheetNewBound() {
     watch,
   } = newBoundForm
 
-  const { loadFamily, family, loadBounds, diverse, loadDiverse } =
-    useBoundStore(
-      ({ loadFamily, family, loadBounds, diverse, loadDiverse }) => {
-        const familyFormatted = family
-          ? family?.map((item) => ({
-              value: item.id.toString(),
-              label: item.family,
-            }))
-          : []
+  const { loadFamily, loadBounds, diverse, loadDiverse } = useBoundStore(
+    ({ loadFamily, family, loadBounds, diverse, loadDiverse }) => {
+      const familyFormatted = family
+        ? family?.map((item) => ({
+            value: item.id.toString(),
+            label: item.family,
+          }))
+        : []
 
-        return {
-          loadFamily,
-          family: familyFormatted,
-          loadBounds,
-          loadDiverse,
-          diverse,
-        }
-      },
-    )
+      return {
+        loadFamily,
+        family: familyFormatted,
+        loadBounds,
+        loadDiverse,
+        diverse,
+      }
+    },
+  )
 
   const { toast } = useToast()
 
@@ -113,6 +113,22 @@ export function SheetNewBound() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const { data } = useQuery({
+    queryKey: ['checklist/bounds/selects'],
+    queryFn: async () => {
+      const family = await loadFamily()
+      const diverse = await loadDiverse()
+
+      return {
+        family: family?.map(({ id, family }) => ({
+          label: family,
+          value: id.toString(),
+        })),
+        diverse,
+      }
+    },
+  })
+
   const type = watch('type')
 
   console.log(diverse)
@@ -146,13 +162,13 @@ export function SheetNewBound() {
             {type === 'family' ? (
               <Form.Field>
                 <Form.Label>Família:</Form.Label>
-                <Form.Select name="family" options={family} />
+                <Form.Select name="family" options={data?.family || []} />
                 <Form.ErrorMessage field="family" />
               </Form.Field>
             ) : (
               <Form.Field>
                 <Form.Label>Diverso:</Form.Label>
-                <Form.Select name="diverse" options={diverse || []} />
+                <Form.Select name="diverse" options={data?.diverse || []} />
                 <Form.ErrorMessage field="diverse" />
               </Form.Field>
             )}
