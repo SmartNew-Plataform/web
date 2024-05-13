@@ -189,6 +189,8 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
     }
   }
 
+  console.log(checklistAsksScreen)
+
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetContent className="max-h-screen">

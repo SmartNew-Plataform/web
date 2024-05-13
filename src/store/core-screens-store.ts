@@ -91,6 +91,8 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
     },
     changeAskEditing: async (ask) => {
       const restStore = get()
+      console.log(ask)
+
       if (!restStore.checklistAsksScreen) return
 
       set({
@@ -190,6 +192,7 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
     },
 
     loadChecklistAsks: async (productionId) => {
+      const editingAsk = get().checklistAsksScreen?.editingAsk
       const asks = await api
         .get('smart-list/check-list/find-by-id', {
           params: {
@@ -204,6 +207,7 @@ export const useCoreScreensStore = create<CoreScreensData>((set, get) => {
 
       set({
         checklistAsksScreen: {
+          editingAsk,
           ...asks,
           allStatus: status.map(
             ({ id, descricao }: { id: number; descricao: string }) => ({

@@ -26,7 +26,7 @@ interface SmartListBoundStoreData {
       }>
     | undefined
 
-  loadBounds: () => Promise<void>
+  loadBounds: () => Promise<BoundType[]>
   loadFamily: () => Promise<void>
   loadDiverse: () => Promise<void>
 }
@@ -42,12 +42,14 @@ export const useBoundStore = create<SmartListBoundStoreData>((set) => {
     async loadBounds() {
       set({ bounds: undefined })
       const response = await api
-        .get('/smart-list/bound')
+        .get<{ bound: BoundType[] }>('/smart-list/bound')
         .then((res) => res.data)
 
       set({
         bounds: response.bound,
       })
+
+      return response.bound
     },
 
     async loadFamily() {

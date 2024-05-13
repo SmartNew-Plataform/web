@@ -57,17 +57,6 @@ export function HeaderChecklist() {
                 Diversos
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem disabled asChild>
-              <Link
-                target="_blank"
-                href={{
-                  pathname: '/checklist/controle',
-                  query: { token: searchParams.get('token') },
-                }}
-              >
-                Controle
-              </Link>
-            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link
                 target="_blank"
@@ -79,7 +68,7 @@ export function HeaderChecklist() {
                 Vinculos
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            {/* <DropdownMenuItem asChild>
               <Link
                 target="_blank"
                 href={{
@@ -89,7 +78,7 @@ export function HeaderChecklist() {
               >
                 Categorias
               </Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
 

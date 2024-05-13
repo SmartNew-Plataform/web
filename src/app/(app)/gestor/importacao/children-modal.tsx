@@ -6,7 +6,7 @@ interface IChildrenModal extends ComponentProps<typeof Dialog> {
   data: { [key: string]: string }[]
 }
 
-export function ChildrenModal({ data, ...rest }: IChildrenModal) {
+export function ChildrenModal({ ...rest }: IChildrenModal) {
   return (
     <Dialog {...rest}>
       <DialogContent className="max-w-5xl">
