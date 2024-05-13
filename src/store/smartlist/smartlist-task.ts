@@ -1,3 +1,4 @@
+import { SelectData } from '@/@types/select-data'
 import { StatusType, TaskType, Types } from '@/@types/smartlist-tasks'
 import { api } from '@/lib/api'
 import { create } from 'zustand'
@@ -9,8 +10,7 @@ interface StoreData {
   types: Types[] | undefined
 
   loadTasks: () => Promise<TaskType[] | undefined>
-  loadStatus: () => Promise<void>
-  loadTypes: () => Promise<void>
+  loadSelects: () => Promise<{ status: SelectData[]; types: SelectData[] }>
   filterTasks: (text: string) => void
 }
 
@@ -29,24 +29,41 @@ export const useTasksStore = create<StoreData>((set, get) => {
       return response.task
     },
 
-    async loadStatus() {
-      set({ status: undefined })
-      const response = await api
-        .get('/smart-list/check-list/list-status')
+    async loadSelects() {
+      const responseStatus = await api
+        .get<{ status: StatusType[] }>('/smart-list/check-list/list-status')
         .then((res) => res.data)
+
+      const responseControl = await api
+        .get<{ control: Types[] }>('/smart-list/bound/list-control')
+        .then((res) => res.data)
+
+      const status = responseStatus.status
+      const types = responseControl.control
 
       set({
-        status: response.status,
+        status: responseStatus.status,
+        types: responseControl.control,
       })
-    },
 
-    async loadTypes() {
-      set({ types: undefined })
-      const response = await api
-        .get('/smart-list/bound/list-control')
-        .then((res) => res.data)
+      const statusFormatted = status
+        ? status?.map(({ description, id }) => ({
+            label: description,
+            value: id.toString(),
+          }))
+        : []
 
-      set({ types: response.control })
+      const typesFormatted = types
+        ? types.map(({ description, id }) => ({
+            label: description,
+            value: id.toString(),
+          }))
+        : []
+
+      return {
+        status: statusFormatted,
+        types: typesFormatted,
+      }
     },
 
     filterTasks(text) {

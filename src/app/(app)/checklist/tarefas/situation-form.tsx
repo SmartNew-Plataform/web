@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useTasksStore } from '@/store/smartlist/smartlist-task'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { CornerDownLeft, Loader2, Save, Trash2, Wind } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -48,23 +49,7 @@ interface SituationForm {
 }
 
 export function SituationForm({ taskId }: SituationForm) {
-  const { status, types } = useTasksStore(({ status, types }) => {
-    const statusFormatted = status
-      ? status?.map(({ description, id }) => ({
-          label: description,
-          value: id.toString(),
-        }))
-      : []
-
-    const typesFormatted = types
-      ? types.map(({ description, id }) => ({
-          label: description,
-          value: id.toString(),
-        }))
-      : []
-
-    return { status: statusFormatted, types: typesFormatted }
-  })
+  const { loadSelects } = useTasksStore()
   const [actions, setActions] = useState<ActionType[]>([])
   const [actionsLoading, setActionsLoading] = useState(false)
 
@@ -142,6 +127,11 @@ export function SituationForm({ taskId }: SituationForm) {
     }
   }
 
+  const { data } = useQuery({
+    queryKey: ['checklist/status-control'],
+    queryFn: loadSelects,
+  })
+
   return (
     <FormProvider {...situationForm}>
       <div className="ov flex h-full flex-col gap-4 overflow-auto">
@@ -151,7 +141,7 @@ export function SituationForm({ taskId }: SituationForm) {
         >
           <Form.Field>
             <Form.Label>Controle:</Form.Label>
-            <Form.Select name="status" options={status} />
+            <Form.Select name="status" options={data?.status} />
             <Form.ErrorMessage field="status" />
           </Form.Field>
 
@@ -163,7 +153,7 @@ export function SituationForm({ taskId }: SituationForm) {
 
           <Form.Field>
             <Form.Label>Tipo:</Form.Label>
-            <Form.Select name="type" options={types} />
+            <Form.Select name="type" options={data?.types} />
             <Form.ErrorMessage field="type" />
           </Form.Field>
 
