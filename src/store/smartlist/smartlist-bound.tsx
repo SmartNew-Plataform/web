@@ -27,8 +27,8 @@ interface SmartListBoundStoreData {
     | undefined
 
   loadBounds: () => Promise<BoundType[]>
-  loadFamily: () => Promise<void>
-  loadDiverse: () => Promise<void>
+  loadFamily: () => Promise<SmartListBoundStoreData['family']>
+  loadDiverse: () => Promise<SmartListBoundStoreData['diverse']>
 }
 
 type ErrorMessage = { message: string }
@@ -61,6 +61,8 @@ export const useBoundStore = create<SmartListBoundStoreData>((set) => {
       set({
         family: response,
       })
+
+      return response
     },
 
     async loadDiverse() {
@@ -74,6 +76,8 @@ export const useBoundStore = create<SmartListBoundStoreData>((set) => {
       set({
         diverse: response,
       })
+
+      return response
     },
   }
 })
