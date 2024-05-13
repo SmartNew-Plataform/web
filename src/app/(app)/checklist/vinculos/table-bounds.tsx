@@ -3,7 +3,7 @@
 import { DataTable } from '@/components/data-table'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
 import { ColumnDef } from '@tanstack/react-table'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
   AlertDialog,
@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import {
   ArrowDownWideNarrow,
@@ -35,7 +36,7 @@ export type BoundData = {
 }
 
 export function TableBounds() {
-  const { loadBounds, bounds } = useBoundStore(({ loadBounds, bounds }) => ({
+  const { loadBounds } = useBoundStore(({ loadBounds, bounds }) => ({
     loadBounds,
     bounds,
   }))
@@ -44,9 +45,10 @@ export function TableBounds() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
 
-  useEffect(() => {
-    loadBounds()
-  }, [])
+  const { data, refetch } = useQuery({
+    queryKey: ['checklist/bounds'],
+    queryFn: loadBounds,
+  })
 
   const columnsBound: ColumnDef<BoundData>[] = [
     {
@@ -137,7 +139,7 @@ export function TableBounds() {
       title: 'Vinculo deletado com sucesso!',
       variant: 'success',
     })
-    loadBounds()
+    refetch()
   }
 
   return (
@@ -165,11 +167,7 @@ export function TableBounds() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <DataTable
-        columns={columnsBound}
-        data={bounds || []}
-        isLoading={!bounds}
-      />
+      <DataTable columns={columnsBound} data={data || []} isLoading={!data} />
     </>
   )
 }
