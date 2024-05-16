@@ -55,7 +55,7 @@ export function TabSpeedLimit() {
   }: SpeedLimitFormData) {
     const response = await api
       .get<{ speedlimit: SpeedLimit[]; ok: boolean; message: string }>(
-        'https://api-gateway.portalddmx.com.br/location/json/listSpeedLimit',
+        'https://api-gateway.portalddmx.com.br/location/v1/json/listSpeedLimit',
         {
           params: {
             login: 'MECBRUN',

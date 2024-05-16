@@ -43,7 +43,7 @@ export function TabAnalysis() {
   async function handleFetchRoutes({ date, serial, hours }: AnalysisFormData) {
     const response = await api
       .get<{ analises: Analysis[]; ok: boolean; message: string }>(
-        'https://api-gateway.portalddmx.com.br/location/json/calculaAnaliseData',
+        'https://api-gateway.portalddmx.com.br/location/v1/json/calculaAnaliseData',
         {
           params: {
             login: 'MECBRUN',

@@ -47,7 +47,7 @@ export function TabBoarding() {
   }: BoardingFormData) {
     const response = await api
       .get<{ embarques: Boarding[]; ok: boolean; message: string }>(
-        'https://api-gateway.portalddmx.com.br/location/json/listEmbarques',
+        'https://api-gateway.portalddmx.com.br/location/v1/json/listEmbarques',
         {
           params: {
             login: 'MECBRUN',

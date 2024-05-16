@@ -41,7 +41,7 @@ export function TabMaintenance() {
   async function handleFetchRoutes({ serial }: MaintenanceFormData) {
     const response = await api
       .get<{ maintenances: Maintenance[]; ok: boolean; message: string }>(
-        'https://api-gateway.portalddmx.com.br/location/json/listMaintenances',
+        'https://api-gateway.portalddmx.com.br/location/v1/json/listMaintenances',
         {
           params: {
             login: 'MECBRUN',

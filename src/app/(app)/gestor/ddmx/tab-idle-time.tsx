@@ -53,7 +53,7 @@ export function TabIdleTime() {
   }: IdleTimeFormData) {
     const response = await api
       .get<{ idletime: IdleTime[]; ok: boolean; message: string }>(
-        'https://api-gateway.portalddmx.com.br/location/json/listIdleTime',
+        'https://api-gateway.portalddmx.com.br/location/v1/json/listIdleTime',
         {
           params: {
             login: 'MECBRUN',

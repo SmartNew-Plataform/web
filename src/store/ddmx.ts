@@ -18,7 +18,7 @@ export const useDdmx = create<DdmxData>((set) => {
     async fetchEquipments() {
       const response = await api
         .get<{ automobiles: Equipment[] }>(
-          'https://api-gateway.portalddmx.com.br/location/json/listAutomobiles',
+          'https://api-gateway.portalddmx.com.br/location/v1/json/listAutomobiles',
           {
             params: {
               login: 'MECBRUN',

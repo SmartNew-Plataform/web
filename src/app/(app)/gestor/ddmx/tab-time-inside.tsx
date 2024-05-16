@@ -55,7 +55,7 @@ export function TabTimeInside() {
   }: TimeInsideFormData) {
     const response = await api
       .get<{ timeinsidearea: TimeInsideArea[]; ok: boolean; message: string }>(
-        'https://api-gateway.portalddmx.com.br/location/json/listTimeInsideArea',
+        'https://api-gateway.portalddmx.com.br/location/v1/json/listTimeInsideArea',
         {
           params: {
             login: 'MECBRUN',
