@@ -47,7 +47,7 @@ export function TabRoutes() {
   }: RouteFormData) {
     const response = await api
       .get<{ route: Route[]; ok: boolean; message: string }>(
-        'https://api-gateway.portalddmx.com.br/location/json/routelist',
+        'https://api-gateway.portalddmx.com.br/location/v1/json/routelist',
         {
           params: {
             login: 'MECBRUN',

@@ -47,7 +47,7 @@ export function TabVehicleUse() {
   }: VehicleUseFormData) {
     const response = await api
       .get<{ vehicleuse: VehicleUse[]; ok: boolean; message: string }>(
-        'https://api-gateway.portalddmx.com.br/location/json/listvehicleuse',
+        'https://api-gateway.portalddmx.com.br/location/v1/json/listvehicleuse',
         {
           params: {
             login: 'MECBRUN',
