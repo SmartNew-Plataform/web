@@ -1,5 +1,6 @@
-import { ComponentProps } from 'react'
+import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
+import { ComponentProps } from 'react'
 
 export interface WizardFormStepProps extends ComponentProps<typeof motion.div> {
   direction?: number
@@ -28,6 +29,7 @@ const variants = {
 
 export function WizardFormStep({
   direction = 1,
+  className,
   ...props
 }: WizardFormStepProps) {
   return (
@@ -42,7 +44,10 @@ export function WizardFormStep({
         x: { type: 'spring', stiffness: 300, damping: 30 },
         opacity: { duration: 0.2 },
       }}
-      className="absolute top-0 flex w-96 flex-col gap-4"
+      className={cn(
+        'absolute top-0 flex w-96 flex-col gap-4 bg-white',
+        className,
+      )}
       {...props}
     />
   )

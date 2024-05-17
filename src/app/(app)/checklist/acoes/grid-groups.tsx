@@ -262,26 +262,6 @@ export function GridGroups() {
       },
     },
     {
-      accessorKey: 'endDate',
-      sortingFn: 'datetime',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Prazo
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => {
-        const deadline = row.getValue('endDate') as string
-
-        return deadline ? dayjs(deadline).format('DD/MM/YYYY') : 'Sem registro'
-      },
-    },
-    {
       accessorKey: 'equipment',
       header: ({ column }) => {
         return (
@@ -289,7 +269,7 @@ export function GridGroups() {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Equipamento
+            Ativo/Diverso
             <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -321,6 +301,26 @@ export function GridGroups() {
             <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
           </Button>
         )
+      },
+    },
+    {
+      accessorKey: 'endDate',
+      sortingFn: 'datetime',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Prazo
+            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const deadline = row.getValue('endDate') as string
+
+        return deadline ? dayjs(deadline).format('DD/MM/YYYY') : 'Sem registro'
       },
     },
     {
