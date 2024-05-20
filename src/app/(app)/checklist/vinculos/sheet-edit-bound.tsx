@@ -66,7 +66,7 @@ export function SheetEditBound({ boundId, onOpenChange }: SheetEditBoundProps) {
       title: 'Vinculo atualizado com sucesso!',
       variant: 'success',
     })
-    loadBounds()
+    loadBounds({ filterText: undefined })
     onOpenChange(null)
   }
 
