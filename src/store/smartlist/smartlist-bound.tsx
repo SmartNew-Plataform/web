@@ -25,8 +25,10 @@ interface SmartListBoundStoreData {
         observation: string
       }>
     | undefined
+  filterText: string | undefined
 
-  loadBounds: () => Promise<BoundType[]>
+  setFilterText: (param: string) => void
+  loadBounds: (p: { filterText: string | undefined }) => Promise<BoundType[]>
   loadFamily: () => Promise<SmartListBoundStoreData['family']>
   loadDiverse: () => Promise<SmartListBoundStoreData['diverse']>
 }
@@ -38,11 +40,18 @@ export const useBoundStore = create<SmartListBoundStoreData>((set) => {
     bounds: undefined,
     diverse: undefined,
     family: undefined,
+    filterText: undefined,
 
-    async loadBounds() {
+    setFilterText(filterText) {
+      set({ filterText })
+    },
+
+    async loadBounds({ filterText }) {
       set({ bounds: undefined })
       const response = await api
-        .get<{ bound: BoundType[] }>('/smart-list/bound')
+        .get<{
+          bound: BoundType[]
+        }>('/smart-list/bound', { params: { filterText } })
         .then((res) => res.data)
 
       set({

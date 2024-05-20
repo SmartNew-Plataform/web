@@ -62,7 +62,7 @@ export function Header() {
             <span className="text-slate-800">{checklistAsksScreen.id}</span>
           </div>
           <div className="flex flex-col gap-1 pl-2">
-            <strong className="uppercase text-slate-700">Equipamento:</strong>
+            <strong className="uppercase text-slate-700">Ativo/Diverso:</strong>
             <span className="text-slate-800">
               {checklistAsksScreen.equipment}
             </span>
@@ -84,7 +84,9 @@ export function Header() {
             <span className="text-slate-800">{checklistAsksScreen.user}</span>
           </div>
           <div className="flex flex-col gap-1 pl-2">
-            <strong className="uppercase text-slate-700">Modelo:</strong>
+            <strong className="uppercase text-slate-700">
+              Tipo Checklist:
+            </strong>
             <span className="text-slate-800">{checklistAsksScreen.model}</span>
           </div>
         </div>

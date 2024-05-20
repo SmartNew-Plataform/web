@@ -23,6 +23,17 @@ import { Eraser, FileBarChart, Info, ListFilter, Search } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+interface Checklist {
+  id: number
+  status: string
+  startDate: string
+  endDate: any
+  model: string
+  item: string
+  user: string
+  period: string
+}
+
 const filterFormSchema = z.object({
   filterText: z.string().optional(),
   dateFrom: z.date().optional(),
@@ -65,7 +76,10 @@ export function HeaderInfo() {
 
   async function handleGenerateExcel() {
     loading.show()
-    const data = await fetchDataTable({ index: null, perPage: null })
+    const data: { rows: Checklist[] } | undefined = await fetchDataTable({
+      index: null,
+      perPage: null,
+    })
     loading.hide()
 
     if (!data?.rows) return
@@ -76,13 +90,14 @@ export function HeaderInfo() {
       body: JSON.stringify({
         currencyFormat: [],
         title: 'Ações',
-        data: data.rows.map((item: any) => ({
+        data: data.rows.map((item) => ({
           id: item.id,
+          modelo: item.model,
           'data de abertura': item.startDate,
           turno: item.period,
-          equipamento: item.equipment,
+          'ativo/diverso': item.item,
           usuário: item.user,
-          status: item.status,
+          status: item.status === 'open' ? 'Aberto' : 'Finalizado ',
         })),
       }),
       headers: {

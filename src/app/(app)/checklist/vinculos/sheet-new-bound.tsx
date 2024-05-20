@@ -104,7 +104,7 @@ export function SheetNewBound() {
       variant: 'success',
     })
     reset({ description: '', family: '', diverse: '', type: 'family' })
-    loadBounds()
+    loadBounds({ filterText: undefined })
   }
 
   useEffect(() => {

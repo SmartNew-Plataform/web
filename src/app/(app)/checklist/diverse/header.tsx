@@ -13,7 +13,7 @@ export function Header() {
 
       <Button onClick={() => setOpen(true)}>
         <Plus size={16} />
-        Novo diverso
+        diverso
       </Button>
 
       <DiverseModal mode="create" open={open} onOpenChange={setOpen} />
