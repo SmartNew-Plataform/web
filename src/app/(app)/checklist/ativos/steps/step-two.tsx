@@ -1,13 +1,35 @@
 'use client'
 import { Form } from '@/components/form'
+import { useActives } from '@/store/smartlist/actives'
+import { StepFive } from './step-five'
+import { StepFour } from './step-four'
+import { StepSeven } from './step-seven'
+import { StepSix } from './step-six'
+import { StepThree } from './step-three'
 
 export function StepTwo() {
+  const { selects } = useActives()
+
   return (
     <>
+      {selects.equipmentDad ? (
+        <Form.Field>
+          <Form.Label htmlFor="equipmentDad">Equipamento Pai:</Form.Label>
+          <Form.Select
+            name="equipmentDad"
+            id="equipmentDad"
+            options={selects.equipmentDad}
+          />
+          <Form.ErrorMessage field="equipmentDad" />
+        </Form.Field>
+      ) : (
+        <Form.SkeletonField />
+      )}
+
       <Form.Field>
-        <Form.Label htmlFor="description">Descrição:</Form.Label>
-        <Form.Input name="description" id="description" />
-        <Form.ErrorMessage field="description" />
+        <Form.Label htmlFor="patrimonyNumber">Nº Patrimonio:</Form.Label>
+        <Form.Input name="patrimonyNumber" id="patrimonyNumber" />
+        <Form.ErrorMessage field="patrimonyNumber" />
       </Form.Field>
 
       <Form.Field>
@@ -27,6 +49,16 @@ export function StepTwo() {
         <Form.ImagePicker name="images" id="images" />
         <Form.ErrorMessage field="images" />
       </Form.Field>
+
+      <StepThree />
+
+      <StepFour />
+
+      <StepFive />
+
+      <StepSix />
+
+      <StepSeven />
     </>
   )
 }

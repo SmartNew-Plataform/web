@@ -1,13 +1,18 @@
 'use client'
 import { Active } from '@/@types/active'
 import { DataTable } from '@/components/data-table'
+import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
 import { useActives } from '@/store/smartlist/actives'
 import { useQuery } from '@tanstack/react-query'
-import { columns } from './columns'
+import { ColumnDef } from '@tanstack/react-table'
+import { Pencil } from 'lucide-react'
+import { useState } from 'react'
+import { ActiveForm, ActiveFormData } from './active-form'
 
 export function Table() {
   const { setSelects } = useActives()
+  const [currentActive, setCurrentActive] = useState<Active | undefined>()
 
   async function fetchActives() {
     const response = await api
@@ -77,7 +82,101 @@ export function Table() {
     queryFn: fetchSelects,
   })
 
-  console.log(data)
+  async function handleEditActive(data: ActiveFormData) {
+    console.log(data)
+  }
 
-  return <DataTable columns={columns} data={data || []} />
+  async function fetchActive(id: number) {
+    const response = await api
+      .get(`system/equipment/${id}`)
+      .then((res) => res.data)
+    console.log(response.data)
+
+    // setCurrentActive()
+  }
+
+  const columns: ColumnDef<Active>[] = [
+    {
+      accessorKey: 'id',
+      header: '',
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="secondary"
+            size="icon-xs"
+            onClick={() => fetchActive(row.getValue('id'))}
+          >
+            <Pencil size={12} />
+          </Button>
+        )
+      },
+    },
+    {
+      accessorKey: 'id',
+      header: 'id',
+    },
+    {
+      accessorKey: 'branch.label',
+      header: 'cliente',
+    },
+    {
+      accessorKey: 'costCenter.label',
+      header: 'centro custo',
+    },
+    {
+      accessorKey: 'equipmentCode',
+      header: 'Equipamento código',
+    },
+    {
+      accessorKey: 'description',
+      header: 'Descrição tag',
+    },
+    {
+      accessorKey: 'family.label',
+      header: 'Familia',
+    },
+    {
+      accessorKey: 'typeEquipment.label',
+      header: 'equipamento tipo',
+    },
+    {
+      accessorKey: 'inGuarantee',
+      header: 'Em garantia?',
+    },
+    {
+      accessorKey: 'plate',
+      header: 'Placa',
+    },
+    {
+      accessorKey: 'chassi',
+      header: 'chassi',
+    },
+    {
+      accessorKey: 'serie',
+      header: 'n° serie',
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status Equipamento',
+    },
+    {
+      accessorKey: 'observation',
+      header: 'observação',
+    },
+  ]
+
+  return (
+    <>
+      <DataTable columns={columns} data={data || []} />
+      <ActiveForm
+        open={!!currentActive}
+        onOpenChange={(open) =>
+          setCurrentActive(open ? currentActive : undefined)
+        }
+        mode="edit"
+        onSubmit={handleEditActive}
+        defaultValues={currentActive!}
+      />
+    </>
+  )
 }
