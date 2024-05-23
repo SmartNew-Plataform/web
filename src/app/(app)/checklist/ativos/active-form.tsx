@@ -30,12 +30,12 @@ const createActiveFormSchema = z.object({
   model: z.string().optional().nullable(),
   serialNumber: z.string().optional().nullable(),
   fiscalNumber: z.string().optional().nullable(),
-  acquisitionValue: z.number().optional().nullable(),
-  manufacturingYear: z.number().optional().nullable(),
-  modelYear: z.number().optional().nullable(),
+  acquisitionValue: z.coerce.number().optional().nullable(),
+  manufacturingYear: z.coerce.number().optional().nullable(),
+  modelYear: z.coerce.number().optional().nullable(),
   buyDate: z.date().optional().nullable(),
-  guaranteeTime: z.number().optional().nullable(),
-  costPerHour: z.number().optional().nullable(),
+  guaranteeTime: z.coerce.number().optional().nullable(),
+  costPerHour: z.coerce.number().optional().nullable(),
   equipmentStatus: z.string().optional().nullable(),
   consumptionType: z.string({
     required_error: 'O tipo de consumo e obrigatório!',
@@ -44,7 +44,7 @@ const createActiveFormSchema = z.object({
     required_error: 'O consumo de combustível e obrigatório!',
   }),
   unityMeter: z.string().optional().nullable(),
-  limitUnityMeter: z.number().optional().nullable(),
+  limitUnityMeter: z.coerce.number().optional().nullable(),
   owner: z.string().optional().nullable(),
   fleet: z.string().optional().nullable(),
   chassis: z.string().optional().nullable(),
@@ -66,7 +66,7 @@ const createActiveFormSchema = z.object({
         manufacturer: z.string().optional().nullable(),
         model: z.string().optional().nullable(),
         serialNumber: z.string().optional().nullable(),
-        manufacturingYear: z.number().optional().nullable(),
+        manufacturingYear: z.coerce.number().optional().nullable(),
         status: z.string({ required_error: 'O status e obrigatório!' }),
       }),
     )
@@ -92,7 +92,11 @@ export function ActiveForm({
     resolver: zodResolver(createActiveFormSchema),
   })
 
-  const { handleSubmit, reset } = createActiveForm
+  const {
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = createActiveForm
   const createActiveWizardForm = useWizardForm()
   const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
 
@@ -180,7 +184,13 @@ export function ActiveForm({
             </Button>
 
             <div className="flex gap-3">
-              <Button type="submit" variant="success" form="active-form">
+              <Button
+                loading={isSubmitting}
+                disabled={isSubmitting}
+                type="submit"
+                variant="success"
+                form="active-form"
+              >
                 <Save size={16} />
                 Salvar
               </Button>
