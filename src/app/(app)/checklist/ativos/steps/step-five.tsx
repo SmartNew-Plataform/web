@@ -23,33 +23,6 @@ export function StepFive() {
         <Form.SkeletonField />
       )}
 
-      {selects.consumptionType ? (
-        <Form.Field>
-          <Form.Label htmlFor="consumptionType">Tipo de Consumo:</Form.Label>
-          <Form.Select
-            name="consumptionType"
-            id="consumptionType"
-            options={selects.consumptionType}
-          />
-          <Form.ErrorMessage field="consumptionType" />
-        </Form.Field>
-      ) : (
-        <Form.SkeletonField />
-      )}
-
-      <Form.Field>
-        <Form.Label htmlFor="consumptionFuel">
-          Consumo de Combustível:
-        </Form.Label>
-        <Form.Input
-          type="number"
-          step="any"
-          name="consumptionFuel"
-          id="consumptionFuel"
-        />
-        <Form.ErrorMessage field="consumptionFuel" />
-      </Form.Field>
-
       {selects.unityMeter ? (
         <Form.Field>
           <Form.Label htmlFor="unityMeter">Unidade de Medida:</Form.Label>

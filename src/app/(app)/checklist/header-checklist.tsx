@@ -39,6 +39,17 @@ export function HeaderChecklist() {
               <Link
                 target="_blank"
                 href={{
+                  pathname: '/checklist/ativos',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Cadastro de equipamentos
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
                   pathname: '/checklist/tarefas',
                   query: { token: searchParams.get('token') },
                 }}

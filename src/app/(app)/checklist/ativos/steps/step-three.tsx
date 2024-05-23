@@ -1,21 +1,9 @@
 'use client'
 import { Form } from '@/components/form'
-import { useActives } from '@/store/smartlist/actives'
 
 export function StepThree() {
-  const { selects } = useActives()
   return (
     <>
-      {selects.family ? (
-        <Form.Field>
-          <Form.Label htmlFor="family">Familia:</Form.Label>
-          <Form.Select name="family" id="family" options={selects.family} />
-          <Form.ErrorMessage field="family" />
-        </Form.Field>
-      ) : (
-        <Form.SkeletonField />
-      )}
-
       <Form.Field>
         <Form.Label htmlFor="equipmentType">Tipo de Equipamento:</Form.Label>
         <Form.Input name="equipmentType" id="equipmentType" />

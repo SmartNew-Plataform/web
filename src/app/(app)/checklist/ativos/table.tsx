@@ -1,17 +1,36 @@
 'use client'
 import { Active } from '@/@types/active'
 import { DataTable } from '@/components/data-table'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useLoading } from '@/store/loading-store'
 import { useActives } from '@/store/smartlist/actives'
 import { useQuery } from '@tanstack/react-query'
-import { columns } from './columns'
+import { ColumnDef } from '@tanstack/react-table'
+import { Pencil, Trash2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { ActiveForm, ActiveFormData } from './active-form'
 
 export function Table() {
-  const { setSelects } = useActives()
+  const { setSelects, setImages, setEquipmentId, equipmentId } = useActives()
+  const searchParams = useSearchParams()
+  const [currentActive, setCurrentActive] = useState<
+    ActiveFormData | undefined
+  >()
+  const { toast } = useToast()
+  const loading = useLoading()
+
+  const filterText = searchParams.get('s') || ''
 
   async function fetchActives() {
     const response = await api
-      .get<{ data: Active[] }>('system/equipment')
+      .get<{ data: Active[] }>('system/equipment', {
+        params: {
+          filterText: searchParams.get('s'),
+        },
+      })
       .then((res) => res.data)
 
     return response.data
@@ -67,17 +86,191 @@ export function Table() {
     })
   }
 
-  const { data } = useQuery({
-    queryKey: ['checklist-list-actives'],
+  const { data, refetch } = useQuery({
+    queryKey: ['checklist-list-actives', filterText],
     queryFn: fetchActives,
   })
+
+  console.log(filterText)
 
   useQuery({
     queryKey: ['checklist-actives-selects'],
     queryFn: fetchSelects,
   })
 
-  console.log(data)
+  async function handleEditActive(data: ActiveFormData) {
+    const response = await api.put(`system/equipment/${equipmentId}`, data)
+    if (response.status !== 200) return
 
-  return <DataTable columns={columns} data={data || []} />
+    data.images?.forEach(async (file) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      console.log(file)
+
+      const response = await api.post(
+        `system/equipment/${equipmentId}/attach`,
+        formData,
+      )
+
+      if (response.status !== 201) return
+
+      toast({
+        title: 'Anexos inseridos com sucesso!',
+        variant: 'success',
+      })
+    })
+
+    toast({
+      title: 'Equipamento atualizado com sucesso!',
+      variant: 'success',
+    })
+    refetch()
+  }
+
+  async function fetchActive(id: number) {
+    setEquipmentId(id)
+    loading.show()
+    const response = await api
+      .get<{ data: ActiveFormData }>(`system/equipment/${id}`)
+      .then((res) => res.data)
+    loading.hide()
+
+    if (!response.data) {
+      setEquipmentId(undefined)
+      return toast({
+        title: 'Equipamento não encontrado!',
+        variant: 'destructive',
+      })
+    }
+
+    setCurrentActive(response.data)
+
+    loading.show()
+    const images = await api
+      .get<{ img: Array<{ url: string }> }>(`system/equipment/${id}/attach`)
+      .then((res) => res.data)
+    loading.hide()
+
+    setImages(images.img.map(({ url }) => url))
+  }
+
+  async function handleDeleteEquipment(id: number) {
+    loading.show()
+    const response = await api.delete(`system/equipment/${id}`)
+    loading.hide()
+
+    if (response.status !== 200) return
+
+    toast({
+      title: 'Equipamento deletado com sucesso!',
+      variant: 'success',
+    })
+
+    refetch()
+  }
+
+  const columns: ColumnDef<Active>[] = [
+    {
+      accessorKey: 'id',
+      header: '',
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="secondary"
+            size="icon-xs"
+            onClick={() => fetchActive(row.getValue('id'))}
+          >
+            <Pencil size={12} />
+          </Button>
+        )
+      },
+    },
+    {
+      accessorKey: 'id',
+      header: '',
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="destructive"
+            size="icon-xs"
+            onClick={() => handleDeleteEquipment(row.getValue('id'))}
+          >
+            <Trash2 size={12} />
+          </Button>
+        )
+      },
+    },
+    {
+      accessorKey: 'id',
+      header: 'id',
+    },
+    {
+      accessorKey: 'branch.label',
+      header: 'cliente',
+    },
+    {
+      accessorKey: 'costCenter.label',
+      header: 'centro custo',
+    },
+    {
+      accessorKey: 'equipmentCode',
+      header: 'Equipamento código',
+    },
+    {
+      accessorKey: 'description',
+      header: 'Descrição tag',
+    },
+    {
+      accessorKey: 'family.label',
+      header: 'Familia',
+    },
+    {
+      accessorKey: 'typeEquipment.label',
+      header: 'equipamento tipo',
+    },
+    {
+      accessorKey: 'inGuarantee',
+      header: 'Em garantia?',
+    },
+    {
+      accessorKey: 'plate',
+      header: 'Placa',
+    },
+    {
+      accessorKey: 'chassi',
+      header: 'chassi',
+    },
+    {
+      accessorKey: 'serie',
+      header: 'n° serie',
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status Equipamento',
+    },
+    {
+      accessorKey: 'observation',
+      header: 'observação',
+    },
+  ]
+
+  return (
+    <>
+      <DataTable columns={columns} data={data || []} />
+      <ActiveForm
+        open={!!currentActive}
+        onOpenChange={(open) => {
+          if (open) {
+            setCurrentActive(currentActive)
+          } else {
+            setCurrentActive(undefined)
+            setEquipmentId(undefined)
+          }
+        }}
+        mode="edit"
+        onSubmit={handleEditActive}
+        defaultValues={currentActive}
+      />
+    </>
+  )
 }

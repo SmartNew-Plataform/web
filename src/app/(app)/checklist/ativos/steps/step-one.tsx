@@ -4,7 +4,6 @@ import { useActives } from '@/store/smartlist/actives'
 
 export function StepOne() {
   const { selects } = useActives()
-  console.log(selects)
 
   return (
     <>
@@ -24,25 +23,21 @@ export function StepOne() {
         <Form.ErrorMessage field="equipment" />
       </Form.Field>
 
-      {selects.equipmentDad ? (
+      <Form.Field>
+        <Form.Label htmlFor="description">Descrição:</Form.Label>
+        <Form.Input name="description" id="description" />
+        <Form.ErrorMessage field="description" />
+      </Form.Field>
+
+      {selects.family ? (
         <Form.Field>
-          <Form.Label htmlFor="equipmentDad">Equipamento Pai:</Form.Label>
-          <Form.Select
-            name="equipmentDad"
-            id="equipmentDad"
-            options={selects.equipmentDad}
-          />
-          <Form.ErrorMessage field="equipmentDad" />
+          <Form.Label htmlFor="family">Familia:</Form.Label>
+          <Form.Select name="family" id="family" options={selects.family} />
+          <Form.ErrorMessage field="family" />
         </Form.Field>
       ) : (
         <Form.SkeletonField />
       )}
-
-      <Form.Field>
-        <Form.Label htmlFor="patrimonyNumber">Nº Patrimonio:</Form.Label>
-        <Form.Input name="patrimonyNumber" id="patrimonyNumber" />
-        <Form.ErrorMessage field="patrimonyNumber" />
-      </Form.Field>
 
       {selects.costCenter ? (
         <Form.Field>
@@ -57,6 +52,33 @@ export function StepOne() {
       ) : (
         <Form.SkeletonField />
       )}
+
+      {selects.consumptionType ? (
+        <Form.Field>
+          <Form.Label htmlFor="consumptionType">Tipo de Consumo:</Form.Label>
+          <Form.Select
+            name="consumptionType"
+            id="consumptionType"
+            options={selects.consumptionType}
+          />
+          <Form.ErrorMessage field="consumptionType" />
+        </Form.Field>
+      ) : (
+        <Form.SkeletonField />
+      )}
+
+      <Form.Field>
+        <Form.Label htmlFor="consumptionFuel">
+          Consumo de Combustível:
+        </Form.Label>
+        <Form.Input
+          type="number"
+          step="any"
+          name="consumptionFuel"
+          id="consumptionFuel"
+        />
+        <Form.ErrorMessage field="consumptionFuel" />
+      </Form.Field>
     </>
   )
 }
