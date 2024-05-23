@@ -13,8 +13,12 @@ interface ActiveStoreData {
     fleet?: SelectData[] | undefined
     componentStatus?: SelectData[] | undefined
   }
+  images: string[] | undefined
+  equipmentId: number | undefined
 
   setSelects: (data: ActiveStoreData['selects']) => void
+  setImages: (images: string[] | undefined) => void
+  setEquipmentId: (id: number | undefined) => void
 }
 
 export const useActives = create<ActiveStoreData>((set) => {
@@ -30,9 +34,19 @@ export const useActives = create<ActiveStoreData>((set) => {
       fleet: undefined,
       componentStatus: undefined,
     },
+    images: undefined,
+    equipmentId: undefined,
 
     setSelects(data) {
       set({ selects: { ...data } })
+    },
+
+    setImages(images) {
+      set({ images })
+    },
+
+    setEquipmentId(id) {
+      set({ equipmentId: id })
     },
   }
 })

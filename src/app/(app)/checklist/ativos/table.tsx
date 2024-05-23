@@ -2,17 +2,23 @@
 import { Active } from '@/@types/active'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useLoading } from '@/store/loading-store'
 import { useActives } from '@/store/smartlist/actives'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { Pencil } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
 
 export function Table() {
-  const { setSelects } = useActives()
-  const [currentActive, setCurrentActive] = useState<Active | undefined>()
+  const { setSelects, setImages, setEquipmentId, equipmentId } = useActives()
+  const [currentActive, setCurrentActive] = useState<
+    ActiveFormData | undefined
+  >()
+  const { toast } = useToast()
+  const loading = useLoading()
 
   async function fetchActives() {
     const response = await api
@@ -72,7 +78,7 @@ export function Table() {
     })
   }
 
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ['checklist-list-actives'],
     queryFn: fetchActives,
   })
@@ -83,16 +89,74 @@ export function Table() {
   })
 
   async function handleEditActive(data: ActiveFormData) {
-    console.log(data)
+    const response = await api.put(`system/equipment/${equipmentId}`, data)
+    if (response.status !== 200) return
+
+    data.images?.forEach(async (file) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      console.log(file)
+
+      const response = await api.post(
+        `system/equipment/${equipmentId}/attach`,
+        formData,
+      )
+
+      if (response.status !== 201) return
+
+      toast({
+        title: 'Anexos inseridos com sucesso!',
+        variant: 'success',
+      })
+    })
+
+    toast({
+      title: 'Equipamento atualizado com sucesso!',
+      variant: 'success',
+    })
+    refetch()
   }
 
   async function fetchActive(id: number) {
+    setEquipmentId(id)
+    loading.show()
     const response = await api
-      .get(`system/equipment/${id}`)
+      .get<{ data: ActiveFormData }>(`system/equipment/${id}`)
       .then((res) => res.data)
-    console.log(response.data)
+    loading.hide()
 
-    // setCurrentActive()
+    if (!response.data) {
+      setEquipmentId(undefined)
+      return toast({
+        title: 'Equipamento não encontrado!',
+        variant: 'destructive',
+      })
+    }
+
+    setCurrentActive(response.data)
+
+    loading.show()
+    const images = await api
+      .get<{ img: Array<{ url: string }> }>(`system/equipment/${id}/attach`)
+      .then((res) => res.data)
+    loading.hide()
+
+    setImages(images.img.map(({ url }) => url))
+  }
+
+  async function handleDeleteEquipment(id: number) {
+    loading.show()
+    const response = await api.delete(`system/equipment/${id}`)
+    loading.hide()
+
+    if (response.status !== 200) return
+
+    toast({
+      title: 'Equipamento deletado com sucesso!',
+      variant: 'success',
+    })
+
+    refetch()
   }
 
   const columns: ColumnDef<Active>[] = [
@@ -107,6 +171,21 @@ export function Table() {
             onClick={() => fetchActive(row.getValue('id'))}
           >
             <Pencil size={12} />
+          </Button>
+        )
+      },
+    },
+    {
+      accessorKey: 'id',
+      header: '',
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="destructive"
+            size="icon-xs"
+            onClick={() => handleDeleteEquipment(row.getValue('id'))}
+          >
+            <Trash2 size={12} />
           </Button>
         )
       },
@@ -170,12 +249,17 @@ export function Table() {
       <DataTable columns={columns} data={data || []} />
       <ActiveForm
         open={!!currentActive}
-        onOpenChange={(open) =>
-          setCurrentActive(open ? currentActive : undefined)
-        }
+        onOpenChange={(open) => {
+          if (open) {
+            setCurrentActive(currentActive)
+          } else {
+            setCurrentActive(undefined)
+            setEquipmentId(undefined)
+          }
+        }}
         mode="edit"
         onSubmit={handleEditActive}
-        defaultValues={currentActive!}
+        defaultValues={currentActive}
       />
     </>
   )

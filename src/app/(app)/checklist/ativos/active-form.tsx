@@ -1,5 +1,4 @@
 'use client'
-import { Active } from '@/@types/active'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { WizardForm } from '@/components/wizard-form'
@@ -8,7 +7,7 @@ import { useWizardForm } from '@/hooks/use-wizard-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
-import { ComponentProps } from 'react'
+import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { StepOne } from './steps/step-one'
@@ -17,72 +16,78 @@ import { StepTwo } from './steps/step-two'
 const createActiveFormSchema = z.object({
   client: z.string({ required_error: 'O cliente e obrigatório!' }),
   equipment: z.string({ required_error: 'O equipamento e obrigatório!' }),
-  equipmentDad: z.string().optional(),
-  patrimonyNumber: z.string().optional(),
+  equipmentDad: z.string().optional().nullable(),
+  patrimonyNumber: z.string().optional().nullable(),
   costCenter: z.string({ required_error: 'O centro de custo e obrigatório!' }),
   description: z.string({ required_error: 'A descrição e obrigatória!' }),
-  observation: z.string().optional(),
-  images: z.array(z.instanceof(File)).optional(),
-  dataSheet: z.string().optional(),
+  observation: z.string().optional().nullable(),
+  images: z.array(z.instanceof(File)).optional().nullable(),
+  dataSheet: z.string().optional().nullable(),
   family: z.string({ required_error: 'A familia e obrigatória!' }),
-  equipmentType: z.string().optional(),
-  manufacturer: z.string().optional(),
-  brand: z.string().optional(),
-  model: z.string().optional(),
-  serialNumber: z.string().optional(),
-  fiscalNumber: z.string().optional(),
-  acquisitionValue: z.number().optional(),
-  manufacturingYear: z.number().optional(),
-  modelYear: z.number().optional(),
-  buyDate: z.date().optional(),
-  guaranteeTime: z.number().optional(),
-  costPerHour: z.number().optional(),
-  equipmentStatus: z.string().optional(),
+  equipmentType: z.string().optional().nullable(),
+  manufacturer: z.string().optional().nullable(),
+  brand: z.string().optional().nullable(),
+  model: z.string().optional().nullable(),
+  serialNumber: z.string().optional().nullable(),
+  fiscalNumber: z.string().optional().nullable(),
+  acquisitionValue: z.number().optional().nullable(),
+  manufacturingYear: z.number().optional().nullable(),
+  modelYear: z.number().optional().nullable(),
+  buyDate: z.date().optional().nullable(),
+  guaranteeTime: z.number().optional().nullable(),
+  costPerHour: z.number().optional().nullable(),
+  equipmentStatus: z.string().optional().nullable(),
   consumptionType: z.string({
     required_error: 'O tipo de consumo e obrigatório!',
   }),
   consumptionFuel: z.string({
     required_error: 'O consumo de combustível e obrigatório!',
   }),
-  unityMeter: z.string().optional(),
-  limitUnityMeter: z.number().optional(),
-  owner: z.string().optional(),
-  fleet: z.string().optional(),
-  chassis: z.string().optional(),
-  plate: z.string().optional(),
-  color: z.string().optional(),
-  reindeerCode: z.string().optional(),
-  CRVNumber: z.string().optional(),
-  emissionDateCRV: z.date().optional(),
-  licensing: z.string().optional(),
-  insurancePolicy: z.string().optional(),
-  insurancePolicyExpiration: z.string().optional(),
-  CTFinameNumber: z.string().optional(),
-  recipient: z.string().optional(),
+  unityMeter: z.string().optional().nullable(),
+  limitUnityMeter: z.number().optional().nullable(),
+  owner: z.string().optional().nullable(),
+  fleet: z.string().optional().nullable(),
+  chassis: z.string().optional().nullable(),
+  plate: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
+  reindeerCode: z.string().optional().nullable(),
+  CRVNumber: z.string().optional().nullable(),
+  emissionDateCRV: z.date().optional().nullable(),
+  licensing: z.string().optional().nullable(),
+  insurancePolicy: z.string().optional().nullable(),
+  insurancePolicyExpiration: z.string().optional().nullable(),
+  CTFinameNumber: z.string().optional().nullable(),
+  recipient: z.string().optional().nullable(),
   components: z
     .array(
       z.object({
         description: z.string({ required_error: 'A descrição e obrigatória!' }),
-        image: z.array(z.instanceof(File)).optional(),
-        manufacturer: z.string().optional(),
-        model: z.string().optional(),
-        serialNumber: z.string().optional(),
-        manufacturingYear: z.number().optional(),
+        image: z.array(z.instanceof(File)).optional().nullable(),
+        manufacturer: z.string().optional().nullable(),
+        model: z.string().optional().nullable(),
+        serialNumber: z.string().optional().nullable(),
+        manufacturingYear: z.number().optional().nullable(),
         status: z.string({ required_error: 'O status e obrigatório!' }),
       }),
     )
-    .optional(),
+    .optional()
+    .nullable(),
 })
 
 export type ActiveFormData = z.infer<typeof createActiveFormSchema>
 
 interface ActiveFormProps extends ComponentProps<typeof Sheet> {
   onSubmit: (data: ActiveFormData) => Promise<void>
-  defaultValues?: Active
+  defaultValues?: ActiveFormData
   mode: 'create' | 'edit'
 }
 
-export function ActiveForm({ onSubmit, mode, ...props }: ActiveFormProps) {
+export function ActiveForm({
+  onSubmit,
+  mode,
+  defaultValues,
+  ...props
+}: ActiveFormProps) {
   const createActiveForm = useForm<ActiveFormData>({
     resolver: zodResolver(createActiveFormSchema),
   })
@@ -90,6 +95,11 @@ export function ActiveForm({ onSubmit, mode, ...props }: ActiveFormProps) {
   const { handleSubmit, reset } = createActiveForm
   const createActiveWizardForm = useWizardForm()
   const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
+
+  useEffect(() => {
+    if (!defaultValues) return
+    reset(defaultValues)
+  }, [defaultValues, reset])
 
   function handleNextStep() {
     paginate({ newDirection: 1 })

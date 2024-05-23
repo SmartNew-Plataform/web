@@ -1,5 +1,9 @@
 'use client'
+import { AttachList } from '@/components/attach-list'
 import { Form } from '@/components/form'
+import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/api'
+import { useLoading } from '@/store/loading-store'
 import { useActives } from '@/store/smartlist/actives'
 import { StepFive } from './step-five'
 import { StepFour } from './step-four'
@@ -8,7 +12,31 @@ import { StepSix } from './step-six'
 import { StepThree } from './step-three'
 
 export function StepTwo() {
-  const { selects } = useActives()
+  const { selects, images, setImages, equipmentId } = useActives()
+  const { toast } = useToast()
+  const loading = useLoading()
+
+  async function deleteAttach(url: string) {
+    const urlSplit = url.split('/')
+    const file = urlSplit[urlSplit.length - 1]
+
+    loading.show()
+    const response = await api.delete(
+      `system/equipment/${equipmentId}/attach`,
+      { data: { file } },
+    )
+    loading.hide()
+
+    if (response.status !== 200) return
+
+    const newImages = images?.filter((image) => !image.includes(file))
+    setImages(newImages)
+
+    toast({
+      title: 'Anexo deletado com sucesso!',
+      variant: 'success',
+    })
+  }
 
   return (
     <>
@@ -46,9 +74,11 @@ export function StepTwo() {
 
       <Form.Field>
         <Form.Label htmlFor="images">Images:</Form.Label>
-        <Form.ImagePicker name="images" id="images" />
+        <Form.ImagePicker multiple name="images" id="images" />
         <Form.ErrorMessage field="images" />
       </Form.Field>
+
+      <AttachList data={images || []} onDelete={deleteAttach} />
 
       <StepThree />
 

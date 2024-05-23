@@ -25,6 +25,8 @@ export function Header() {
     data.images?.forEach(async (file) => {
       const formData = new FormData()
       formData.append('file', file)
+      console.log(file)
+
       const response = await api.post(
         `system/equipment/${equipmentId}/attach`,
         formData,
@@ -36,8 +38,6 @@ export function Header() {
         title: 'Anexos inseridos com sucesso!',
         variant: 'success',
       })
-
-      return formData
     })
 
     queryClient.refetchQueries(['checklist-list-actives'])
