@@ -9,20 +9,28 @@ import { useActives } from '@/store/smartlist/actives'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Trash2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
 
 export function Table() {
   const { setSelects, setImages, setEquipmentId, equipmentId } = useActives()
+  const searchParams = useSearchParams()
   const [currentActive, setCurrentActive] = useState<
     ActiveFormData | undefined
   >()
   const { toast } = useToast()
   const loading = useLoading()
 
+  const filterText = searchParams.get('s') || ''
+
   async function fetchActives() {
     const response = await api
-      .get<{ data: Active[] }>('system/equipment')
+      .get<{ data: Active[] }>('system/equipment', {
+        params: {
+          filterText: searchParams.get('s'),
+        },
+      })
       .then((res) => res.data)
 
     return response.data
@@ -79,9 +87,11 @@ export function Table() {
   }
 
   const { data, refetch } = useQuery({
-    queryKey: ['checklist-list-actives'],
+    queryKey: ['checklist-list-actives', filterText],
     queryFn: fetchActives,
   })
+
+  console.log(filterText)
 
   useQuery({
     queryKey: ['checklist-actives-selects'],

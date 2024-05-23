@@ -1,5 +1,6 @@
 'use client'
 import { PageHeader } from '@/components/page-header'
+import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
@@ -50,10 +51,13 @@ export function Header() {
           Equipamentos Ativos
         </h1>
 
-        <Button onClick={() => setIsOpen(true)}>
-          <Plus size={16} />
-          Ativo
-        </Button>
+        <div className="flex gap-4">
+          <SearchInput />
+          <Button onClick={() => setIsOpen(true)}>
+            <Plus size={16} />
+            Ativo
+          </Button>
+        </div>
       </PageHeader>
       <ActiveForm
         open={isOpen}
