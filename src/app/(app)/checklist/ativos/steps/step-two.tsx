@@ -7,7 +7,6 @@ import { useLoading } from '@/store/loading-store'
 import { useActives } from '@/store/smartlist/actives'
 import { StepFive } from './step-five'
 import { StepFour } from './step-four'
-import { StepSeven } from './step-seven'
 import { StepSix } from './step-six'
 import { StepThree } from './step-three'
 
@@ -87,8 +86,6 @@ export function StepTwo() {
       <StepFive />
 
       <StepSix />
-
-      <StepSeven />
     </>
   )
 }

@@ -11,6 +11,7 @@ import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { StepOne } from './steps/step-one'
+import { StepSeven } from './steps/step-seven'
 import { StepTwo } from './steps/step-two'
 
 const createActiveFormSchema = z.object({
@@ -33,7 +34,7 @@ const createActiveFormSchema = z.object({
   acquisitionValue: z.coerce.number().optional().nullable(),
   manufacturingYear: z.coerce.number().optional().nullable(),
   modelYear: z.coerce.number().optional().nullable(),
-  buyDate: z.date().optional().nullable(),
+  buyDate: z.coerce.date().optional().nullable(),
   guaranteeTime: z.coerce.number().optional().nullable(),
   costPerHour: z.coerce.number().optional().nullable(),
   equipmentStatus: z.string().optional().nullable(),
@@ -52,7 +53,7 @@ const createActiveFormSchema = z.object({
   color: z.string().optional().nullable(),
   reindeerCode: z.string().optional().nullable(),
   CRVNumber: z.string().optional().nullable(),
-  emissionDateCRV: z.date().optional().nullable(),
+  emissionDateCRV: z.coerce.date().optional().nullable(),
   licensing: z.string().optional().nullable(),
   insurancePolicy: z.string().optional().nullable(),
   insurancePolicyExpiration: z.string().optional().nullable(),
@@ -169,6 +170,9 @@ export function ActiveForm({
               </WizardFormStep>
               <WizardFormStep>
                 <StepTwo />
+              </WizardFormStep>
+              <WizardFormStep>
+                <StepSeven />
               </WizardFormStep>
             </WizardForm>
           </form>

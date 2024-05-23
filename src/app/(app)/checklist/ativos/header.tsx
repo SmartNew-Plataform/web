@@ -41,6 +41,20 @@ export function Header() {
       })
     })
 
+    data.components?.forEach(async (component) => {
+      const response = await api.post(
+        `system/equipment/${equipmentId}/component`,
+        component,
+      )
+
+      if (response.status !== 201) return
+
+      toast({
+        title: 'Componente criado com sucesso!',
+        variant: 'success',
+      })
+    })
+
     queryClient.refetchQueries(['checklist-list-actives'])
   }
 

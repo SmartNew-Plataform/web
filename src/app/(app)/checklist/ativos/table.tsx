@@ -1,5 +1,5 @@
 'use client'
-import { Active } from '@/@types/active'
+import { Active, Component } from '@/@types/active'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
@@ -14,7 +14,8 @@ import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
 
 export function Table() {
-  const { setSelects, setImages, setEquipmentId, equipmentId } = useActives()
+  const { setSelects, setImages, setEquipmentId, equipmentId, setComponents } =
+    useActives()
   const searchParams = useSearchParams()
   const [currentActive, setCurrentActive] = useState<
     ActiveFormData | undefined
@@ -151,7 +152,14 @@ export function Table() {
       .then((res) => res.data)
     loading.hide()
 
+    loading.show()
+    const components = await api
+      .get<{ data: Component[] }>(`system/equipment/${id}/component`)
+      .then((res) => res.data)
+    loading.hide()
+
     setImages(images.img.map(({ url }) => url))
+    setComponents(components.data)
   }
 
   async function handleDeleteEquipment(id: number) {
@@ -265,6 +273,8 @@ export function Table() {
           } else {
             setCurrentActive(undefined)
             setEquipmentId(undefined)
+            setImages(undefined)
+            setComponents(undefined)
           }
         }}
         mode="edit"

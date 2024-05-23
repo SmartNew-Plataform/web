@@ -15,3 +15,13 @@ export interface Active {
   serie: string | undefined
   status: string
 }
+
+export interface Component {
+  id: number
+  description: string
+  manufacture: string
+  model: string
+  serie: string
+  yearManufacture: string
+  status: string
+}

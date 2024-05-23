@@ -8,11 +8,14 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { Plus, Trash2 } from 'lucide-react'
+import { useActives } from '@/store/smartlist/actives'
+import { Plus, Save, Trash2 } from 'lucide-react'
+import { useEffect } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
 export function StepSeven() {
-  const { control, watch } = useFormContext()
+  const { components, selects } = useActives()
+  const { control, watch, setValue } = useFormContext()
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'components',
@@ -22,6 +25,13 @@ export function StepSeven() {
     remove(index)
   }
 
+  useEffect(() => {
+    if (!components) return
+    setValue('components', components)
+  }, [components])
+
+  console.log(components)
+
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto">
       <h2 className="text-xl font-semibold text-slate-600">Componentes</h2>
@@ -29,6 +39,8 @@ export function StepSeven() {
       <Accordion type="multiple">
         {fields.map((field, index) => {
           const description = watch(`components.${index}.description`)
+          const isCreated = !!description
+
           return (
             <AccordionItem value={field.id} key={field.id}>
               <AccordionTrigger>
@@ -43,6 +55,7 @@ export function StepSeven() {
                   <Form.Input
                     name={`components.${index}.description`}
                     id={`components.${index}.description`}
+                    value={description}
                   />
                   <Form.ErrorMessage
                     field={`components.${index}.description`}
@@ -110,26 +123,39 @@ export function StepSeven() {
                   />
                 </Form.Field>
 
-                <Form.Field>
-                  <Form.Label htmlFor={`components.${index}.status`}>
-                    Status:
-                  </Form.Label>
-                  <Form.Select
-                    id={`components.${index}.status`}
-                    name={`components.${index}.status`}
-                    options={[{ label: 'Teste', value: '1' }]}
-                  />
-                  <Form.ErrorMessage field={`components.${index}.status`} />
-                </Form.Field>
+                {selects.componentStatus ? (
+                  <Form.Field>
+                    <Form.Label htmlFor={`components.${index}.status`}>
+                      Status:
+                    </Form.Label>
+                    <Form.Select
+                      id={`components.${index}.status`}
+                      name={`components.${index}.status`}
+                      options={selects.componentStatus}
+                    />
+                    <Form.ErrorMessage field={`components.${index}.status`} />
+                  </Form.Field>
+                ) : (
+                  <Form.SkeletonField />
+                )}
 
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => handleRemoveComponent(index)}
-                >
-                  <Trash2 size={16} />
-                  Remover
-                </Button>
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => handleRemoveComponent(index)}
+                    className="flex-1"
+                  >
+                    <Trash2 size={16} />
+                    Remover
+                  </Button>
+                  {isCreated && (
+                    <Button type="button" className="flex-1">
+                      <Save size={16} />
+                      Salvar
+                    </Button>
+                  )}
+                </div>
               </AccordionContent>
             </AccordionItem>
           )
@@ -138,13 +164,7 @@ export function StepSeven() {
 
       <Form.ErrorMessage field="components" />
 
-      <Button
-        variant="outline"
-        type="button"
-        onClick={() =>
-          append({ description: `Componente ${fields.length + 1}` })
-        }
-      >
+      <Button variant="outline" type="button" onClick={() => append({})}>
         <Plus size={16} />
         Adicionar Componente
       </Button>
