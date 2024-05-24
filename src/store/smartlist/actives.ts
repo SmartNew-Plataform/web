@@ -22,9 +22,11 @@ interface ActiveStoreData {
   setImages: (images: string[] | undefined) => void
   setEquipmentId: (id: number | undefined) => void
   setComponents: (components: Component[] | undefined) => void
+  removeComponent: (componentId: number) => void
+  addComponent: (component: Component) => void
 }
 
-export const useActives = create<ActiveStoreData>((set) => {
+export const useActives = create<ActiveStoreData>((set, get) => {
   return {
     selects: {
       client: undefined,
@@ -45,6 +47,10 @@ export const useActives = create<ActiveStoreData>((set) => {
       set({ selects: { ...data } })
     },
 
+    setEquipmentId(id) {
+      set({ equipmentId: id })
+    },
+
     setImages(images) {
       set({ images })
     },
@@ -53,8 +59,19 @@ export const useActives = create<ActiveStoreData>((set) => {
       set({ components })
     },
 
-    setEquipmentId(id) {
-      set({ equipmentId: id })
+    removeComponent(componentId) {
+      const components = get().components?.filter(
+        ({ id }) => id !== componentId,
+      )
+
+      set({ components })
+    },
+
+    addComponent(component) {
+      const components = get().components
+      components?.push(component)
+
+      set({ components })
     },
   }
 })

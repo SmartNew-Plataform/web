@@ -19,7 +19,7 @@ const createActiveFormSchema = z.object({
   equipment: z.string({ required_error: 'O equipamento e obrigatório!' }),
   equipmentDad: z.string().optional().nullable(),
   patrimonyNumber: z.string().optional().nullable(),
-  costCenter: z.string({ required_error: 'O centro de custo e obrigatório!' }),
+  costCenter: z.string().optional().nullable(),
   description: z.string({ required_error: 'A descrição e obrigatória!' }),
   observation: z.string().optional().nullable(),
   images: z.array(z.instanceof(File)).optional().nullable(),
@@ -38,12 +38,8 @@ const createActiveFormSchema = z.object({
   guaranteeTime: z.coerce.number().optional().nullable(),
   costPerHour: z.coerce.number().optional().nullable(),
   equipmentStatus: z.string().optional().nullable(),
-  consumptionType: z.string({
-    required_error: 'O tipo de consumo e obrigatório!',
-  }),
-  consumptionFuel: z.string({
-    required_error: 'O consumo de combustível e obrigatório!',
-  }),
+  consumptionType: z.string().optional().nullable(),
+  consumptionFuel: z.string().optional().nullable(),
   unityMeter: z.string().optional().nullable(),
   limitUnityMeter: z.coerce.number().optional().nullable(),
   owner: z.string().optional().nullable(),
@@ -62,6 +58,7 @@ const createActiveFormSchema = z.object({
   components: z
     .array(
       z.object({
+        id: z.number().optional().nullable(),
         description: z.string({ required_error: 'A descrição e obrigatória!' }),
         image: z.array(z.instanceof(File)).optional().nullable(),
         manufacturer: z.string().optional().nullable(),
@@ -96,6 +93,7 @@ export function ActiveForm({
   const {
     handleSubmit,
     reset,
+    resetField,
     formState: { isSubmitting },
   } = createActiveForm
   const createActiveWizardForm = useWizardForm()
@@ -142,7 +140,12 @@ export function ActiveForm({
 
   async function handleSubmitIntermediate(data: ActiveFormData) {
     await onSubmit(data)
-    if (mode !== 'create') return
+    if (mode !== 'create') {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      resetField('components', [])
+      return
+    }
     reset()
   }
 

@@ -10,13 +10,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { useActives } from '@/store/smartlist/actives'
 import { Plus, Trash2 } from 'lucide-react'
-import { useEffect } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { ComponentForm } from './component-form'
 
 export function StepSeven() {
   const { components, selects } = useActives()
-  const { control, watch, setValue } = useFormContext()
+  const { control, watch } = useFormContext()
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'components',
@@ -25,13 +24,6 @@ export function StepSeven() {
   async function handleRemoveComponent(index: number) {
     remove(index)
   }
-
-  useEffect(() => {
-    if (!components) return
-    setValue('components', components)
-  }, [components])
-
-  console.log(components)
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto">
@@ -144,6 +136,11 @@ export function StepSeven() {
                   <Form.Input
                     name={`components.${index}.manufacturingYear`}
                     id={`components.${index}.manufacturingYear`}
+                    type="number"
+                    min="1900"
+                    max="2099"
+                    step="1"
+                    value={new Date().getFullYear()}
                   />
                   <Form.ErrorMessage
                     field={`components.${index}.manufacturingYear`}
@@ -187,7 +184,14 @@ export function StepSeven() {
         variant="outline"
         type="button"
         onClick={() =>
-          append({ description: `Componente ${fields.length + 1}` })
+          append({
+            description: `Componente ${fields.length + 1}`,
+            manufacturer: null,
+            model: null,
+            serialNumber: null,
+            manufacturingYear: null,
+            status: 'Ativo',
+          })
         }
       >
         <Plus size={16} />

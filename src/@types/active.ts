@@ -19,9 +19,9 @@ export interface Active {
 export interface Component {
   id: number
   description: string
-  manufacture: string
-  model: string
-  serie: string
-  yearManufacture: string
+  manufacturer?: string | null
+  model?: string | null
+  serialNumber?: string | null
+  manufacturingYear?: number | null
   status: string
 }

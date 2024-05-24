@@ -5,14 +5,16 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useDiverse } from '@/store/smartlist/diverse'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Pencil, Trash } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { DiverseModal } from './diverse-modal'
 
 export interface DiverseData {
   value: number
   text: string
+  tag: string
   branch: {
     value: number
     text: string
@@ -24,20 +26,22 @@ export function ListDiverse() {
     number | undefined
   >()
   const { editingData, setEditingData } = useDiverse()
+  const searchParams = useSearchParams()
+
+  const filter = searchParams.get('s') || ''
 
   const { toast } = useToast()
-  const queryClient = useQueryClient()
 
   async function fetchDiverseList() {
     const response: DiverseData[] | undefined = await api
-      .get('smart-list/location')
+      .get('smart-list/location', { params: { s: filter } })
       .then((res) => res.data.data)
 
     return response
   }
 
-  const { data } = useQuery({
-    queryKey: ['checklist-diverse-list'],
+  const { data, refetch } = useQuery({
+    queryKey: ['checklist-diverse-list', filter],
     queryFn: fetchDiverseList,
   })
 
@@ -52,16 +56,18 @@ export function ListDiverse() {
       title: 'Diverso deletado com sucesso!',
       variant: 'success',
     })
-    queryClient.refetchQueries(['checklist-diverse-list'])
+    refetch()
   }
 
   return (
     <main className="grid max-h-full grid-cols-auto gap-4 overflow-auto">
-      {data?.map(({ text, value, branch }) => {
+      {data?.map(({ text, value, tag, branch }) => {
         return (
           <Card key={value}>
             <CardContent className="relative pt-5">
-              <p>{text}</p>
+              <p>
+                {tag} - {text}
+              </p>
 
               <div className="absolute right-4 top-4 flex gap-2">
                 <Button

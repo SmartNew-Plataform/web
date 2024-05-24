@@ -4,6 +4,7 @@ import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useLoading } from '@/store/loading-store'
 import { useActives } from '@/store/smartlist/actives'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Save, Trash2 } from 'lucide-react'
@@ -28,11 +29,12 @@ const componentFormSchema = z.object({
 type ComponentFormData = z.infer<typeof componentFormSchema>
 
 export function ComponentForm({ defaultValues }: ComponentFormProps) {
-  const { selects, equipmentId } = useActives()
+  const { selects, equipmentId, removeComponent } = useActives()
   const componentForm = useForm<ComponentFormData>({
     resolver: zodResolver(componentFormSchema),
   })
   const { toast } = useToast()
+  const loading = useLoading()
 
   const {
     reset,
@@ -54,17 +56,31 @@ export function ComponentForm({ defaultValues }: ComponentFormProps) {
     if (response.status !== 200) return
 
     toast({
-      title: `Component ${data.description} atualizado com sucesso!`,
+      title: `${data.description} foi atualizado com sucesso!`,
+      variant: 'success',
+    })
+  }
+
+  async function handleDeleteComponent(componentId: number) {
+    loading.show()
+    const response = await api.delete(
+      `system/equipment/${equipmentId}/component/${componentId}`,
+    )
+    loading.hide()
+
+    if (response.status !== 200) return
+
+    removeComponent(componentId)
+
+    toast({
+      title: 'Componente deletado com sucesso!',
       variant: 'success',
     })
   }
 
   return (
     <FormProvider {...componentForm}>
-      <form
-        className="relative flex w-full flex-col gap-3"
-        onSubmit={handleSubmit(handleUpdateComponent)}
-      >
+      <div className="relative flex w-full flex-col gap-3">
         <Form.Field>
           <Form.Label htmlFor="description">Descrição:</Form.Label>
           <Form.Input name="description" id="description" />
@@ -99,7 +115,15 @@ export function ComponentForm({ defaultValues }: ComponentFormProps) {
           <Form.Label htmlFor="manufacturingYear">
             Ano de Fabricação:
           </Form.Label>
-          <Form.Input name="manufacturingYear" id="manufacturingYear" />
+          <Form.Input
+            name="manufacturingYear"
+            id="manufacturingYear"
+            type="number"
+            min="1900"
+            max="2099"
+            step="1"
+            value={new Date().getFullYear()}
+          />
           <Form.ErrorMessage field="manufacturingYear" />
         </Form.Field>
 
@@ -123,6 +147,7 @@ export function ComponentForm({ defaultValues }: ComponentFormProps) {
             variant="destructive"
             className="flex-1"
             disabled={isSubmitting}
+            onClick={() => handleDeleteComponent(defaultValues.id)}
           >
             <Trash2 size={16} />
             Remover
@@ -132,12 +157,13 @@ export function ComponentForm({ defaultValues }: ComponentFormProps) {
             className="flex-1"
             disabled={isSubmitting}
             loading={isSubmitting}
+            onClick={handleSubmit(handleUpdateComponent)}
           >
             <Save size={16} />
             Salvar
           </Button>
         </div>
-      </form>
+      </div>
     </FormProvider>
   )
 }

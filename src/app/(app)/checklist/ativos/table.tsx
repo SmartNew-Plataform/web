@@ -14,8 +14,14 @@ import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
 
 export function Table() {
-  const { setSelects, setImages, setEquipmentId, equipmentId, setComponents } =
-    useActives()
+  const {
+    setSelects,
+    setImages,
+    setEquipmentId,
+    equipmentId,
+    setComponents,
+    addComponent,
+  } = useActives()
   const searchParams = useSearchParams()
   const [currentActive, setCurrentActive] = useState<
     ActiveFormData | undefined
@@ -92,8 +98,6 @@ export function Table() {
     queryFn: fetchActives,
   })
 
-  console.log(filterText)
-
   useQuery({
     queryKey: ['checklist-actives-selects'],
     queryFn: fetchSelects,
@@ -116,13 +120,32 @@ export function Table() {
       if (response.status !== 201) return
 
       toast({
-        title: 'Anexos inseridos com sucesso!',
+        title: 'Anexo inseridos com sucesso!',
+        variant: 'success',
+      })
+    })
+
+    data.components?.forEach(async (component) => {
+      const response = await api.post(
+        `system/equipment/${equipmentId}/component`,
+        component,
+      )
+
+      if (response.status !== 201) return
+
+      addComponent({
+        id: response.data.id,
+        ...component,
+      })
+
+      toast({
+        title: `${component.description} foi criado com sucesso!`,
         variant: 'success',
       })
     })
 
     toast({
-      title: 'Equipamento atualizado com sucesso!',
+      title: `${data.description} foi atualizado com sucesso!`,
       variant: 'success',
     })
     refetch()
