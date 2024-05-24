@@ -9,9 +9,10 @@ import {
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { useActives } from '@/store/smartlist/actives'
-import { Plus, Save, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
+import { ComponentForm } from './component-form'
 
 export function StepSeven() {
   const { components, selects } = useActives()
@@ -34,16 +35,43 @@ export function StepSeven() {
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto">
-      <h2 className="text-xl font-semibold text-slate-600">Componentes</h2>
+      {components && (
+        <>
+          <span className="text-lg font-bold uppercase text-slate-900">
+            Componentes cadastrados
+          </span>
+          <div className="h-px w-full bg-slate-200" />
+          <Accordion type="multiple" className="mb-6">
+            {components.map((component) => {
+              return (
+                <AccordionItem
+                  value={component.id.toString()}
+                  key={component.id}
+                >
+                  <AccordionTrigger className="text-slate-500">
+                    {component.description}
+                  </AccordionTrigger>
+
+                  <AccordionContent className="flex flex-col gap-3">
+                    <ComponentForm defaultValues={component} />
+                  </AccordionContent>
+                </AccordionItem>
+              )
+            })}
+          </Accordion>
+        </>
+      )}
+      <span className="text-lg font-bold uppercase text-slate-900">
+        Componentes novos
+      </span>
       <div className="h-px w-full bg-slate-200" />
       <Accordion type="multiple">
         {fields.map((field, index) => {
           const description = watch(`components.${index}.description`)
-          const isCreated = !!description
 
           return (
             <AccordionItem value={field.id} key={field.id}>
-              <AccordionTrigger>
+              <AccordionTrigger className="text-slate-500">
                 {description || `Componente ${index + 1}`}
               </AccordionTrigger>
 
@@ -55,7 +83,6 @@ export function StepSeven() {
                   <Form.Input
                     name={`components.${index}.description`}
                     id={`components.${index}.description`}
-                    value={description}
                   />
                   <Form.ErrorMessage
                     field={`components.${index}.description`}
@@ -139,23 +166,15 @@ export function StepSeven() {
                   <Form.SkeletonField />
                 )}
 
-                <div className="flex gap-3">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => handleRemoveComponent(index)}
-                    className="flex-1"
-                  >
-                    <Trash2 size={16} />
-                    Remover
-                  </Button>
-                  {isCreated && (
-                    <Button type="button" className="flex-1">
-                      <Save size={16} />
-                      Salvar
-                    </Button>
-                  )}
-                </div>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => handleRemoveComponent(index)}
+                  className="flex-1"
+                >
+                  <Trash2 size={16} />
+                  Remover
+                </Button>
               </AccordionContent>
             </AccordionItem>
           )
@@ -164,7 +183,13 @@ export function StepSeven() {
 
       <Form.ErrorMessage field="components" />
 
-      <Button variant="outline" type="button" onClick={() => append({})}>
+      <Button
+        variant="outline"
+        type="button"
+        onClick={() =>
+          append({ description: `Componente ${fields.length + 1}` })
+        }
+      >
         <Plus size={16} />
         Adicionar Componente
       </Button>
