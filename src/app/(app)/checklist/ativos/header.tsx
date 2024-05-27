@@ -4,15 +4,19 @@ import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useActives } from '@/store/smartlist/actives'
 import { useQueryClient } from '@tanstack/react-query'
-import { Plus } from 'lucide-react'
+import { Plus, QrCode } from 'lucide-react'
 import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
+import { QRCodeModal } from './qrcode-modal'
 
 export function Header() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const [isOpen, setIsOpen] = useState(false)
+  const [isOpenQrCode, setIsOpenQrCode] = useState(false)
+  const { selects, setQrCodeEquipments } = useActives()
 
   async function handleCreateActive(data: ActiveFormData) {
     const responseEquipment = await api.post('system/equipment', data)
@@ -58,6 +62,12 @@ export function Header() {
     queryClient.refetchQueries(['checklist-list-actives'])
   }
 
+  function handleOpenQrCodeModal() {
+    const equipments = selects.equipmentDad?.map(({ value }) => value)
+    setQrCodeEquipments(equipments)
+    setIsOpenQrCode(true)
+  }
+
   return (
     <>
       <PageHeader>
@@ -71,6 +81,10 @@ export function Header() {
             <Plus size={16} />
             Ativo
           </Button>
+          <Button variant="outline" onClick={handleOpenQrCodeModal}>
+            <QrCode size={16} />
+            Gerar QRCode
+          </Button>
         </div>
       </PageHeader>
       <ActiveForm
@@ -78,6 +92,11 @@ export function Header() {
         onOpenChange={setIsOpen}
         onSubmit={handleCreateActive}
         mode="create"
+      />
+      <QRCodeModal
+        open={isOpenQrCode}
+        multiple
+        onOpenChange={setIsOpenQrCode}
       />
     </>
   )
