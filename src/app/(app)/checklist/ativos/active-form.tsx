@@ -11,6 +11,7 @@ import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { StepOne } from './steps/step-one'
+import { StepSeven } from './steps/step-seven'
 import { StepTwo } from './steps/step-two'
 
 const createActiveFormSchema = z.object({
@@ -18,31 +19,27 @@ const createActiveFormSchema = z.object({
   equipment: z.string({ required_error: 'O equipamento e obrigatório!' }),
   equipmentDad: z.string().optional().nullable(),
   patrimonyNumber: z.string().optional().nullable(),
-  costCenter: z.string({ required_error: 'O centro de custo e obrigatório!' }),
+  costCenter: z.string().optional().nullable(),
   description: z.string({ required_error: 'A descrição e obrigatória!' }),
   observation: z.string().optional().nullable(),
   images: z.array(z.instanceof(File)).optional().nullable(),
   dataSheet: z.string().optional().nullable(),
   family: z.string({ required_error: 'A familia e obrigatória!' }),
   equipmentType: z.string().optional().nullable(),
-  manufacturer: z.string().optional().nullable(),
+  manufacturer: z.string({ required_error: 'O fabricante e obrigatório!' }),
   brand: z.string().optional().nullable(),
-  model: z.string().optional().nullable(),
+  model: z.string({ required_error: 'O modelo e obrigatório!' }),
   serialNumber: z.string().optional().nullable(),
   fiscalNumber: z.string().optional().nullable(),
   acquisitionValue: z.coerce.number().optional().nullable(),
   manufacturingYear: z.coerce.number().optional().nullable(),
   modelYear: z.coerce.number().optional().nullable(),
-  buyDate: z.date().optional().nullable(),
+  buyDate: z.coerce.date().optional().nullable(),
   guaranteeTime: z.coerce.number().optional().nullable(),
   costPerHour: z.coerce.number().optional().nullable(),
   equipmentStatus: z.string().optional().nullable(),
-  consumptionType: z.string({
-    required_error: 'O tipo de consumo e obrigatório!',
-  }),
-  consumptionFuel: z.string({
-    required_error: 'O consumo de combustível e obrigatório!',
-  }),
+  consumptionType: z.string().optional().nullable(),
+  consumptionFuel: z.string().optional().nullable(),
   unityMeter: z.string().optional().nullable(),
   limitUnityMeter: z.coerce.number().optional().nullable(),
   owner: z.string().optional().nullable(),
@@ -52,7 +49,7 @@ const createActiveFormSchema = z.object({
   color: z.string().optional().nullable(),
   reindeerCode: z.string().optional().nullable(),
   CRVNumber: z.string().optional().nullable(),
-  emissionDateCRV: z.date().optional().nullable(),
+  emissionDateCRV: z.coerce.date().optional().nullable(),
   licensing: z.string().optional().nullable(),
   insurancePolicy: z.string().optional().nullable(),
   insurancePolicyExpiration: z.string().optional().nullable(),
@@ -61,6 +58,7 @@ const createActiveFormSchema = z.object({
   components: z
     .array(
       z.object({
+        id: z.number().optional().nullable(),
         description: z.string({ required_error: 'A descrição e obrigatória!' }),
         image: z.array(z.instanceof(File)).optional().nullable(),
         manufacturer: z.string().optional().nullable(),
@@ -95,6 +93,7 @@ export function ActiveForm({
   const {
     handleSubmit,
     reset,
+    resetField,
     formState: { isSubmitting },
   } = createActiveForm
   const createActiveWizardForm = useWizardForm()
@@ -141,7 +140,12 @@ export function ActiveForm({
 
   async function handleSubmitIntermediate(data: ActiveFormData) {
     await onSubmit(data)
-    if (mode !== 'create') return
+    if (mode !== 'create') {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      resetField('components', [])
+      return
+    }
     reset()
   }
 
@@ -169,6 +173,9 @@ export function ActiveForm({
               </WizardFormStep>
               <WizardFormStep>
                 <StepTwo />
+              </WizardFormStep>
+              <WizardFormStep>
+                <StepSeven />
               </WizardFormStep>
             </WizardForm>
           </form>

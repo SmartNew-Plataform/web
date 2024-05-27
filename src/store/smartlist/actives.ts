@@ -1,3 +1,4 @@
+import { Component } from '@/@types/active'
 import { SelectData } from '@/@types/select-data'
 import { create } from 'zustand'
 
@@ -15,13 +16,17 @@ interface ActiveStoreData {
   }
   images: string[] | undefined
   equipmentId: number | undefined
+  components: Component[] | undefined
 
   setSelects: (data: ActiveStoreData['selects']) => void
   setImages: (images: string[] | undefined) => void
   setEquipmentId: (id: number | undefined) => void
+  setComponents: (components: Component[] | undefined) => void
+  removeComponent: (componentId: number) => void
+  addComponent: (component: Component) => void
 }
 
-export const useActives = create<ActiveStoreData>((set) => {
+export const useActives = create<ActiveStoreData>((set, get) => {
   return {
     selects: {
       client: undefined,
@@ -36,17 +41,37 @@ export const useActives = create<ActiveStoreData>((set) => {
     },
     images: undefined,
     equipmentId: undefined,
+    components: undefined,
 
     setSelects(data) {
       set({ selects: { ...data } })
+    },
+
+    setEquipmentId(id) {
+      set({ equipmentId: id })
     },
 
     setImages(images) {
       set({ images })
     },
 
-    setEquipmentId(id) {
-      set({ equipmentId: id })
+    setComponents(components) {
+      set({ components })
+    },
+
+    removeComponent(componentId) {
+      const components = get().components?.filter(
+        ({ id }) => id !== componentId,
+      )
+
+      set({ components })
+    },
+
+    addComponent(component) {
+      const components = get().components
+      components?.push(component)
+
+      set({ components })
     },
   }
 })

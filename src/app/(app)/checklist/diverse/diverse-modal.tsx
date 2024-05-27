@@ -19,6 +19,7 @@ interface DiverseModalProps extends ComponentProps<typeof Dialog> {
 const diverseFormSchema = z.object({
   description: z.string({ required_error: 'Este campo e obrigatório!' }).min(1),
   branch: z.string({ required_error: 'Escola uma filial!' }),
+  tag: z.string({ required_error: 'Este campo e obrigatório!' }),
 })
 
 type DiverseFormData = z.infer<typeof diverseFormSchema>
@@ -27,7 +28,11 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
   const diverseForm = useForm<DiverseFormData>({
     resolver: zodResolver(diverseFormSchema),
   })
-  const { handleSubmit, reset } = diverseForm
+  const {
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = diverseForm
   const { editingData } = useDiverse()
 
   const { toast } = useToast()
@@ -54,8 +59,9 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
     })
     queryClient.refetchQueries(['checklist-diverse-list'])
     reset({
+      description: '',
+      tag: '',
       branch: undefined,
-      description: undefined,
     })
   }
 
@@ -106,6 +112,12 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
               <Form.ErrorMessage field="description" />
             </Form.Field>
 
+            <Form.Field>
+              <Form.Label htmlFor="tag-input">TAG:</Form.Label>
+              <Form.Input name="tag" id="tag-input" />
+              <Form.ErrorMessage field="tag" />
+            </Form.Field>
+
             {isLoading ? (
               <Form.SkeletonField />
             ) : (
@@ -116,7 +128,11 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
               </Form.Field>
             )}
 
-            <Button type="submit">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
               <Save size={16} />
               Salvar
             </Button>

@@ -39,45 +39,16 @@ export function StepOne() {
         <Form.SkeletonField />
       )}
 
-      {selects.costCenter ? (
-        <Form.Field>
-          <Form.Label htmlFor="costCenter">Centro de Custo:</Form.Label>
-          <Form.Select
-            name="costCenter"
-            id="costCenter"
-            options={selects.costCenter}
-          />
-          <Form.ErrorMessage field="costCenter" />
-        </Form.Field>
-      ) : (
-        <Form.SkeletonField />
-      )}
-
-      {selects.consumptionType ? (
-        <Form.Field>
-          <Form.Label htmlFor="consumptionType">Tipo de Consumo:</Form.Label>
-          <Form.Select
-            name="consumptionType"
-            id="consumptionType"
-            options={selects.consumptionType}
-          />
-          <Form.ErrorMessage field="consumptionType" />
-        </Form.Field>
-      ) : (
-        <Form.SkeletonField />
-      )}
+      <Form.Field>
+        <Form.Label htmlFor="manufacturer">Fabricante:</Form.Label>
+        <Form.Input name="manufacturer" id="manufacturer" />
+        <Form.ErrorMessage field="manufacturer" />
+      </Form.Field>
 
       <Form.Field>
-        <Form.Label htmlFor="consumptionFuel">
-          Consumo de Combustível:
-        </Form.Label>
-        <Form.Input
-          type="number"
-          step="any"
-          name="consumptionFuel"
-          id="consumptionFuel"
-        />
-        <Form.ErrorMessage field="consumptionFuel" />
+        <Form.Label htmlFor="model">Modelo:</Form.Label>
+        <Form.Input name="model" id="model" />
+        <Form.ErrorMessage field="model" />
       </Form.Field>
     </>
   )

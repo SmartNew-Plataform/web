@@ -18,7 +18,7 @@ export function Header() {
     const responseEquipment = await api.post('system/equipment', data)
     if (responseEquipment.status !== 201) return
     toast({
-      title: 'Ativo criado com sucesso!',
+      title: `${data.description} foi criado com sucesso!`,
       variant: 'success',
     })
 
@@ -36,7 +36,21 @@ export function Header() {
       if (response.status !== 201) return
 
       toast({
-        title: 'Anexos inseridos com sucesso!',
+        title: 'Anexo inseridos com sucesso!',
+        variant: 'success',
+      })
+    })
+
+    data.components?.forEach(async (component) => {
+      const response = await api.post(
+        `system/equipment/${equipmentId}/component`,
+        component,
+      )
+
+      if (response.status !== 201) return
+
+      toast({
+        title: `${component.description} foi criado com sucesso!`,
         variant: 'success',
       })
     })
