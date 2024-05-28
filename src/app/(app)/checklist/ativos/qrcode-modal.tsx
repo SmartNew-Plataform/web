@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useActives } from '@/store/smartlist/actives'
 import { zodResolver } from '@hookform/resolvers/zod'
+import CryptoJS from 'crypto-js'
 import { ExternalLink } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -14,7 +15,7 @@ const activeQrCodeSchema = z.object({
   active: z.array(z.string(), {
     required_error: 'Selecione pelo menos 1 equipamento!',
   }),
-  width: z.number().optional(),
+  width: z.coerce.number().optional(),
   withActive: z.boolean().optional(),
   withTag: z.boolean().optional(),
   withReport: z.boolean().optional(),
@@ -31,14 +32,14 @@ export function QRCodeModal({ multiple = false, ...props }: QRCodeModalProps) {
   const activeQrCodeForm = useForm<ActiveQrCodeData>({
     resolver: zodResolver(activeQrCodeSchema),
     defaultValues: {
-      width: 300,
+      width: 150,
       withActive: true,
       withReport: true,
       withTag: true,
     },
   })
 
-  const { watch, setValue } = activeQrCodeForm
+  const { watch, setValue, handleSubmit } = activeQrCodeForm
 
   useEffect(() => {
     if (!qrCodeEquipments) return
@@ -52,11 +53,21 @@ export function QRCodeModal({ multiple = false, ...props }: QRCodeModalProps) {
     ({ value }) => value === firstEquipmentId,
   )?.label
 
+  function handleGenerateQrCode(data: ActiveQrCodeData) {
+    const hash = CryptoJS.AES.encrypt(JSON.stringify(data), 'qrcode-equipments')
+    window.open(
+      `https://pdf.smartnewsistemas.com.br/generator/manager/qrCodeEquipments?params=${hash}`,
+    )
+  }
+
   return (
     <Dialog {...props}>
       <DialogContent className="flex max-w-3xl gap-2">
         <FormProvider {...activeQrCodeForm}>
-          <form className="flex max-w-xs flex-1 flex-col gap-3">
+          <form
+            className="flex max-w-xs flex-1 flex-col gap-3"
+            onSubmit={handleSubmit(handleGenerateQrCode)}
+          >
             {selects.equipmentDad ? (
               <Form.Field>
                 <Form.Label>Ativos:</Form.Label>
@@ -65,31 +76,36 @@ export function QRCodeModal({ multiple = false, ...props }: QRCodeModalProps) {
                   disabled={!multiple}
                   options={selects.equipmentDad}
                 />
+                <Form.ErrorMessage field="active" />
               </Form.Field>
             ) : (
               <Form.SkeletonField />
             )}
             <Form.Field>
               <Form.Label>Largura :</Form.Label>
-              <Form.Input type="number" name="width" min="150" max="550" />
+              <Form.Input type="number" name="width" min="80" max="550" />
+              <Form.ErrorMessage field="width" />
             </Form.Field>
             <Form.Field>
               <Form.Label className="flex items-center gap-2">
                 <Form.Checkbox name="withActive" />
                 Incluir ativos no PDF
               </Form.Label>
+              <Form.ErrorMessage field="withActive" />
             </Form.Field>
             <Form.Field>
               <Form.Label className="flex items-center gap-2">
                 <Form.Checkbox name="withTag" />
                 Incluir TAG do(s) ativo(s) no PDF
               </Form.Label>
+              <Form.ErrorMessage field="withTag" />
             </Form.Field>
             <Form.Field>
               <Form.Label className="flex items-center gap-2">
                 <Form.Checkbox name="withReport" />
                 Incluir relatório(s) no PDF
               </Form.Label>
+              <Form.ErrorMessage field="withReport" />
             </Form.Field>
             <Button>
               Gerar PDF

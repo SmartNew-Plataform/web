@@ -151,6 +151,11 @@ export function Table() {
       title: `${data.description} foi atualizado com sucesso!`,
       variant: 'success',
     })
+
+    setCurrentActive(undefined)
+    setEquipmentId(undefined)
+    setImages(undefined)
+    setComponents(undefined)
     refetch()
   }
 
@@ -251,6 +256,9 @@ export function Table() {
     {
       accessorKey: 'costCenter.label',
       header: 'centro custo',
+      cell: (row) => {
+        return <p className="whitespace-nowrap">{row.getValue() as string}</p>
+      },
     },
     {
       accessorKey: 'equipmentCode',
