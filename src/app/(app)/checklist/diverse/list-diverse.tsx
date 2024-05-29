@@ -27,7 +27,6 @@ export function ListDiverse() {
   >()
   const { editingData, setEditingData } = useDiverse()
   const searchParams = useSearchParams()
-
   const filter = searchParams.get('s') || ''
 
   const { toast } = useToast()
