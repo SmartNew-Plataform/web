@@ -2,7 +2,7 @@
 
 import { DataTable } from '@/components/data-table'
 import { ColumnDef } from '@tanstack/react-table'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
   AlertDialog,
@@ -16,8 +16,10 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useTasksBoundedStore } from '@/store/smartlist/smartlist-tasks-bounded'
+import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { ArrowDownWideNarrow, CornerDownLeft, Trash2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 
 export type TasksBoundedData = {
   id: number
@@ -31,23 +33,30 @@ interface TableTasksBounded {
 
 export function TableTasksBounded({ boundId }: TableTasksBounded) {
   const [deleteId, setDeleteId] = useState<number | null>(null)
-  const { tasksBounded, loadTasksBounded, loadTasks, loadControl } =
-    useTasksBoundedStore(
-      ({ tasksBounded, loadTasksBounded, loadTasks, loadControl }) => ({
-        tasksBounded,
-        loadTasksBounded,
-        loadTasks,
-        loadControl,
-      }),
-    )
+  const { loadTasksBounded, loadTasks, loadControl } = useTasksBoundedStore(
+    ({ tasksBounded, loadTasksBounded, loadTasks, loadControl }) => ({
+      tasksBounded,
+      loadTasksBounded,
+      loadTasks,
+      loadControl,
+    }),
+  )
+  const searchParams = useSearchParams()
+  const filterText = searchParams.get('s') || ''
   const { toast } = useToast()
 
-  useEffect(() => {
-    loadTasksBounded(boundId)
-    loadTasks()
-    loadControl()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  useQuery({
+    queryKey: ['checklist/bound/task/selects'],
+    queryFn: () => {
+      loadTasks()
+      loadControl()
+    },
+  })
+
+  const { data, isFetching, refetch } = useQuery({
+    queryKey: ['checklist/bound/task', boundId, filterText],
+    queryFn: () => loadTasksBounded({ boundId, filterText }),
+  })
 
   async function handleDeleteTask() {
     const response = await api
@@ -68,7 +77,7 @@ export function TableTasksBounded({ boundId }: TableTasksBounded) {
       title: 'Vinculo deletado com sucesso!',
       variant: 'success',
     })
-    loadTasksBounded(boundId)
+    refetch()
   }
 
   const columns: ColumnDef<TasksBoundedData>[] = [
@@ -122,6 +131,8 @@ export function TableTasksBounded({ boundId }: TableTasksBounded) {
     },
   ]
 
+  console.log(data)
+
   return (
     <>
       <AlertDialog
@@ -147,11 +158,7 @@ export function TableTasksBounded({ boundId }: TableTasksBounded) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <DataTable
-        columns={columns}
-        data={tasksBounded || []}
-        isLoading={!tasksBounded}
-      />
+      <DataTable columns={columns} data={data || []} isLoading={isFetching} />
     </>
   )
 }

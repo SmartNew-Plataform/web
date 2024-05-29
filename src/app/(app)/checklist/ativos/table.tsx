@@ -8,16 +8,18 @@ import { useLoading } from '@/store/loading-store'
 import { useActives } from '@/store/smartlist/actives'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, QrCode, Trash2 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
+import { QRCodeModal } from './qrcode-modal'
 
 export function Table() {
   const {
     setSelects,
     setImages,
     setEquipmentId,
+    setQrCodeEquipments,
     equipmentId,
     setComponents,
     addComponent,
@@ -26,6 +28,7 @@ export function Table() {
   const [currentActive, setCurrentActive] = useState<
     ActiveFormData | undefined
   >()
+  const [qrCodeIsOpen, setQrCodeIsOpen] = useState(false)
   const { toast } = useToast()
   const loading = useLoading()
 
@@ -148,6 +151,11 @@ export function Table() {
       title: `${data.description} foi atualizado com sucesso!`,
       variant: 'success',
     })
+
+    setCurrentActive(undefined)
+    setEquipmentId(undefined)
+    setImages(undefined)
+    setComponents(undefined)
     refetch()
   }
 
@@ -200,34 +208,40 @@ export function Table() {
     refetch()
   }
 
+  function handleOpenQrCodeModal(equipmentId: string) {
+    setQrCodeEquipments([equipmentId])
+    setQrCodeIsOpen(true)
+  }
+
   const columns: ColumnDef<Active>[] = [
     {
       accessorKey: 'id',
       header: '',
       cell: ({ row }) => {
         return (
-          <Button
-            variant="secondary"
-            size="icon-xs"
-            onClick={() => fetchActive(row.getValue('id'))}
-          >
-            <Pencil size={12} />
-          </Button>
-        )
-      },
-    },
-    {
-      accessorKey: 'id',
-      header: '',
-      cell: ({ row }) => {
-        return (
-          <Button
-            variant="destructive"
-            size="icon-xs"
-            onClick={() => handleDeleteEquipment(row.getValue('id'))}
-          >
-            <Trash2 size={12} />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="icon-xs"
+              onClick={() => fetchActive(row.getValue('id'))}
+            >
+              <Pencil size={12} />
+            </Button>
+            <Button
+              variant="destructive"
+              size="icon-xs"
+              onClick={() => handleDeleteEquipment(row.getValue('id'))}
+            >
+              <Trash2 size={12} />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-xs"
+              onClick={() => handleOpenQrCodeModal(String(row.getValue('id')))}
+            >
+              <QrCode size={12} />
+            </Button>
+          </div>
         )
       },
     },
@@ -242,6 +256,9 @@ export function Table() {
     {
       accessorKey: 'costCenter.label',
       header: 'centro custo',
+      cell: (row) => {
+        return <p className="whitespace-nowrap">{row.getValue() as string}</p>
+      },
     },
     {
       accessorKey: 'equipmentCode',
@@ -304,6 +321,7 @@ export function Table() {
         onSubmit={handleEditActive}
         defaultValues={currentActive}
       />
+      <QRCodeModal open={qrCodeIsOpen} onOpenChange={setQrCodeIsOpen} />
     </>
   )
 }

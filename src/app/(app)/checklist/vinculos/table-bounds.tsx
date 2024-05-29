@@ -36,17 +36,15 @@ export type BoundData = {
 }
 
 export function TableBounds() {
-  const { loadBounds, filterText } = useBoundStore(
-    ({ loadBounds, bounds, filterText }) => ({
-      loadBounds,
-      bounds,
-      filterText,
-    }),
-  )
+  const { loadBounds } = useBoundStore(({ loadBounds }) => ({
+    loadBounds,
+  }))
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [editId, setEditId] = useState<number | null>(null)
   const { toast } = useToast()
   const searchParams = useSearchParams()
+
+  const filterText = searchParams.get('s') || ''
 
   const { data, refetch } = useQuery({
     queryKey: ['checklist/bounds', filterText],

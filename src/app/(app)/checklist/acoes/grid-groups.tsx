@@ -24,6 +24,7 @@ import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, FileBarChart2, Image, Timer } from 'lucide-react'
 import { useState } from 'react'
 import { DialogAction } from './dialog-action'
+import { SearchInput } from '@/components/search-input'
 
 export function GridGroups() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
@@ -34,7 +35,7 @@ export function GridGroups() {
   const { show, hide } = useLoading()
   const {
     setCurrentTask,
-    fetchResponsible,
+    fetchResponsible, 
     groupAttach,
     fetchDataTableGroups,
     fetchDataTableUngrouped,
@@ -342,19 +343,21 @@ export function GridGroups() {
   return (
     <>
       <PageHeader className="p-4">
-        <div className="flex flex-col gap-2">
-          <Label>Filtrar grupos:</Label>
-          <Select value={searchOption} onValueChange={handleChangeGroup}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="with-action">Com ação</SelectItem>
-              <SelectItem value="without-action">Sem ação</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className='flex gap-4 items-end'>
+          <div className="flex flex-col gap-2">
+            <Label>Filtrar grupos:</Label>
+            <Select value={searchOption} onValueChange={handleChangeGroup}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="with-action">Com ação</SelectItem>
+                <SelectItem value="without-action">Sem ação</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <SearchInput />
         </div>
-
         <div className="flex items-center gap-2">
           <Button onClick={handleExportExcel} variant="outline">
             <FileBarChart2 className="h-4 w-4" />

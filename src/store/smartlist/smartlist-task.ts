@@ -9,7 +9,7 @@ interface StoreData {
   status: StatusType[] | undefined
   types: Types[] | undefined
 
-  loadTasks: () => Promise<TaskType[] | undefined>
+  loadTasks: (filterText: string) => Promise<TaskType[] | undefined>
   loadSelects: () => Promise<{ status: SelectData[]; types: SelectData[] }>
   filterTasks: (text: string) => void
 }
@@ -21,9 +21,11 @@ export const useTasksStore = create<StoreData>((set, get) => {
     status: undefined,
     types: undefined,
 
-    async loadTasks() {
+    async loadTasks(filterText) {
       set({ tasks: undefined })
-      const response = await api.get('/smart-list/task').then((res) => res.data)
+      const response = await api
+        .get('/smart-list/task', { params: { filterText } })
+        .then((res) => res.data)
 
       set({ tasks: response.task, allTasks: response.task })
       return response.task
@@ -59,6 +61,8 @@ export const useTasksStore = create<StoreData>((set, get) => {
             value: id.toString(),
           }))
         : []
+
+      console.log(statusFormatted, typesFormatted)
 
       return {
         status: statusFormatted,

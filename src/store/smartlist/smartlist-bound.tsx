@@ -80,8 +80,6 @@ export const useBoundStore = create<SmartListBoundStoreData>((set) => {
         .then((res) => res.data)
         .catch((err: AxiosError<ErrorMessage>) => console.error(err))
 
-      console.log(response)
-
       set({
         diverse: response,
       })

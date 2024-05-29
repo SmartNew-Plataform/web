@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { Save } from 'lucide-react'
 import { Dispatch, SetStateAction, useEffect } from 'react'
@@ -27,7 +28,7 @@ const editBoundSchema = z.object({
 type EditBoundData = z.infer<typeof editBoundSchema>
 
 export function SheetEditBound({ boundId, onOpenChange }: SheetEditBoundProps) {
-  const { loadBounds, bounds } = useBoundStore()
+  const { bounds } = useBoundStore()
 
   const newBoundForm = useForm<EditBoundData>({
     resolver: zodResolver(editBoundSchema),
@@ -39,6 +40,7 @@ export function SheetEditBound({ boundId, onOpenChange }: SheetEditBoundProps) {
   } = newBoundForm
 
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const bound = bounds?.find(({ id }) => id === boundId)
@@ -66,7 +68,7 @@ export function SheetEditBound({ boundId, onOpenChange }: SheetEditBoundProps) {
       title: 'Vinculo atualizado com sucesso!',
       variant: 'success',
     })
-    loadBounds({ filterText: undefined })
+    queryClient.refetchQueries(['checklist/bounds'])
     onOpenChange(null)
   }
 

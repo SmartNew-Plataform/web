@@ -18,7 +18,6 @@ import { useTasksStore } from '@/store/smartlist/smartlist-task'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { CornerDownLeft, Loader2, Save, Trash2, Wind } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { EditActionForm } from './edit-action-form'
@@ -42,6 +41,10 @@ export type ActionType = {
   description: string
   id: string
   impediment: boolean
+  status: {
+    id: number
+    description: string
+  }
 }
 
 interface SituationForm {
@@ -50,8 +53,6 @@ interface SituationForm {
 
 export function SituationForm({ taskId }: SituationForm) {
   const { loadSelects } = useTasksStore()
-  const [actions, setActions] = useState<ActionType[]>([])
-  const [actionsLoading, setActionsLoading] = useState(false)
 
   const situationForm = useForm<ChangeSituationData>({
     resolver: zodResolver(changeSituationSchema),
@@ -67,6 +68,37 @@ export function SituationForm({ taskId }: SituationForm) {
   } = situationForm
 
   const statusId = watch('status')
+
+  async function fetchSituation() {
+    const response = await api
+      .get(`/smart-list/task/${taskId}/statusAction`)
+      .then((res) => res.data)
+
+    return response.data
+  }
+
+  const { data: selects, isLoading: isLoadingSelects } = useQuery({
+    queryKey: ['checklist/status-control'],
+    queryFn: loadSelects,
+  })
+
+  const { data, isLoading, refetch } = useQuery<ActionType[]>({
+    queryKey: ['checklist/tasks/situations'],
+    queryFn: fetchSituation,
+  })
+
+  async function handleDeleteAction(actionId: string) {
+    const response = await api
+      .delete(`/smart-list/task/${taskId}/statusAction/${statusId}/${actionId}`)
+      .then((res) => res.data)
+
+    if (!response.deleted) return
+    toast({
+      title: 'Ação deletada com sucesso!',
+      variant: 'success',
+    })
+    refetch()
+  }
 
   async function handleChangeControl(data: ChangeSituationData) {
     const response = await api.post(
@@ -90,47 +122,10 @@ export function SituationForm({ taskId }: SituationForm) {
         description: '',
         impediment: false,
       })
-      handleChangeStatus()
+      refetch()
     }
   }
-
-  useEffect(() => {
-    if (!statusId) return
-
-    handleChangeStatus()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusId])
-
-  async function handleChangeStatus() {
-    setActions([])
-    setActionsLoading(true)
-    const response = await api
-      .get(`/smart-list/task/${taskId}/statusAction/${statusId}`)
-      .then((res) => res.data)
-
-    setActions(response.statusAction)
-    setActionsLoading(false)
-  }
-
-  async function handleDeleteAction(actionId: string) {
-    const response = await api
-      .delete(`/smart-list/task/${taskId}/statusAction/${statusId}/${actionId}`)
-      .then((res) => res.data)
-
-    if (response.deleted) {
-      toast({
-        title: 'Ação deletada com sucesso!',
-        variant: 'success',
-      })
-
-      handleChangeStatus()
-    }
-  }
-
-  const { data } = useQuery({
-    queryKey: ['checklist/status-control'],
-    queryFn: loadSelects,
-  })
+  console.log(data)
 
   return (
     <FormProvider {...situationForm}>
@@ -139,11 +134,15 @@ export function SituationForm({ taskId }: SituationForm) {
           onSubmit={handleSubmit(handleChangeControl)}
           className="mt-4 flex w-full flex-col gap-3"
         >
-          <Form.Field>
-            <Form.Label>Controle:</Form.Label>
-            <Form.Select name="status" options={data?.status} />
-            <Form.ErrorMessage field="status" />
-          </Form.Field>
+          {isLoadingSelects ? (
+            <Form.SkeletonField />
+          ) : (
+            <Form.Field>
+              <Form.Label>Controle:</Form.Label>
+              <Form.Select name="status" options={selects?.status} />
+              <Form.ErrorMessage field="status" />
+            </Form.Field>
+          )}
 
           <Form.Field>
             <Form.Label>Descrição:</Form.Label>
@@ -151,11 +150,15 @@ export function SituationForm({ taskId }: SituationForm) {
             <Form.ErrorMessage field="description" />
           </Form.Field>
 
-          <Form.Field>
-            <Form.Label>Tipo:</Form.Label>
-            <Form.Select name="type" options={data?.types} />
-            <Form.ErrorMessage field="type" />
-          </Form.Field>
+          {isLoadingSelects ? (
+            <Form.SkeletonField />
+          ) : (
+            <Form.Field>
+              <Form.Label>Tipo:</Form.Label>
+              <Form.Select name="type" options={selects?.types} />
+              <Form.ErrorMessage field="type" />
+            </Form.Field>
+          )}
 
           <Form.Field className="flex-row">
             <Form.Checkbox id="impeditive" name="impediment" />
@@ -169,26 +172,31 @@ export function SituationForm({ taskId }: SituationForm) {
           </Button>
         </form>
         <Separator />
-        {actionsLoading ? (
+        {isLoading ? (
           <div className="flex w-full items-center justify-center gap-4 p-4">
             <Loader2 className="h-4 w-4 animate-spin text-violet-500" />
             <span className="text-slate-700">Carregando...</span>
           </div>
         ) : (
           <div className="flex h-full flex-1 flex-col gap-3 overflow-auto">
-            {actions.length > 0 ? (
-              actions.map((action) => {
-                const { id, description, control } = action
+            {data && data.length > 0 ? (
+              data?.map((action) => {
+                const { id, description, control, status } = action
                 return (
                   <div
                     key={id}
                     className="flex justify-between rounded-2xl border p-4"
                   >
-                    <div className="flex gap-2 divide-x divide-slate-300">
-                      <span>{control.description}</span>
-                      <span className="pl-2 font-semibold text-slate-700">
-                        {description}
+                    <div className="flex flex-col gap-4">
+                      <span className="w-max rounded-full bg-violet-200 px-2 py-1 text-sm font-medium capitalize text-violet-600">
+                        {status.description}
                       </span>
+                      <div className="flex gap-2 divide-x divide-slate-300">
+                        <span>{control.description}</span>
+                        <span className="pl-2 font-semibold text-slate-700">
+                          {description}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex gap-2">
@@ -223,7 +231,7 @@ export function SituationForm({ taskId }: SituationForm) {
                       </AlertDialog>
 
                       <EditActionForm
-                        loadActions={handleChangeStatus}
+                        loadActions={fetchSituation}
                         statusId={statusId}
                         taskId={taskId}
                         {...action}
