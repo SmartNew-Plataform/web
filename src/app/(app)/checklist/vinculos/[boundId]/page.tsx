@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { SheetNewTask } from './sheet-new-task'
 import { TableTasksBounded } from './table-tasks-bounded'
+import { SearchInput } from '@/components/search-input'
 
 export default function TasksBoundedPage({
   params,
@@ -12,7 +13,7 @@ export default function TasksBoundedPage({
   return (
     <PageWrapper>
       <Card className="flex justify-between p-4">
-        <Input className="max-w-xs" />
+        <SearchInput />
 
         <SheetNewTask boundId={params.boundId} />
       </Card>

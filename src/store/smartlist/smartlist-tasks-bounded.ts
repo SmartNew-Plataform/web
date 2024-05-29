@@ -22,7 +22,10 @@ interface StoreData {
   task: Task[] | undefined
   control: Control[] | undefined
 
-  loadTasksBounded: (boundId: string) => Promise<void>
+  loadTasksBounded: (parms: {
+    boundId: string
+    filterText: string
+  }) => Promise<void>
   loadTasks: () => Promise<void>
   loadControl: () => Promise<void>
 }
@@ -33,10 +36,12 @@ export const useTasksBoundedStore = create<StoreData>((set) => {
     task: undefined,
     control: undefined,
 
-    async loadTasksBounded(boundId) {
+    async loadTasksBounded({boundId, filterText}) {
       set({ tasksBounded: undefined })
       const response = await api
-        .get(`/smart-list/bound/${boundId}`)
+        .get(`/smart-list/bound/${boundId}`, {
+          params: {filterText}
+        })
         .then((res) => res.data)
 
       set({

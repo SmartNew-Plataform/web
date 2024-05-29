@@ -18,6 +18,7 @@ import { api } from '@/lib/api'
 import { useTasksBoundedStore } from '@/store/smartlist/smartlist-tasks-bounded'
 import { AxiosError } from 'axios'
 import { ArrowDownWideNarrow, CornerDownLeft, Trash2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 
 export type TasksBoundedData = {
   id: number
@@ -40,14 +41,16 @@ export function TableTasksBounded({ boundId }: TableTasksBounded) {
         loadControl,
       }),
     )
+  const searchParams = useSearchParams()
+  const filterText = searchParams.get('s') || ''
   const { toast } = useToast()
 
   useEffect(() => {
-    loadTasksBounded(boundId)
+    loadTasksBounded({boundId, filterText})
     loadTasks()
     loadControl()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [filterText])
 
   async function handleDeleteTask() {
     const response = await api
@@ -68,7 +71,7 @@ export function TableTasksBounded({ boundId }: TableTasksBounded) {
       title: 'Vinculo deletado com sucesso!',
       variant: 'success',
     })
-    loadTasksBounded(boundId)
+    loadTasksBounded({boundId, filterText})
   }
 
   const columns: ColumnDef<TasksBoundedData>[] = [
