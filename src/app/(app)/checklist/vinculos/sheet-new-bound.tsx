@@ -13,7 +13,7 @@ import { api } from '@/lib/api'
 import { validateMultipleOptions } from '@/lib/validate-multiple-options'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { Plus } from 'lucide-react'
 import { useEffect } from 'react'
@@ -57,8 +57,8 @@ export function SheetNewBound() {
     watch,
   } = newBoundForm
 
-  const { loadFamily, loadBounds, diverse, loadDiverse } = useBoundStore(
-    ({ loadFamily, family, loadBounds, diverse, loadDiverse }) => {
+  const { loadFamily, diverse, loadDiverse } = useBoundStore(
+    ({ loadFamily, family, diverse, loadDiverse }) => {
       const familyFormatted = family
         ? family?.map((item) => ({
             value: item.id.toString(),
@@ -69,7 +69,6 @@ export function SheetNewBound() {
       return {
         loadFamily,
         family: familyFormatted,
-        loadBounds,
         loadDiverse,
         diverse,
       }
@@ -77,6 +76,7 @@ export function SheetNewBound() {
   )
 
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   async function handleCreateNewBound(data: NewBoundData) {
     console.log(data)
@@ -104,7 +104,7 @@ export function SheetNewBound() {
       variant: 'success',
     })
     reset({ description: '', family: '', diverse: '', type: 'family' })
-    loadBounds({ filterText: undefined })
+    queryClient.refetchQueries(['checklist/bounds'])
   }
 
   useEffect(() => {

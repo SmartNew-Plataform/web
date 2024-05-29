@@ -70,12 +70,17 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
     })
   }
 
-  async function handleEditDiverse({ branch, description }: DiverseFormData) {
+  async function handleEditDiverse({
+    branch,
+    description,
+    tag,
+  }: DiverseFormData) {
     const response = await api.put(
       `smart-list/location/${editingData?.value}`,
       {
         branchId: branch,
         description,
+        tag,
       },
     )
 

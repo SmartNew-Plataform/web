@@ -12,8 +12,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
-import { useTasksStore } from '@/store/smartlist/smartlist-task'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -25,7 +25,6 @@ const taskFormSchema = z.object({
 type TaskFormData = z.infer<typeof taskFormSchema>
 
 export function FormNewTask() {
-  const { loadTasks } = useTasksStore(({ loadTasks }) => ({ loadTasks }))
   const {
     register,
     handleSubmit,
@@ -34,6 +33,7 @@ export function FormNewTask() {
     resolver: zodResolver(taskFormSchema),
   })
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   async function handleCreateTask(data: TaskFormData) {
     await api.post('/smart-list/task', data).then((res) => res.data)
@@ -41,7 +41,7 @@ export function FormNewTask() {
       title: 'Task adicionada com sucesso!',
       variant: 'success',
     })
-    loadTasks()
+    queryClient.refetchQueries(['checklist-task'])
   }
 
   return (

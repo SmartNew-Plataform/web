@@ -12,8 +12,10 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useTasksBoundedStore } from '@/store/smartlist/smartlist-tasks-bounded'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { Plus } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -37,7 +39,7 @@ interface SheetNewTask {
 }
 
 export function SheetNewTask({ boundId }: SheetNewTask) {
-  const { task, loadTasksBounded, control } = useTasksBoundedStore(
+  const { task, control } = useTasksBoundedStore(
     ({ task, loadTasksBounded, control }) => {
       const taskFormatted = task
         ? task?.map(({ id, description }) => ({
@@ -70,12 +72,16 @@ export function SheetNewTask({ boundId }: SheetNewTask) {
   } = newTaskForm
 
   const { toast } = useToast()
+  const searchParams = useSearchParams()
+  const filter = searchParams.get('s') || ''
+  const queryClient = useQueryClient()
 
   async function handleNewTask(data: NewTaskData) {
     await api
       .post(`/smart-list/bound/${boundId}/item`, {
         controlId: Number(data.control),
         task: data.task,
+        filterText: filter,
       })
       .then((res) => res.data)
       .catch((err: AxiosError<{ message: string }>) =>
@@ -94,7 +100,7 @@ export function SheetNewTask({ boundId }: SheetNewTask) {
       variant: 'success',
     })
     reset({ control: '', task: [] })
-    loadTasksBounded(boundId)
+    queryClient.refetchQueries(['checklist/bound/task', boundId])
   }
 
   return (

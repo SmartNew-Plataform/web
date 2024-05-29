@@ -1,8 +1,8 @@
 'use client'
 import { useTasksStore } from '@/store/smartlist/smartlist-task'
 import { useQuery } from '@tanstack/react-query'
-import { Task } from './task'
 import { useSearchParams } from 'next/navigation'
+import { Task } from './task'
 
 export function ListTask() {
   const { loadTasks } = useTasksStore()
@@ -10,7 +10,7 @@ export function ListTask() {
   const filterText = searchParams.get('s') || ''
 
   const { data } = useQuery({
-    queryKey: ['checklist-task'],
+    queryKey: ['checklist-task', filterText],
     queryFn: () => loadTasks(filterText),
   })
 
