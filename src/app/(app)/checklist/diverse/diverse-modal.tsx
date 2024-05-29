@@ -45,10 +45,15 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
     })
   }, [editingData])
 
-  async function handleCreateDiverse({ branch, description }: DiverseFormData) {
+  async function handleCreateDiverse({
+    branch,
+    description,
+    tag,
+  }: DiverseFormData) {
     const response = await api.post('smart-list/location', {
       branchId: Number(branch),
       description,
+      tag,
     })
 
     if (response.status !== 201) return

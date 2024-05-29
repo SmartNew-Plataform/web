@@ -17,11 +17,13 @@ interface ActiveStoreData {
   images: string[] | undefined
   equipmentId: number | undefined
   components: Component[] | undefined
+  qrCodeEquipments: string[] | undefined
 
   setSelects: (data: ActiveStoreData['selects']) => void
   setImages: (images: string[] | undefined) => void
   setEquipmentId: (id: number | undefined) => void
   setComponents: (components: Component[] | undefined) => void
+  setQrCodeEquipments: (equipments: string[] | undefined) => void
   removeComponent: (componentId: number) => void
   addComponent: (component: Component) => void
 }
@@ -42,6 +44,7 @@ export const useActives = create<ActiveStoreData>((set, get) => {
     images: undefined,
     equipmentId: undefined,
     components: undefined,
+    qrCodeEquipments: undefined,
 
     setSelects(data) {
       set({ selects: { ...data } })
@@ -53,6 +56,10 @@ export const useActives = create<ActiveStoreData>((set, get) => {
 
     setImages(images) {
       set({ images })
+    },
+
+    setQrCodeEquipments(equipments) {
+      set({ qrCodeEquipments: equipments })
     },
 
     setComponents(components) {
