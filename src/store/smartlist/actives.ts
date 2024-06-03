@@ -13,6 +13,7 @@ interface ActiveStoreData {
     unityMeter?: SelectData[] | undefined
     fleet?: SelectData[] | undefined
     componentStatus?: SelectData[] | undefined
+    typeEquipment?: SelectData[] | undefined
   }
   images: string[] | undefined
   equipmentId: number | undefined

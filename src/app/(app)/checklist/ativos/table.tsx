@@ -57,6 +57,7 @@ export function Table() {
       unityMeter,
       fleet,
       componentStatus,
+      typeEquipment,
     ] = await Promise.all([
       await api.get('system/list-branch').then((res) => res.data.data),
       await api
@@ -74,6 +75,9 @@ export function Table() {
       await api.get('system/equipment/list-fleet').then((res) => res.data.data),
       await api
         .get('system/equipment/list-component-status')
+        .then((res) => res.data.data),
+      await api
+        .get('system/equipment/list-type-equipment')
         .then((res) => res.data.data),
     ])
 
@@ -93,6 +97,7 @@ export function Table() {
       unityMeter,
       fleet,
       componentStatus,
+      typeEquipment,
     })
   }
 
