@@ -16,6 +16,7 @@ import { useUserStore } from '@/store/user-store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -61,6 +62,8 @@ export function SheetNewBound() {
 
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
+  const filterText = searchParams.get('s') || ''
 
   async function handleCreateNewBound(data: NewBoundData) {
     const response = await api
@@ -71,14 +74,14 @@ export function SheetNewBound() {
       })
       .then((res) => res.data)
 
-    if (response?.error) return false
-
-    toast({
-      title: 'Vinculo criado com sucesso!',
-      variant: 'success',
-    })
-    reset({ description: '', family: '', diverse: '', type: 'family' })
-    queryClient.refetchQueries(['checklist/bounds'])
+    if (!response?.error) {
+      toast({
+        title: 'Vinculo criado com sucesso!',
+        variant: 'success',
+      })
+      reset({ description: '', family: '', diverse: '', type: 'family' })
+      queryClient.refetchQueries(['checklist/bounds', filterText])
+    }
   }
 
   const { data } = useQuery({
@@ -98,6 +101,8 @@ export function SheetNewBound() {
   })
 
   const type = watch('type')
+
+  console.log(isSubmitting)
 
   return (
     <Sheet>
