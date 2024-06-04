@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { validateMultipleOptions } from '@/lib/validate-multiple-options'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
+import { useUserStore } from '@/store/user-store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
@@ -54,6 +55,7 @@ export function SheetNewBound() {
     reset,
     watch,
   } = newBoundForm
+  const { user } = useUserStore()
 
   const { loadFamily, loadDiverse } = useBoundStore()
 
@@ -80,7 +82,7 @@ export function SheetNewBound() {
   }
 
   const { data } = useQuery({
-    queryKey: ['checklist/bounds/selects'],
+    queryKey: ['checklist/bounds/selects', user?.login],
     queryFn: async () => {
       const [family, diverse] = await Promise.all([loadFamily(), loadDiverse()])
 
@@ -93,7 +95,6 @@ export function SheetNewBound() {
       }
     },
     retry: true,
-    retryDelay: 1000,
   })
 
   const type = watch('type')
