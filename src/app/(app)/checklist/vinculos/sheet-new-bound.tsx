@@ -93,6 +93,7 @@ export function SheetNewBound() {
         diverse,
       }
     },
+    retry: true,
   })
 
   const type = watch('type')
