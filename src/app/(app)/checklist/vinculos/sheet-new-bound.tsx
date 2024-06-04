@@ -24,14 +24,18 @@ const newBoundSchema = z
   .object({
     type: z.enum(['family', 'diverse'], { required_error: 'Escolha um tipo!' }),
     family: z
-      .string({
-        invalid_type_error: 'Você não selecionou nada!',
-      })
+      .array(
+        z.string({
+          invalid_type_error: 'Selecione uma familia!',
+        }),
+      )
       .optional(),
     diverse: z
-      .string({
-        required_error: 'A família e obrigatória!',
-      })
+      .array(
+        z.string({
+          required_error: 'A família e obrigatória!',
+        }),
+      )
       .optional(),
     description: z
       .string({ required_error: 'A descrição e obrigatória!' })
@@ -72,8 +76,8 @@ export function SheetNewBound() {
       await api
         .post('/smart-list/bound', {
           ...data,
-          familyId: Number(data.family),
-          diverseId: Number(data.diverse),
+          familyId: data.family,
+          diverseId: data.diverse,
         })
         .then((res) => res.data)
       // .finally(() => loading.hide())
@@ -82,7 +86,7 @@ export function SheetNewBound() {
         title: 'Vinculo criado com sucesso!',
         variant: 'success',
       })
-      reset({ description: '', family: '', diverse: '', type: 'family' })
+      reset({ description: '', family: [], diverse: [], type: 'family' })
       queryClient.refetchQueries(['checklist/bounds', filterText])
     } catch (error) {
       console.log(error)
@@ -107,7 +111,6 @@ export function SheetNewBound() {
   })
 
   const type = watch('type')
-  console.log(isSubmitting)
 
   return (
     <Sheet>
@@ -140,7 +143,10 @@ export function SheetNewBound() {
                 {data?.family ? (
                   <Form.Field>
                     <Form.Label>Família:</Form.Label>
-                    <Form.Select name="family" options={data?.family || []} />
+                    <Form.MultiSelect
+                      name="family"
+                      options={data?.family || []}
+                    />
                     <Form.ErrorMessage field="family" />
                   </Form.Field>
                 ) : (
@@ -152,7 +158,10 @@ export function SheetNewBound() {
                 {data?.diverse ? (
                   <Form.Field>
                     <Form.Label>Diverso:</Form.Label>
-                    <Form.Select name="diverse" options={data?.diverse || []} />
+                    <Form.MultiSelect
+                      name="diverse"
+                      options={data?.diverse || []}
+                    />
                     <Form.ErrorMessage field="diverse" />
                   </Form.Field>
                 ) : (
