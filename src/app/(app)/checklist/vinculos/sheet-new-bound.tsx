@@ -52,9 +52,9 @@ export function SheetNewBound() {
   })
   const {
     handleSubmit,
-    formState: { isSubmitting },
     reset,
     watch,
+    formState: { isSubmitting },
   } = newBoundForm
   const { user } = useUserStore()
 
@@ -64,23 +64,29 @@ export function SheetNewBound() {
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
   const filterText = searchParams.get('s') || ''
+  // const loading = useLoading()
 
   async function handleCreateNewBound(data: NewBoundData) {
-    const response = await api
-      .post('/smart-list/bound', {
-        ...data,
-        familyId: Number(data.family),
-        diverseId: Number(data.diverse),
-      })
-      .then((res) => res.data)
+    try {
+      // loading.show()
+      await api
+        .post('/smart-list/bound', {
+          ...data,
+          familyId: Number(data.family),
+          diverseId: Number(data.diverse),
+        })
+        .then((res) => res.data)
+      // .finally(() => loading.hide())
 
-    if (!response?.error) {
       toast({
         title: 'Vinculo criado com sucesso!',
         variant: 'success',
       })
       reset({ description: '', family: '', diverse: '', type: 'family' })
       queryClient.refetchQueries(['checklist/bounds', filterText])
+    } catch (error) {
+      console.log(error)
+      // loading.hide()
     }
   }
 
@@ -101,7 +107,6 @@ export function SheetNewBound() {
   })
 
   const type = watch('type')
-
   console.log(isSubmitting)
 
   return (
