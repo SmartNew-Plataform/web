@@ -82,8 +82,7 @@ export function SheetNewBound() {
   const { data } = useQuery({
     queryKey: ['checklist/bounds/selects'],
     queryFn: async () => {
-      const family = await loadFamily()
-      const diverse = await loadDiverse()
+      const [family, diverse] = await Promise.all([loadFamily(), loadDiverse()])
 
       return {
         family: family?.map(({ id, family }) => ({
