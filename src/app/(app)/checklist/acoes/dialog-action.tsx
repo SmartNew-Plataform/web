@@ -16,8 +16,6 @@ type DialogActionProps = ComponentProps<typeof Sheet>
 export type InfoData = {
   id: number
   code: number
-  equipment: Array<string>
-  branch: Array<string>
   responsible: {
     login: string
     name: string
