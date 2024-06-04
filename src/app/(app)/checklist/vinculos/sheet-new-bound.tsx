@@ -14,7 +14,6 @@ import { validateMultipleOptions } from '@/lib/validate-multiple-options'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
 import { Plus } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -56,29 +55,12 @@ export function SheetNewBound() {
     watch,
   } = newBoundForm
 
-  const { loadFamily, diverse, loadDiverse } = useBoundStore(
-    ({ loadFamily, family, diverse, loadDiverse }) => {
-      const familyFormatted = family
-        ? family?.map((item) => ({
-            value: item.id.toString(),
-            label: item.family,
-          }))
-        : []
-
-      return {
-        loadFamily,
-        family: familyFormatted,
-        loadDiverse,
-        diverse,
-      }
-    },
-  )
+  const { loadFamily, loadDiverse } = useBoundStore()
 
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
   async function handleCreateNewBound(data: NewBoundData) {
-    console.log(data)
     const response = await api
       .post('/smart-list/bound', {
         ...data,
@@ -86,15 +68,6 @@ export function SheetNewBound() {
         diverseId: Number(data.diverse),
       })
       .then((res) => res.data)
-      .catch((err: AxiosError<{ message: string }>) => {
-        toast({
-          title: err.response?.data.message,
-          description: err.message,
-          variant: 'destructive',
-          duration: 1000 * 10,
-        })
-        throw new Error('Insert bound error')
-      })
 
     if (response?.error) return
 
@@ -123,8 +96,6 @@ export function SheetNewBound() {
   })
 
   const type = watch('type')
-
-  console.log(diverse)
 
   return (
     <Sheet>

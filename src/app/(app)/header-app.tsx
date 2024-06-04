@@ -45,8 +45,8 @@ export function HeaderApp({ children }: HeaderAppProps) {
           console.error('Erro de resposta do servidor:', error)
           hide()
           toast({
-            title: error.message,
-            description: error.response.data.message,
+            title: error.response.data.message,
+            description: error.message,
             variant: 'destructive',
             duration: 1000 * 30, // 30 seconds
           })
