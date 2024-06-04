@@ -71,7 +71,7 @@ export function SheetNewBound() {
       })
       .then((res) => res.data)
 
-    if (response?.error) return
+    if (response?.error) return false
 
     toast({
       title: 'Vinculo criado com sucesso!',
