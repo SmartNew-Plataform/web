@@ -16,7 +16,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { Plus } from 'lucide-react'
-import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -107,12 +106,6 @@ export function SheetNewBound() {
     queryClient.refetchQueries(['checklist/bounds'])
   }
 
-  useEffect(() => {
-    loadFamily()
-    loadDiverse()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const { data } = useQuery({
     queryKey: ['checklist/bounds/selects'],
     queryFn: async () => {
@@ -160,17 +153,29 @@ export function SheetNewBound() {
             </Form.Field>
 
             {type === 'family' ? (
-              <Form.Field>
-                <Form.Label>Família:</Form.Label>
-                <Form.Select name="family" options={data?.family || []} />
-                <Form.ErrorMessage field="family" />
-              </Form.Field>
+              <>
+                {data?.family ? (
+                  <Form.Field>
+                    <Form.Label>Família:</Form.Label>
+                    <Form.Select name="family" options={data?.family || []} />
+                    <Form.ErrorMessage field="family" />
+                  </Form.Field>
+                ) : (
+                  <Form.SkeletonField />
+                )}
+              </>
             ) : (
-              <Form.Field>
-                <Form.Label>Diverso:</Form.Label>
-                <Form.Select name="diverse" options={data?.diverse || []} />
-                <Form.ErrorMessage field="diverse" />
-              </Form.Field>
+              <>
+                {data?.diverse ? (
+                  <Form.Field>
+                    <Form.Label>Diverso:</Form.Label>
+                    <Form.Select name="diverse" options={data?.diverse || []} />
+                    <Form.ErrorMessage field="diverse" />
+                  </Form.Field>
+                ) : (
+                  <Form.SkeletonField />
+                )}
+              </>
             )}
 
             <Form.Field>
