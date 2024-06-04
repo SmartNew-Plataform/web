@@ -42,6 +42,7 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
     reset({
       branch: editingData?.branchId.toString(),
       description: editingData?.text,
+      tag: editingData?.tag,
     })
   }, [editingData])
 
