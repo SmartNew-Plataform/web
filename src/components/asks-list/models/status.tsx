@@ -90,7 +90,9 @@ export function Status({ name, data, onChange }: StatusProps) {
         const currentVariant: VariantsStatus =
           field.value === String(id) ? `${color}Active` : color
         const currentIcon = iconsNames[icon] as keyof typeof dynamicIconImports
-        const Icon = icon && dynamic(dynamicIconImports[currentIcon])
+        const Icon = icon
+          ? dynamic(dynamicIconImports[currentIcon])
+          : dynamic(dynamicIconImports.square)
         return (
           <button
             type="button"
