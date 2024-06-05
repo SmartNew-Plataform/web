@@ -63,9 +63,7 @@ export function Header() {
           </div>
           <div className="flex flex-col gap-1 pl-2">
             <strong className="uppercase text-slate-700">Ativo/Diverso:</strong>
-            <span className="text-slate-800">
-              {checklistAsksScreen.equipment}
-            </span>
+            <span className="text-slate-800">{checklistAsksScreen.item}</span>
           </div>
           <div className="flex flex-col gap-1 pl-2">
             <strong className="uppercase text-slate-700">

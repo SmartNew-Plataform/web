@@ -133,7 +133,6 @@ export function DialogAction(props: DialogActionProps) {
         rows: ActionItem[]
         pageCount: number
       }>(['grouped-table'])
-      console.log(previousGroups)
 
       if (previousGroups) {
         const nextGroups = previousGroups.rows.map((group) => {
@@ -142,7 +141,6 @@ export function DialogAction(props: DialogActionProps) {
           } else return group
         })
 
-        console.log(nextGroups)
         queryClient.setQueryData(['grouped-table'], {
           rows: nextGroups,
           pageCount: previousGroups.pageCount,
