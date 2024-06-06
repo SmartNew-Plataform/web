@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { DiverseModal } from './diverse-modal'
+import { SheetCategories } from './sheet-categories'
 
 export function Header() {
   const [open, setOpen] = useState(false)
@@ -14,6 +15,7 @@ export function Header() {
 
       <div className="flex gap-3">
         <SearchInput />
+        <SheetCategories />
         <Button onClick={() => setOpen(true)}>
           <Plus size={16} />
           diverso
