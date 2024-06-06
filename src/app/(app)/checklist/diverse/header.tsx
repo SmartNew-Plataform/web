@@ -2,13 +2,27 @@
 import { PageHeader } from '@/components/page-header'
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { useDiverse } from '@/store/smartlist/diverse'
+import { Plus, QrCode } from 'lucide-react'
 import { useState } from 'react'
 import { DiverseModal } from './diverse-modal'
+<<<<<<< HEAD
 import { SheetCategories } from './sheet-categories'
+=======
+import { QRCodeModal } from './qrcode-modal'
+>>>>>>> 5b164adae2a5a914c742bf7528b0fb48f60bc67e
 
 export function Header() {
   const [open, setOpen] = useState(false)
+  const [openQrCode, setOpenQrCode] = useState(false)
+  const { setQrCodeDiverse, diverse } = useDiverse()
+
+  function handleOpenQrCode() {
+    const diverseValues = diverse?.map(({ value }) => value)
+    setOpenQrCode(true)
+    setQrCodeDiverse(diverseValues)
+  }
+
   return (
     <PageHeader>
       <h2 className="text-lg font-bold text-slate-600">Cadastro de diversos</h2>
@@ -20,8 +34,13 @@ export function Header() {
           <Plus size={16} />
           diverso
         </Button>
+        <Button variant="outline" onClick={handleOpenQrCode}>
+          <QrCode size={16} />
+          Gerar Qrcode
+        </Button>
       </div>
       <DiverseModal mode="create" open={open} onOpenChange={setOpen} />
+      <QRCodeModal open={openQrCode} onOpenChange={setOpenQrCode} multiple />
     </PageHeader>
   )
 }

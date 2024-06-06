@@ -36,12 +36,9 @@ export type BoundData = {
 }
 
 export function TableBounds() {
-  const { loadBounds } = useBoundStore(
-    ({ loadBounds, bounds }) => ({
-      loadBounds,
-      bounds,
-    }),
-  )
+  const { loadBounds } = useBoundStore(({ loadBounds }) => ({
+    loadBounds,
+  }))
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [editId, setEditId] = useState<number | null>(null)
   const { toast } = useToast()

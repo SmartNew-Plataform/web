@@ -12,11 +12,11 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { validateMultipleOptions } from '@/lib/validate-multiple-options'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
+import { useUserStore } from '@/store/user-store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
-import { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -24,14 +24,18 @@ const newBoundSchema = z
   .object({
     type: z.enum(['family', 'diverse'], { required_error: 'Escolha um tipo!' }),
     family: z
-      .string({
-        invalid_type_error: 'Você não selecionou nada!',
-      })
+      .array(
+        z.string({
+          invalid_type_error: 'Selecione uma familia!',
+        }),
+      )
       .optional(),
     diverse: z
-      .string({
-        required_error: 'A família e obrigatória!',
-      })
+      .array(
+        z.string({
+          required_error: 'A família e obrigatória!',
+        }),
+      )
       .optional(),
     description: z
       .string({ required_error: 'A descrição e obrigatória!' })
@@ -52,72 +56,48 @@ export function SheetNewBound() {
   })
   const {
     handleSubmit,
-    formState: { isSubmitting },
     reset,
     watch,
+    formState: { isSubmitting },
   } = newBoundForm
+  const { user } = useUserStore()
 
-  const { loadFamily, loadBounds, diverse, loadDiverse } = useBoundStore(
-    ({ loadFamily, family, loadBounds, diverse, loadDiverse }) => {
-      const familyFormatted = family
-        ? family?.map((item) => ({
-            value: item.id.toString(),
-            label: item.family,
-          }))
-        : []
-
-      return {
-        loadFamily,
-        family: familyFormatted,
-        loadBounds,
-        loadDiverse,
-        diverse,
-      }
-    },
-  )
+  const { loadFamily, loadDiverse } = useBoundStore()
 
   const { toast } = useToast()
+  const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
+  const filterText = searchParams.get('s') || ''
+  // const loading = useLoading()
 
   async function handleCreateNewBound(data: NewBoundData) {
-    console.log(data)
-    const response = await api
-      .post('/smart-list/bound', {
-        ...data,
-        familyId: Number(data.family),
-        diverseId: Number(data.diverse),
-      })
-      .then((res) => res.data)
-      .catch((err: AxiosError<{ message: string }>) => {
-        toast({
-          title: err.response?.data.message,
-          description: err.message,
-          variant: 'destructive',
-          duration: 1000 * 10,
+    try {
+      // loading.show()
+      await api
+        .post('/smart-list/bound', {
+          ...data,
+          familyId: data.family,
+          diverseId: data.diverse,
         })
-        throw new Error('Insert bound error')
+        .then((res) => res.data)
+      // .finally(() => loading.hide())
+
+      toast({
+        title: 'Vinculo criado com sucesso!',
+        variant: 'success',
       })
-
-    if (response?.error) return
-
-    toast({
-      title: 'Vinculo criado com sucesso!',
-      variant: 'success',
-    })
-    reset({ description: '', family: '', diverse: '', type: 'family' })
-    loadBounds({ filterText: undefined })
+      reset({ description: '', family: [], diverse: [], type: 'family' })
+      queryClient.refetchQueries(['checklist/bounds', filterText])
+    } catch (error) {
+      console.log(error)
+      // loading.hide()
+    }
   }
 
-  useEffect(() => {
-    loadFamily()
-    loadDiverse()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const { data } = useQuery({
-    queryKey: ['checklist/bounds/selects'],
+    queryKey: ['checklist/bounds/selects', user?.login],
     queryFn: async () => {
-      const family = await loadFamily()
-      const diverse = await loadDiverse()
+      const [family, diverse] = await Promise.all([loadFamily(), loadDiverse()])
 
       return {
         family: family?.map(({ id, family }) => ({
@@ -127,11 +107,10 @@ export function SheetNewBound() {
         diverse,
       }
     },
+    retry: true,
   })
 
   const type = watch('type')
-
-  console.log(diverse)
 
   return (
     <Sheet>
@@ -160,17 +139,35 @@ export function SheetNewBound() {
             </Form.Field>
 
             {type === 'family' ? (
-              <Form.Field>
-                <Form.Label>Família:</Form.Label>
-                <Form.Select name="family" options={data?.family || []} />
-                <Form.ErrorMessage field="family" />
-              </Form.Field>
+              <>
+                {data?.family ? (
+                  <Form.Field>
+                    <Form.Label>Família:</Form.Label>
+                    <Form.MultiSelect
+                      name="family"
+                      options={data?.family || []}
+                    />
+                    <Form.ErrorMessage field="family" />
+                  </Form.Field>
+                ) : (
+                  <Form.SkeletonField />
+                )}
+              </>
             ) : (
-              <Form.Field>
-                <Form.Label>Diverso:</Form.Label>
-                <Form.Select name="diverse" options={data?.diverse || []} />
-                <Form.ErrorMessage field="diverse" />
-              </Form.Field>
+              <>
+                {data?.diverse ? (
+                  <Form.Field>
+                    <Form.Label>Diverso:</Form.Label>
+                    <Form.MultiSelect
+                      name="diverse"
+                      options={data?.diverse || []}
+                    />
+                    <Form.ErrorMessage field="diverse" />
+                  </Form.Field>
+                ) : (
+                  <Form.SkeletonField />
+                )}
+              </>
             )}
 
             <Form.Field>

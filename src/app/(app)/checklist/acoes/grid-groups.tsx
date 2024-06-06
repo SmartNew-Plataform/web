@@ -3,6 +3,7 @@
 import { AttachThumbList } from '@/components/attach-thumb-list'
 import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { PageHeader } from '@/components/page-header'
+import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -24,7 +25,6 @@ import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, FileBarChart2, Image, Timer } from 'lucide-react'
 import { useState } from 'react'
 import { DialogAction } from './dialog-action'
-import { SearchInput } from '@/components/search-input'
 
 export function GridGroups() {
   const [sheetActionOpen, setSheetActionOpen] = useState<boolean>(false)
@@ -35,7 +35,7 @@ export function GridGroups() {
   const { show, hide } = useLoading()
   const {
     setCurrentTask,
-    fetchResponsible, 
+    fetchResponsible,
     groupAttach,
     fetchDataTableGroups,
     fetchDataTableUngrouped,
@@ -263,7 +263,7 @@ export function GridGroups() {
       },
     },
     {
-      accessorKey: 'equipment',
+      accessorKey: 'item',
       header: ({ column }) => {
         return (
           <Button
@@ -343,7 +343,7 @@ export function GridGroups() {
   return (
     <>
       <PageHeader className="p-4">
-        <div className='flex gap-4 items-end'>
+        <div className="flex items-end gap-4">
           <div className="flex flex-col gap-2">
             <Label>Filtrar grupos:</Label>
             <Select value={searchOption} onValueChange={handleChangeGroup}>

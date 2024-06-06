@@ -6,10 +6,11 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useDiverse } from '@/store/smartlist/diverse'
 import { useQuery } from '@tanstack/react-query'
-import { Pencil, Trash } from 'lucide-react'
+import { Pencil, QrCode, Trash } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { DiverseModal } from './diverse-modal'
+import { QRCodeModal } from './qrcode-modal'
 
 export interface DiverseData {
   value: number
@@ -25,7 +26,9 @@ export function ListDiverse() {
   const [diverseIdToDelete, setDiverseIdToDelete] = useState<
     number | undefined
   >()
-  const { editingData, setEditingData } = useDiverse()
+  const [qrCodeIsOpen, setQrCodeOpen] = useState(false)
+  const { editingData, setEditingData, setDiverse, setQrCodeDiverse } =
+    useDiverse()
   const searchParams = useSearchParams()
   const filter = searchParams.get('s') || ''
 
@@ -35,6 +38,12 @@ export function ListDiverse() {
     const response: DiverseData[] | undefined = await api
       .get('smart-list/location', { params: { s: filter } })
       .then((res) => res.data.data)
+
+    const diverse = response?.map(({ tag, text, value }) => ({
+      value: value.toString(),
+      label: `${tag} - ${text}`,
+    }))
+    setDiverse(diverse)
 
     return response
   }
@@ -56,6 +65,11 @@ export function ListDiverse() {
       variant: 'success',
     })
     refetch()
+  }
+
+  function handleSelectDiverseQrCode(diverseId: number) {
+    setQrCodeDiverse([diverseId.toString()])
+    setQrCodeOpen(true)
   }
 
   return (
@@ -80,16 +94,25 @@ export function ListDiverse() {
                   variant="secondary"
                   size="icon-sm"
                   onClick={() =>
-                    setEditingData({ text, value, branchId: branch.value })
+                    setEditingData({ text, value, branchId: branch.value, tag })
                   }
                 >
                   <Pencil size={14} />
+                </Button>
+                <Button
+                  size="icon-sm"
+                  variant="outline"
+                  onClick={() => handleSelectDiverseQrCode(value)}
+                >
+                  <QrCode size={14} />
                 </Button>
               </div>
             </CardContent>
           </Card>
         )
       })}
+
+      <QRCodeModal open={qrCodeIsOpen} onOpenChange={setQrCodeOpen} />
 
       <AlertModal
         open={!!diverseIdToDelete}

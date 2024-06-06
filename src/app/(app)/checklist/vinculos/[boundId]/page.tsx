@@ -1,9 +1,8 @@
 import { PageWrapper } from '@/components/page-wrapper'
+import { SearchInput } from '@/components/search-input'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { SheetNewTask } from './sheet-new-task'
 import { TableTasksBounded } from './table-tasks-bounded'
-import { SearchInput } from '@/components/search-input'
 
 export default function TasksBoundedPage({
   params,

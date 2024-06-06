@@ -67,9 +67,9 @@ export function StepSix() {
       </Form.Field>
 
       <Form.Field>
-        <Form.Label htmlFor="CTFFinameNumber">Nª CT Finame:</Form.Label>
-        <Form.Input name="CTFFinameNumber" id="CTFFinameNumber" />
-        <Form.ErrorMessage field="CTFFinameNumber" />
+        <Form.Label htmlFor="CTFinameNumber">Nª CT Finame:</Form.Label>
+        <Form.Input name="CTFinameNumber" id="CTFinameNumber" />
+        <Form.ErrorMessage field="CTFinameNumber" />
       </Form.Field>
 
       <Form.Field>

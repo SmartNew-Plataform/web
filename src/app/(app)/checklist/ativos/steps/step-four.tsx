@@ -17,7 +17,7 @@ export function StepFour() {
       </Form.Field>
 
       <Form.Field>
-        <Form.Label htmlFor="acquisitionValue">Nº Nota Fiscal:</Form.Label>
+        <Form.Label htmlFor="acquisitionValue">Valor de aquisição:</Form.Label>
         <Form.Input
           type="number"
           step="any"

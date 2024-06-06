@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useTasksStore } from '@/store/smartlist/smartlist-task'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { Pencil, Save } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -38,7 +39,6 @@ export function EditActionForm({
   taskId,
   statusId,
   id,
-  loadActions,
 }: EditActionFormProps) {
   const editActionForm = useForm<EditActionData>({
     resolver: zodResolver(editActionSchema),
@@ -53,6 +53,7 @@ export function EditActionForm({
     formState: { isSubmitting },
   } = editActionForm
   const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   const { types } = useTasksStore(({ types }) => {
     const typesFormatted = types
@@ -80,7 +81,7 @@ export function EditActionForm({
         variant: 'success',
       })
     }
-    loadActions()
+    queryClient.refetchQueries(['checklist/tasks/situations'])
   }
 
   return (

@@ -28,7 +28,7 @@ interface CoreScreensData {
     startDate: string
     model: string
     endDate: string
-    equipment: string
+    item: string
     user: string
     allStatus: Array<{
       id: number
