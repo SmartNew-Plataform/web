@@ -116,7 +116,7 @@ export function QRCodeModal({ multiple = false, ...props }: QRCodeModalProps) {
 
         <div className="flex flex-1 flex-col items-center justify-center gap-3">
           <div className="rounded-md border border-zinc-200 p-3 shadow">
-            <QRCode value="hello world" size={width} />
+            <QRCode value={firstEquipmentId} size={width} />
           </div>
           {withTag && (
             <span className="rounded border border-zinc-200 px-1.5 shadow">

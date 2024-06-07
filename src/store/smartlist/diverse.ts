@@ -6,6 +6,7 @@ type EditingData = {
   text: string
   tag: string
   branchId: number
+  categoryId?: number
 }
 
 interface StoreDiverseData {

@@ -20,6 +20,10 @@ export interface DiverseData {
     value: number
     text: string
   }
+  category: {
+    value: number
+    text: string
+  } | null
 }
 
 export function ListDiverse() {
@@ -74,7 +78,7 @@ export function ListDiverse() {
 
   return (
     <main className="grid max-h-full grid-cols-auto gap-4 overflow-auto">
-      {data?.map(({ text, value, tag, branch }) => {
+      {data?.map(({ text, value, tag, branch, category }) => {
         return (
           <Card key={value}>
             <CardContent className="relative pt-5">
@@ -94,7 +98,13 @@ export function ListDiverse() {
                   variant="secondary"
                   size="icon-sm"
                   onClick={() =>
-                    setEditingData({ text, value, branchId: branch.value, tag })
+                    setEditingData({
+                      text,
+                      value,
+                      branchId: branch.value,
+                      tag,
+                      categoryId: category?.value,
+                    })
                   }
                 >
                   <Pencil size={14} />

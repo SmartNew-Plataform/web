@@ -1,4 +1,3 @@
-import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
@@ -19,6 +18,7 @@ interface DiverseModalProps extends ComponentProps<typeof Dialog> {
 const diverseFormSchema = z.object({
   description: z.string({ required_error: 'Este campo e obrigatório!' }).min(1),
   branch: z.string({ required_error: 'Escola uma filial!' }),
+  category: z.string({ required_error: 'Escola uma categoria!' }),
   tag: z.string({ required_error: 'Este campo e obrigatório!' }),
 })
 
@@ -41,6 +41,7 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
   useEffect(() => {
     reset({
       branch: editingData?.branchId.toString(),
+      category: String(editingData?.categoryId),
       description: editingData?.text,
       tag: editingData?.tag,
     })
@@ -49,11 +50,13 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
   async function handleCreateDiverse({
     branch,
     description,
+    category,
     tag,
   }: DiverseFormData) {
     const response = await api.post('smart-list/location', {
       branchId: Number(branch),
       description,
+      categoryId: category,
       tag,
     })
 
@@ -68,6 +71,7 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
       description: '',
       tag: '',
       branch: undefined,
+      category: undefined,
     })
   }
 
@@ -75,6 +79,7 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
     branch,
     description,
     tag,
+    category,
   }: DiverseFormData) {
     const response = await api.put(
       `smart-list/location/${editingData?.value}`,
@@ -82,6 +87,7 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
         branchId: branch,
         description,
         tag,
+        categoryId: category,
       },
     )
 
@@ -94,17 +100,21 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
     queryClient.refetchQueries(['checklist-diverse-list'])
   }
 
-  async function fetchBranch() {
-    const response: SelectData[] | undefined = await api
-      .get('system/list-branch')
-      .then((res) => res.data.data)
+  async function fetchSelects() {
+    const [responseBranch, responseCategory] = await Promise.all([
+      api.get('system/list-branch').then((res) => res.data.data),
+      api.get('smart-list/location/category').then((res) => res.data.data),
+    ])
 
-    return response
+    return {
+      branch: responseBranch,
+      category: responseCategory,
+    }
   }
 
   const { data, isLoading } = useQuery({
     queryKey: ['diverse-branch'],
-    queryFn: fetchBranch,
+    queryFn: fetchSelects,
   })
 
   return (
@@ -134,8 +144,26 @@ export function DiverseModal({ mode, ...props }: DiverseModalProps) {
             ) : (
               <Form.Field>
                 <Form.Label htmlFor="branch-input">Filial:</Form.Label>
-                <Form.Select name="branch" id="branch-input" options={data} />
+                <Form.Select
+                  name="branch"
+                  id="branch-input"
+                  options={data?.branch || []}
+                />
                 <Form.ErrorMessage field="branch" />
+              </Form.Field>
+            )}
+
+            {isLoading ? (
+              <Form.SkeletonField />
+            ) : (
+              <Form.Field>
+                <Form.Label htmlFor="category-input">Categoria:</Form.Label>
+                <Form.Select
+                  name="category"
+                  id="category-input"
+                  options={data?.category || []}
+                />
+                <Form.ErrorMessage field="category" />
               </Form.Field>
             )}
 
