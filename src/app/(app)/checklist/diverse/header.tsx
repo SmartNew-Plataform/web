@@ -6,11 +6,8 @@ import { useDiverse } from '@/store/smartlist/diverse'
 import { Plus, QrCode } from 'lucide-react'
 import { useState } from 'react'
 import { DiverseModal } from './diverse-modal'
-<<<<<<< HEAD
-import { SheetCategories } from './sheet-categories'
-=======
 import { QRCodeModal } from './qrcode-modal'
->>>>>>> 5b164adae2a5a914c742bf7528b0fb48f60bc67e
+import { SheetCategories } from './sheet-categories'
 
 export function Header() {
   const [open, setOpen] = useState(false)
