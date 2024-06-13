@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bolt, Pencil, Plus, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { CategoryFormData, ModalCategoryForm } from './modal-category-form'
@@ -22,6 +22,7 @@ export function SheetCategories() {
   const [editModalData, setEditModalData] = useState<
     CategoryFormData | undefined
   >()
+  const queryClient = useQueryClient()
 
   const { toast } = useToast()
 
@@ -48,6 +49,7 @@ export function SheetCategories() {
       title: `Categoria ${data.description} criada com sucesso`,
       variant: 'success',
     })
+    queryClient.refetchQueries(['diverse-branch'])
   }
 
   async function handleEditCategory(data: CategoryFormData) {
@@ -64,11 +66,13 @@ export function SheetCategories() {
       title: `Categoria ${data.description} editada com sucesso`,
       variant: 'success',
     })
+    queryClient.refetchQueries(['diverse-branch'])
+    setEditCategoryId(undefined)
   }
 
   async function handleDeleteCategory() {
     const response = await api.delete(
-      `smart-list/location/category/${editCategoryId}`,
+      `smart-list/location/category/${deleteCategoryId}`,
     )
 
     if (response.status !== 200) return
@@ -77,9 +81,11 @@ export function SheetCategories() {
       title: `Categoria deletada com sucesso`,
       variant: 'success',
     })
+    queryClient.refetchQueries(['diverse-branch'])
+    setDeleteCategoryId(undefined)
   }
 
-  console.log(data)
+  console.log(deleteCategoryId)
 
   return (
     <Sheet>
