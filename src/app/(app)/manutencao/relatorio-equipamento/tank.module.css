@@ -1,0 +1,24 @@
+.fuelContainer {
+  position: relative;
+  width: 350px; 
+  height: 300px; 
+}
+
+.fuelPump {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #eee;
+  clip-path: url(#myClip);
+}
+
+.fuelLevel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
