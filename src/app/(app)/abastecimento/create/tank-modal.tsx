@@ -1,10 +1,10 @@
+import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { RadioGroupItem } from '@/components/ui/radio-group'
-import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
 import { ComponentProps } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -16,8 +16,9 @@ interface TankModalProps extends ComponentProps<typeof Dialog> {
 
 const tankFormSchema = z.object({
   description: z.string({ required_error: 'Este campo e obrigatório!' }).min(1),
-  branch: z.string({ required_error: 'Escola uma filial!' }),
   tag: z.string({ required_error: 'Este campo e obrigatório!' }),
+  capacity: z.number().min(0),
+  branch: z.string({ required_error: 'Escola uma filial!' }),
 })
 
 type TankFormData = z.infer<typeof tankFormSchema>
@@ -28,32 +29,47 @@ export function TankModal({ mode, ...props }: TankModalProps) {
   })
   const {
     handleSubmit,
-    reset,
     formState: { isSubmitting },
   } = diverseForm
 
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
+  // const { toast } = useToast()
+  // const queryClient = useQueryClient()
 
   async function handleCreateDiverse({
     branch,
     description,
     tag,
-  }: TankFormData) {}
+  }: TankFormData) {
+    console.log(branch, description, tag, mode)
+  }
+
+  async function fetchSelects() {
+    const response = await api
+      .get<{ data: SelectData[] }>('system/list-branch')
+      .then((res) => res.data)
+
+    return {
+      branch: response.data,
+    }
+  }
+
+  const { data: selects } = useQuery({
+    queryKey: ['fuelling/create/selects'],
+    queryFn: fetchSelects,
+  })
+
   return (
     <Dialog {...props}>
       <DialogContent>
         <FormProvider {...diverseForm}>
-          <form className="flex w-full flex-col gap-2">
+          <form
+            className="flex w-full flex-col gap-2"
+            onSubmit={handleSubmit(handleCreateDiverse)}
+          >
             <Form.Field>
-              <Form.RadioGroup name="type" className="flex">
-                <RadioGroupItem value="internal" id="internal" />
-                <Form.Label htmlFor="internal">Interno</Form.Label>
-
-                <RadioGroupItem value="external" id="internal" />
-                <Form.Label htmlFor="external">Externo</Form.Label>
-              </Form.RadioGroup>
-              <Form.ErrorMessage field="type" />
+              <Form.Label htmlFor="description-input">Descrição:</Form.Label>
+              <Form.Input name="description" id="description-input" />
+              <Form.ErrorMessage field="description" />
             </Form.Field>
 
             <Form.Field>
@@ -63,10 +79,24 @@ export function TankModal({ mode, ...props }: TankModalProps) {
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="branch-input">Filial:</Form.Label>
-              <Form.Select name="branch" id="branch-input" options={[]} />
-              <Form.ErrorMessage field="branch" />
+              <Form.Label htmlFor="capacity-input">Capacidade:</Form.Label>
+              <Form.Input name="capacity" id="capacity-input" type="number" />
+              <Form.ErrorMessage field="capacity" />
             </Form.Field>
+
+            {selects?.branch ? (
+              <Form.Field>
+                <Form.Label htmlFor="branch-input">Filial:</Form.Label>
+                <Form.Select
+                  name="branch"
+                  id="branch-input"
+                  options={selects.branch}
+                />
+                <Form.ErrorMessage field="branch" />
+              </Form.Field>
+            ) : (
+              <Form.SkeletonField />
+            )}
 
             <Button
               type="submit"

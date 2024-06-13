@@ -1,5 +1,7 @@
 'use client'
 import { motion } from 'framer-motion'
+import { useId } from 'react'
+import { PumpSvg } from './PumpSvg'
 import { TruckSvg } from './TruckSvg'
 import styles from './tank.module.css'
 
@@ -11,6 +13,7 @@ interface TankProps {
 }
 
 export function Tank({ type, fuel, fuelLevel, fuelCapacity }: TankProps) {
+  const id = useId()
   const fuelLevelPercent = (fuelLevel * 100) / fuelCapacity
   const background =
     fuelLevelPercent <= 33
@@ -22,8 +25,8 @@ export function Tank({ type, fuel, fuelLevel, fuelCapacity }: TankProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className={styles.fuelContainer}>
-        <TruckSvg />
-        <div className={styles.fuelPump}>
+        {type === 'internal' ? <TruckSvg id={id} /> : <PumpSvg id={id} />}
+        <div style={{ clipPath: `url(#${id})` }} className={styles.fuelPump}>
           <motion.div
             animate={{ height: `${fuelLevelPercent}%`, background }}
             className={styles.fuelLevel}
