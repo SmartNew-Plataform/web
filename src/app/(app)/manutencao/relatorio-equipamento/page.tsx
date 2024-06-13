@@ -20,7 +20,7 @@ export default function Page() {
             <Tank
               type="externo"
               fuel="Etanol"
-              fuelLevel={63}
+              fuelLevel={13}
               fuelCapacity={100}
             />
             <Tank
