@@ -13,7 +13,7 @@ export function Header() {
   return (
     <PageHeader>
       <h1 className="text-xl font-semibold text-slate-600">
-        Equipamentos Ativos
+        Cadastro de tanques
       </h1>
       <div className="flex gap-4">
         <SearchInput />

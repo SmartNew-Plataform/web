@@ -2,10 +2,23 @@
 import { TankType } from '@/@types/fuelling-tank'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
+import { api } from '@/lib/api'
+import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Trash2 } from 'lucide-react'
 
 export function Table() {
+  async function fetchSelects() {
+    const response = await api.get('fuelling/list-tank').then((res) => res.data)
+
+    return response.data
+  }
+
+  const { data } = useQuery({
+    queryKey: ['fuelling/create/data'],
+    queryFn: fetchSelects,
+  })
+
   const columns: ColumnDef<TankType>[] = [
     {
       accessorKey: 'id',
@@ -27,11 +40,11 @@ export function Table() {
       },
     },
     {
-      accessorKey: 'tag',
+      accessorKey: 'model',
       header: 'tag',
     },
     {
-      accessorKey: 'description',
+      accessorKey: 'tank',
       header: 'Descrição',
     },
     {
@@ -44,5 +57,9 @@ export function Table() {
     },
   ]
 
-  return <DataTable columns={columns} data={[]} />
+  return (
+    <>
+      <DataTable columns={columns} data={data || []} />
+    </>
+  )
 }
