@@ -1,11 +1,16 @@
 'use client'
-import { TankType } from '@/@types/fuelling-tank'
+import { TankResponse } from '@/@types/fuelling-tank'
+import { AlertModal } from '@/components/alert-modal'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { FuelModal } from './fuel-modal'
+import { TankModal } from './tank-modal'
 
 export function Table() {
   async function fetchSelects() {
@@ -14,26 +19,56 @@ export function Table() {
     return response.data
   }
 
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ['fuelling/create/data'],
     queryFn: fetchSelects,
   })
 
-  const columns: ColumnDef<TankType>[] = [
+  const [editData, setEditData] = useState<TankResponse | undefined>()
+  const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
+  const [tankIdToCompartment, setTankIdToCompartment] = useState<
+    string | undefined
+  >(undefined)
+
+  async function handleDeleteTank() {
+    const response = await api.delete(`fuelling/tank/${tankIdToDelete}`)
+
+    if (response.status !== 200) return
+
+    toast({
+      title: 'Tanque deletado com sucesso!',
+      variant: 'success',
+    })
+    refetch()
+  }
+
+  const columns: ColumnDef<TankResponse>[] = [
     {
       accessorKey: 'id',
       header: '',
       cell({ row }) {
-        const id = row.getValue('id')
+        const id = row.getValue('id') as string
+        const data = row.original
         console.log(id)
 
         return (
           <div className="flex gap-2">
-            <Button size="icon-xs">
+            <Button onClick={() => setEditData(data)} size="icon-xs">
               <Pencil size={12} />
             </Button>
-            <Button variant="destructive" size="icon-xs">
+            <Button
+              onClick={() => setTankIdToDelete(data.id)}
+              variant="destructive"
+              size="icon-xs"
+            >
               <Trash2 size={12} />
+            </Button>
+            <Button
+              onClick={() => setTankIdToCompartment(id)}
+              variant="outline"
+              size="icon-xs"
+            >
+              <Plus size={12} />
             </Button>
           </div>
         )
@@ -55,11 +90,36 @@ export function Table() {
       accessorKey: 'branch.label',
       header: 'Filial',
     },
+    {
+      accessorKey: 'fuel',
+      header: 'Combustível',
+    },
   ]
 
   return (
     <>
       <DataTable columns={columns} data={data || []} />
+      <TankModal
+        mode="edit"
+        open={!!editData}
+        defaultValues={editData}
+        onOpenChange={(open) => setEditData(open ? editData : undefined)}
+      />
+      <FuelModal
+        tankId={tankIdToCompartment || ''}
+        open={!!tankIdToCompartment}
+        onOpenChange={(open) => {
+          setTankIdToCompartment(open ? tankIdToCompartment : undefined)
+        }}
+      />
+
+      <AlertModal
+        open={!!tankIdToDelete}
+        onOpenChange={(open) =>
+          setTankIdToDelete(open ? tankIdToDelete : undefined)
+        }
+        onConfirm={handleDeleteTank}
+      />
     </>
   )
 }

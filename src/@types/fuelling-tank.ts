@@ -5,5 +5,16 @@ export interface TankType {
   description: string
   tag: string
   capacity: number
-  branch: SelectData[]
+  branch: SelectData
+}
+
+export interface TankResponse {
+  id: number
+  tank: string
+  model: string
+  stock: number
+  odometer: number
+  current: number
+  capacity: number
+  branch: SelectData
 }
