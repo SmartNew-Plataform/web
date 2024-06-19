@@ -53,6 +53,7 @@ export function ModalCategoryForm({
               <Form.Input name="description" id="description-input" />
               <Form.ErrorMessage field="description" />
             </Form.Field>
+
             <Button type="submit">
               <Save size={16} />
               Salvar

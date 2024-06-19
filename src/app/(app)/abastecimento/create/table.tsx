@@ -9,13 +9,12 @@ import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { FuelModal } from './fuel-modal'
+import { FuelModal } from './SheetFuelModal'
 import { TankModal } from './tank-modal'
 
 export function Table() {
   async function fetchSelects() {
     const response = await api.get('fuelling/list-tank').then((res) => res.data)
-
     return response.data
   }
 
