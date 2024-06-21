@@ -3,9 +3,10 @@ import { FuellingType } from '@/@types/fuelling-fuelling'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
 import { ComponentProps } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -17,7 +18,7 @@ const createSupplyFormSchema = z.object({
   receipt: z.string({ required_error: 'Este campo é obrigatório!' }),
   request: z.string({ required_error: 'Este campo é obrigatório!' }),
   date: z.date({ required_error: 'Informe a data do abastecimento!' }),
-  equipament: z.string({ required_error: 'Selecione o equipamento!' }),
+  equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   previous: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   fuel: z.string({ required_error: 'Informe o combustível!' }),
@@ -36,33 +37,19 @@ type EquipmentResponse = {
 export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
 
 interface SupplyModalProps extends ComponentProps<typeof Sheet> {
-  onSubmit: (data: SupplyFormData) => Promise<void>
   mode: 'create' | 'edit'
   defaultValues?: FuellingType
 }
 
-export function FuelForm({ onSubmit, mode, ...props }: SupplyModalProps) {
+export function FuelForm({ mode, ...props }: SupplyModalProps) {
   const createSupplyForm = useForm<SupplyFormData>({
     resolver: zodResolver(createSupplyFormSchema),
   })
 
   const {
     handleSubmit,
-    reset,
-    resetField,
     formState: { isSubmitting },
   } = createSupplyForm
-
-  async function handleSubmitIntermediate(data: SupplyFormData) {
-    await onSubmit(data)
-    if (mode !== 'create') {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      resetField('components', [])
-      return
-    }
-    reset()
-  }
 
   async function loadSelects() {
     const response = await api
@@ -74,6 +61,34 @@ export function FuelForm({ onSubmit, mode, ...props }: SupplyModalProps) {
         label: `${equipmentCode} - ${description}`,
       })),
     }
+  }
+
+  const queryClient = useQueryClient()
+
+  async function handleCreateFuelling({
+    drive,
+    post,
+    receipt,
+    request,
+    date,
+    equipment,
+    fuel,
+  }: SupplyFormData) {
+    const response = await api.post('fuelling/post', {
+      driver: drive,
+      fuelStation: post,
+      fiscalNumber: receipt,
+      requestNumber: request,
+      date,
+      equipment,
+      tankFuelling: fuel,
+    })
+
+    if (response.status !== 201) return
+
+    toast({ title: 'Tanque criado com sucesso', variant: 'success' })
+
+    queryClient.refetchQueries(['fuelling/new-fuelling'])
   }
 
   const { data: selects, isLoading: isLoadingSelects } = useQuery({
@@ -89,7 +104,7 @@ export function FuelForm({ onSubmit, mode, ...props }: SupplyModalProps) {
         <FormProvider {...createSupplyForm}>
           <form
             id="fuellingForm"
-            onSubmit={handleSubmit(handleSubmitIntermediate)}
+            onSubmit={handleSubmit(handleCreateFuelling)}
             className="mt-4 flex h-full w-full flex-col gap-3 overflow-auto overflow-x-hidden"
           >
             <Form.Field>
@@ -122,13 +137,13 @@ export function FuelForm({ onSubmit, mode, ...props }: SupplyModalProps) {
               <Form.SkeletonField />
             ) : (
               <Form.Field>
-                <Form.Label htmlFor="equipament">Equipamento:</Form.Label>
+                <Form.Label htmlFor="equipment">Equipamento:</Form.Label>
                 <Form.Select
-                  name="equipament"
-                  id="equipament"
+                  name="equipment"
+                  id="equipment"
                   options={selects?.equipment}
                 />
-                <Form.ErrorMessage field="equipament" />
+                <Form.ErrorMessage field="equipment" />
               </Form.Field>
             )}
             <div className="flex w-full justify-around gap-2">
