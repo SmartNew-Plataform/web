@@ -9,3 +9,22 @@ export interface FuellingType {
   postName: SelectData
   // ...
 }
+
+export interface ListFuelling {
+  id: number
+  driver: string | null
+  post: string
+  receipt: string
+  request: string
+  date: SelectData[]
+  equipment: SelectData[]
+  counter: number
+  previous: number
+  type: string
+  fuel: SelectData[]
+  quantity: number
+  accomplished: number
+  unitary: number
+  total: number
+  comments: string
+}

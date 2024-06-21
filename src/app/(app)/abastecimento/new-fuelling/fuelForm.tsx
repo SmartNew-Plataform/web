@@ -1,31 +1,49 @@
 'use client'
+import { FuellingType } from '@/@types/fuelling-fuelling'
+import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
-import { ComponentProps, useEffect } from 'react'
+import { ComponentProps } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { StepOne } from './steps/step-one'
 
-const createActiveFormSchema = z.object({})
+const createSupplyFormSchema = z.object({
+  drive: z.string({ required_error: 'Este campo é obrigatório!' }),
+  post: z.string({ required_error: 'Este campo é obrigatório!' }),
+  receipt: z.string({ required_error: 'Este campo é obrigatório!' }),
+  request: z.string({ required_error: 'Este campo é obrigatório!' }),
+  date: z.date({ required_error: 'Informe a data do abastecimento!' }),
+  equipament: z.string({ required_error: 'Selecione o equipamento!' }),
+  counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
+  previous: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
+  fuel: z.string({ required_error: 'Informe o combustível!' }),
+  quantity: z.coerce.number({ required_error: 'Informe a quantidade!' }),
+  accomplished: z.coerce.number({ required_error: 'Informe o consumo!' }),
+  unitary: z.coerce.number({ required_error: 'Informe o valor unitário!' }),
+  total: z.coerce.number({ required_error: 'Informe o custo total!' }),
+})
 
-export type ActiveFormData = z.infer<typeof createActiveFormSchema>
-
-interface ActiveFormProps extends ComponentProps<typeof Sheet> {
-  onSubmit: (data: ActiveFormData) => Promise<void>
-  defaultValues?: ActiveFormData
-  mode: 'create' | 'edit'
+type EquipmentResponse = {
+  id: number
+  equipmentCode: string
+  description: string
 }
 
-export function FuelForm({
-  onSubmit,
-  mode,
-  defaultValues,
-  ...props
-}: ActiveFormProps) {
-  const createActiveForm = useForm<ActiveFormData>({
-    resolver: zodResolver(createActiveFormSchema),
+export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
+
+interface SupplyModalProps extends ComponentProps<typeof Sheet> {
+  onSubmit: (data: SupplyFormData) => Promise<void>
+  mode: 'create' | 'edit'
+  defaultValues?: FuellingType
+}
+
+export function FuelForm({ onSubmit, mode, ...props }: SupplyModalProps) {
+  const createSupplyForm = useForm<SupplyFormData>({
+    resolver: zodResolver(createSupplyFormSchema),
   })
 
   const {
@@ -33,14 +51,9 @@ export function FuelForm({
     reset,
     resetField,
     formState: { isSubmitting },
-  } = createActiveForm
+  } = createSupplyForm
 
-  useEffect(() => {
-    if (!defaultValues) return
-    reset(defaultValues)
-  }, [defaultValues, reset])
-
-  async function handleSubmitIntermediate(data: ActiveFormData) {
+  async function handleSubmitIntermediate(data: SupplyFormData) {
     await onSubmit(data)
     if (mode !== 'create') {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -51,37 +64,136 @@ export function FuelForm({
     reset()
   }
 
+  async function loadSelects() {
+    const response = await api
+      .get<{ data: EquipmentResponse[] }>(`system/equipment`)
+      .then((response) => response.data)
+    return {
+      equipment: response.data.map(({ id, equipmentCode, description }) => ({
+        value: id.toString(),
+        label: `${equipmentCode} - ${description}`,
+      })),
+    }
+  }
+
+  const { data: selects, isLoading: isLoadingSelects } = useQuery({
+    queryKey: ['system/list-equipment'],
+    queryFn: loadSelects,
+  })
   return (
     <Sheet {...props}>
       <SheetContent className="flex max-h-screen w-1/4 flex-col overflow-x-hidden">
-        <FormProvider {...createActiveForm}>
-          <h2 className="mt-4 text-xl font-semibold text-slate-600">
-            Informações do abastecimento
-          </h2>
-
+        <div className="mt-4 flex items-end justify-between border-b border-zinc-200 pb-4">
+          <SheetTitle>Cadastrar abastecimento</SheetTitle>
+        </div>
+        <FormProvider {...createSupplyForm}>
           <form
-            id="active-form"
+            id="fuellingForm"
             onSubmit={handleSubmit(handleSubmitIntermediate)}
             className="mt-4 flex h-full w-full flex-col gap-3 overflow-auto overflow-x-hidden"
           >
-            <StepOne />
-          </form>
-          <div className="w-full gap-3 bg-white pt-4">
-            <div className="flex gap-3">
-              <Button
-                className="w-full"
-                loading={isSubmitting}
-                disabled={isSubmitting}
-                type="submit"
-                variant="success"
-                form="active-form"
-              >
-                <Save size={16} />
-                Salvar
-              </Button>
+            <Form.Field>
+              <Form.Label htmlFor="drive">Motorista:</Form.Label>
+              <Form.Input name="drive" id="drive" />
+              <Form.ErrorMessage field="drive" />
+            </Form.Field>
+            <Form.Field>
+              <Form.Label htmlFor="post">Nome do posto:</Form.Label>
+              <Form.Input name="post" id="post" />
+              <Form.ErrorMessage field="post" />
+            </Form.Field>
+            <Form.Field>
+              <Form.Label htmlFor="receipt">Nota Fiscal:</Form.Label>
+              <Form.Input name="receipt" id="receipt" />
+              <Form.ErrorMessage field="receipt" />
+            </Form.Field>
+
+            <Form.Field>
+              <Form.Label htmlFor="request">N. Requisição:</Form.Label>
+              <Form.Input name="request" id="request" />
+              <Form.ErrorMessage field="request" />
+            </Form.Field>
+            <Form.Field>
+              <Form.Label htmlFor="date">Data abastecimento:</Form.Label>
+              <Form.DatePicker name="date" id="date" />
+              <Form.ErrorMessage field="date" />
+            </Form.Field>
+            {isLoadingSelects ? (
+              <Form.SkeletonField />
+            ) : (
+              <Form.Field>
+                <Form.Label htmlFor="equipament">Equipamento:</Form.Label>
+                <Form.Select
+                  name="equipament"
+                  id="equipament"
+                  options={selects?.equipment}
+                />
+                <Form.ErrorMessage field="equipament" />
+              </Form.Field>
+            )}
+            <div className="flex w-full justify-around gap-2">
+              <Form.Field>
+                <Form.Label htmlFor="counter">Contador atual:</Form.Label>
+                <Form.Input type="number" name="counter" id="counter" />
+                <Form.ErrorMessage field="counter" />
+              </Form.Field>
+              <Form.Field>
+                <Form.Label htmlFor="previous">Contador anterior:</Form.Label>
+                <Form.Input type="number" name="previous" id="previous" />
+                <Form.ErrorMessage field="previous" />
+              </Form.Field>
             </div>
-          </div>
+            {isLoadingSelects ? (
+              <Form.SkeletonField />
+            ) : (
+              <Form.Field>
+                <Form.Label htmlFor="fuel">Combustível:</Form.Label>
+                <Form.Select
+                  name="fuel"
+                  id="fuel"
+                  options={selects?.equipment}
+                />
+                <Form.ErrorMessage field="fuel" />
+              </Form.Field>
+            )}
+            <Form.Field>
+              <Form.Label htmlFor="quantity">Quantidade:</Form.Label>
+              <Form.Input type="number" name="quantity" id="quantity" />
+              <Form.ErrorMessage field="quantity" />
+            </Form.Field>
+            <Form.Field>
+              <Form.Label htmlFor="accomplished">Consumo realizado:</Form.Label>
+              <Form.Input type="number" name="accomplished" id="accomplished" />
+              <Form.ErrorMessage field="accomplished" />
+            </Form.Field>
+            <Form.Field>
+              <Form.Label htmlFor="unitary">Valor UN:</Form.Label>
+              <Form.Input type="number" name="unitary" id="unitary" />
+              <Form.ErrorMessage field="unitary" />
+            </Form.Field>
+            <Form.Field>
+              <Form.Label htmlFor="total">Custo total:</Form.Label>
+              <Form.Input type="number" name="total" id="total" />
+              <Form.ErrorMessage field="total" />
+            </Form.Field>
+            <Form.Field>
+              <Form.Label htmlFor="comments">Observações:</Form.Label>
+              <Form.Input name="comments" id="comments" />
+              <Form.ErrorMessage field="comments" />
+            </Form.Field>
+          </form>
         </FormProvider>
+        <Button
+          loading={isSubmitting}
+          disabled={isSubmitting}
+          type="submit"
+          className="pt-4"
+          variant="success"
+          form="fuellingForm"
+        >
+          <Save size={16} />
+          Salvar
+        </Button>
       </SheetContent>
     </Sheet>
   )

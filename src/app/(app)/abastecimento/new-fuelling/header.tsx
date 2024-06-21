@@ -17,7 +17,7 @@ export function Header() {
         <Plus size={16} />
         Novo abastecimento
       </Button>
-      <FuelForm open={isOpen} onOpenChange={setIsOpen} mode="create" />{' '}
+      <FuelForm open={isOpen} onOpenChange={setIsOpen} mode="create" />
     </PageHeader>
   )
 }

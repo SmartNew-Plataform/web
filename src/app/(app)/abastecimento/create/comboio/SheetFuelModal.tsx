@@ -26,6 +26,7 @@ interface TankFormProps {
   value: string
   fuel: { label: string; value: number }
   capacity: number
+  quantity: number
   id: number
 }
 
@@ -109,12 +110,13 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
           </Button>
         </div>
         <div className="flex h-full flex-col gap-4 overflow-auto">
-          {data?.map(({ fuel, capacity, value, id }) => {
+          {data?.map(({ fuel, capacity, value, id, quantity }) => {
             return (
               <Card key={value}>
                 <CardContent className="relative pt-5">
                   <p>{fuel.label}</p>
                   <p>Capacidade: {capacity}L</p>
+                  <p>Quantidade: {quantity}</p>
                   <div className="absolute right-4 top-4 flex gap-2">
                     <Button
                       onClick={() => setCompartmentIdToDelete(id)}

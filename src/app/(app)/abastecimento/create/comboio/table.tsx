@@ -10,32 +10,34 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { FuelModal } from './SheetFuelModal'
-import { TankModal } from './tank-modal'
+import { TankModal } from './train-modal'
 
 export function Table() {
   async function fetchSelects() {
-    const response = await api.get('fuelling/list-tank').then((res) => res.data)
+    const response = await api
+      .get('fuelling/list-train')
+      .then((res) => res.data)
     return response.data
   }
 
   const { data, refetch } = useQuery({
-    queryKey: ['fuelling/create/data'],
+    queryKey: ['fuelling/train/data'],
     queryFn: fetchSelects,
   })
 
   const [editData, setEditData] = useState<TankResponse | undefined>()
-  const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
-  const [tankIdToCompartment, setTankIdToCompartment] = useState<
+  const [trainIdToDelete, setTrainIdToDelete] = useState<number | undefined>()
+  const [trainIdToCompartment, setTrainIdToCompartment] = useState<
     string | undefined
   >(undefined)
 
   async function handleDeleteTank() {
-    const response = await api.delete(`fuelling/tank/${tankIdToDelete}`)
+    const response = await api.delete(`fuelling/tank/${trainIdToDelete}`)
 
     if (response.status !== 200) return
 
     toast({
-      title: 'Tanque deletado com sucesso!',
+      title: 'Comboio deletado com sucesso!',
       variant: 'success',
     })
     refetch()
@@ -56,14 +58,14 @@ export function Table() {
               <Pencil size={12} />
             </Button>
             <Button
-              onClick={() => setTankIdToDelete(data.id)}
+              onClick={() => setTrainIdToDelete(data.id)}
               variant="destructive"
               size="icon-xs"
             >
               <Trash2 size={12} />
             </Button>
             <Button
-              onClick={() => setTankIdToCompartment(id)}
+              onClick={() => setTrainIdToCompartment(id)}
               variant="outline"
               size="icon-xs"
             >
@@ -90,7 +92,7 @@ export function Table() {
       header: 'Filial',
     },
     {
-      accessorKey: 'fuel',
+      accessorKey: 'compartment',
       header: 'Combustível',
     },
   ]
@@ -105,17 +107,17 @@ export function Table() {
         onOpenChange={(open) => setEditData(open ? editData : undefined)}
       />
       <FuelModal
-        tankId={tankIdToCompartment || ''}
-        open={!!tankIdToCompartment}
+        tankId={trainIdToCompartment || ''}
+        open={!!trainIdToCompartment}
         onOpenChange={(open) => {
-          setTankIdToCompartment(open ? tankIdToCompartment : undefined)
+          setTrainIdToCompartment(open ? trainIdToCompartment : undefined)
         }}
       />
 
       <AlertModal
-        open={!!tankIdToDelete}
+        open={!!trainIdToDelete}
         onOpenChange={(open) =>
-          setTankIdToDelete(open ? tankIdToDelete : undefined)
+          setTrainIdToDelete(open ? trainIdToDelete : undefined)
         }
         onConfirm={handleDeleteTank}
       />
