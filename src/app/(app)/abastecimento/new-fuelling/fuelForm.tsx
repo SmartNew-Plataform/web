@@ -1,23 +1,29 @@
 'use client'
 import { FuellingType } from '@/@types/fuelling-fuelling'
-import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { toast } from '@/components/ui/use-toast'
+import { WizardForm } from '@/components/wizard-form'
+import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
+import { useWizardForm } from '@/hooks/use-wizard-form'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Save } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { ComponentProps } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { StepTwo } from './steps/FormInternal'
+import { StepOne } from './steps/step-one'
+import { StepThree } from './steps/step-three'
 
 const createSupplyFormSchema = z.object({
+  mode: z.string({ required_error: 'Este campo é obrigatório!' }),
+  typeSupplier: z.string({ required_error: 'Este campo é obrigatório!' }),
   drive: z.string({ required_error: 'Este campo é obrigatório!' }),
-  post: z.string({ required_error: 'Este campo é obrigatório!' }),
   receipt: z.string({ required_error: 'Este campo é obrigatório!' }),
   request: z.string({ required_error: 'Este campo é obrigatório!' }),
-  date: z.date({ required_error: 'Informe a data do abastecimento!' }),
+  date: z.coerce.string({ required_error: 'Informe a data do abastecimento!' }),
   equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   previous: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
@@ -26,13 +32,10 @@ const createSupplyFormSchema = z.object({
   accomplished: z.coerce.number({ required_error: 'Informe o consumo!' }),
   unitary: z.coerce.number({ required_error: 'Informe o valor unitário!' }),
   total: z.coerce.number({ required_error: 'Informe o custo total!' }),
+  compartment: z.string({ required_error: 'Este campo é obrigatório!' }),
+  tank: z.string().optional(),
+  train: z.string().optional(),
 })
-
-type EquipmentResponse = {
-  id: number
-  equipmentCode: string
-  description: string
-}
 
 export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
 
@@ -51,19 +54,9 @@ export function FuelForm({ mode, ...props }: SupplyModalProps) {
     formState: { isSubmitting },
   } = createSupplyForm
 
-  async function loadSelects() {
-    const response = await api
-      .get<{ data: EquipmentResponse[] }>(`system/equipment`)
-      .then((response) => response.data)
-    return {
-      equipment: response.data.map(({ id, equipmentCode, description }) => ({
-        value: id.toString(),
-        label: `${equipmentCode} - ${description}`,
-      })),
-    }
-  }
-
   const queryClient = useQueryClient()
+  const createActiveWizardForm = useWizardForm()
+  const { paginate, lastStep, firstStep } = createActiveWizardForm
 
   async function handleCreateFuelling({
     drive,
@@ -86,15 +79,15 @@ export function FuelForm({ mode, ...props }: SupplyModalProps) {
 
     if (response.status !== 201) return
 
-    toast({ title: 'Tanque criado com sucesso', variant: 'success' })
+    toast({ title: 'Abastecimento criado com sucesso', variant: 'success' })
 
     queryClient.refetchQueries(['fuelling/new-fuelling'])
   }
 
-  const { data: selects, isLoading: isLoadingSelects } = useQuery({
-    queryKey: ['system/list-equipment'],
-    queryFn: loadSelects,
-  })
+  function handleNextStep() {
+    paginate({ newDirection: 1 })
+  }
+
   return (
     <Sheet {...props}>
       <SheetContent className="flex max-h-screen w-1/4 flex-col overflow-x-hidden">
@@ -107,108 +100,50 @@ export function FuelForm({ mode, ...props }: SupplyModalProps) {
             onSubmit={handleSubmit(handleCreateFuelling)}
             className="mt-4 flex h-full w-full flex-col gap-3 overflow-auto overflow-x-hidden"
           >
-            <Form.Field>
-              <Form.Label htmlFor="drive">Motorista:</Form.Label>
-              <Form.Input name="drive" id="drive" />
-              <Form.ErrorMessage field="drive" />
-            </Form.Field>
-            <Form.Field>
-              <Form.Label htmlFor="post">Nome do posto:</Form.Label>
-              <Form.Input name="post" id="post" />
-              <Form.ErrorMessage field="post" />
-            </Form.Field>
-            <Form.Field>
-              <Form.Label htmlFor="receipt">Nota Fiscal:</Form.Label>
-              <Form.Input name="receipt" id="receipt" />
-              <Form.ErrorMessage field="receipt" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="request">N. Requisição:</Form.Label>
-              <Form.Input name="request" id="request" />
-              <Form.ErrorMessage field="request" />
-            </Form.Field>
-            <Form.Field>
-              <Form.Label htmlFor="date">Data abastecimento:</Form.Label>
-              <Form.DatePicker name="date" id="date" />
-              <Form.ErrorMessage field="date" />
-            </Form.Field>
-            {isLoadingSelects ? (
-              <Form.SkeletonField />
-            ) : (
-              <Form.Field>
-                <Form.Label htmlFor="equipment">Equipamento:</Form.Label>
-                <Form.Select
-                  name="equipment"
-                  id="equipment"
-                  options={selects?.equipment}
-                />
-                <Form.ErrorMessage field="equipment" />
-              </Form.Field>
-            )}
-            <div className="flex w-full justify-around gap-2">
-              <Form.Field>
-                <Form.Label htmlFor="counter">Contador atual:</Form.Label>
-                <Form.Input type="number" name="counter" id="counter" />
-                <Form.ErrorMessage field="counter" />
-              </Form.Field>
-              <Form.Field>
-                <Form.Label htmlFor="previous">Contador anterior:</Form.Label>
-                <Form.Input type="number" name="previous" id="previous" />
-                <Form.ErrorMessage field="previous" />
-              </Form.Field>
-            </div>
-            {isLoadingSelects ? (
-              <Form.SkeletonField />
-            ) : (
-              <Form.Field>
-                <Form.Label htmlFor="fuel">Combustível:</Form.Label>
-                <Form.Select
-                  name="fuel"
-                  id="fuel"
-                  options={selects?.equipment}
-                />
-                <Form.ErrorMessage field="fuel" />
-              </Form.Field>
-            )}
-            <Form.Field>
-              <Form.Label htmlFor="quantity">Quantidade:</Form.Label>
-              <Form.Input type="number" name="quantity" id="quantity" />
-              <Form.ErrorMessage field="quantity" />
-            </Form.Field>
-            <Form.Field>
-              <Form.Label htmlFor="accomplished">Consumo realizado:</Form.Label>
-              <Form.Input type="number" name="accomplished" id="accomplished" />
-              <Form.ErrorMessage field="accomplished" />
-            </Form.Field>
-            <Form.Field>
-              <Form.Label htmlFor="unitary">Valor UN:</Form.Label>
-              <Form.Input type="number" name="unitary" id="unitary" />
-              <Form.ErrorMessage field="unitary" />
-            </Form.Field>
-            <Form.Field>
-              <Form.Label htmlFor="total">Custo total:</Form.Label>
-              <Form.Input type="number" name="total" id="total" />
-              <Form.ErrorMessage field="total" />
-            </Form.Field>
-            <Form.Field>
-              <Form.Label htmlFor="comments">Observações:</Form.Label>
-              <Form.Input name="comments" id="comments" />
-              <Form.ErrorMessage field="comments" />
-            </Form.Field>
+            <WizardForm {...createActiveWizardForm}>
+              <WizardFormStep>
+                <StepOne />
+              </WizardFormStep>
+              <WizardFormStep>
+                <StepTwo />
+              </WizardFormStep>
+              <WizardFormStep>
+                <StepThree />
+              </WizardFormStep>
+            </WizardForm>
           </form>
+          <div className="flex w-full justify-between gap-3 bg-white pt-4">
+            <Button
+              type="submit"
+              variant="outline"
+              size="icon"
+              onClick={() => paginate({ newDirection: -1 })}
+              disabled={firstStep}
+            >
+              <ChevronLeft size={16} />
+            </Button>
+
+            <Button
+              className="w-full"
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              type="submit"
+              variant="success"
+              form="fuellingForm"
+            >
+              <Save size={16} />
+              Salvar
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleNextStep}
+              disabled={lastStep}
+              size="icon"
+            >
+              <ChevronRight size={16} />
+            </Button>
+          </div>
         </FormProvider>
-        <Button
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          type="submit"
-          className="pt-4"
-          variant="success"
-          form="fuellingForm"
-        >
-          <Save size={16} />
-          Salvar
-        </Button>
       </SheetContent>
     </Sheet>
   )

@@ -17,4 +17,13 @@ export interface TankResponse {
   current: number
   capacity: number
   branch: SelectData
+  compartmentAll: Array<{
+    id: number
+    capacity: number
+    quantity: number
+    fuel: {
+      value: number
+      label: string
+    }
+  }>
 }

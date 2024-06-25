@@ -28,3 +28,18 @@ export interface ListFuelling {
   total: number
   comments: string
 }
+
+export interface TrainData {
+  id: number
+  train: string
+  compartmentAll: Array<{
+    id: number
+    capacity: number
+    quantity: number
+    odometer: number
+    fuel: {
+      value: number
+      label: string
+    }
+  }>
+}
