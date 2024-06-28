@@ -21,6 +21,7 @@ export interface TankResponse {
     id: number
     capacity: number
     quantity: number
+    odometer: number
     fuel: {
       value: number
       label: string

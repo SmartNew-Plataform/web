@@ -9,25 +9,28 @@ import { useWizardForm } from '@/hooks/use-wizard-form'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { ComponentProps } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { StepTwo } from './steps/FormInternal'
 import { StepOne } from './steps/step-one'
 import { StepThree } from './steps/step-three'
+import { StepTwo } from './steps/step-two'
 
 const createSupplyFormSchema = z.object({
-  mode: z.string({ required_error: 'Este campo é obrigatório!' }),
+  type: z.string({ required_error: 'Este campo é obrigatório!' }),
   typeSupplier: z.string({ required_error: 'Este campo é obrigatório!' }),
   drive: z.string({ required_error: 'Este campo é obrigatório!' }),
   receipt: z.string({ required_error: 'Este campo é obrigatório!' }),
+  odometerPrevious: z.coerce.number().optional().nullable(),
+  odometer: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   request: z.string({ required_error: 'Este campo é obrigatório!' }),
   date: z.coerce.string({ required_error: 'Informe a data do abastecimento!' }),
   equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
-  previous: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
-  fuel: z.string({ required_error: 'Informe o combustível!' }),
+  last: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
+  fuel: z.string({ required_error: 'Informe o combustível!' }).optional(),
   quantity: z.coerce.number({ required_error: 'Informe a quantidade!' }),
   accomplished: z.coerce.number({ required_error: 'Informe o consumo!' }),
   unitary: z.coerce.number({ required_error: 'Informe o valor unitário!' }),
@@ -51,37 +54,41 @@ export function FuelForm({ mode, ...props }: SupplyModalProps) {
 
   const {
     handleSubmit,
+    setError,
     formState: { isSubmitting },
   } = createSupplyForm
 
   const queryClient = useQueryClient()
   const createActiveWizardForm = useWizardForm()
-  const { paginate, lastStep, firstStep } = createActiveWizardForm
+  const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
 
-  async function handleCreateFuelling({
-    drive,
-    post,
-    receipt,
-    request,
-    date,
-    equipment,
-    fuel,
-  }: SupplyFormData) {
-    const response = await api.post('fuelling/post', {
-      driver: drive,
-      fuelStation: post,
-      fiscalNumber: receipt,
-      requestNumber: request,
-      date,
-      equipment,
-      tankFuelling: fuel,
+  async function handleCreateFuelling(data: SupplyFormData) {
+    if (data.odometer > (data?.odometerPrevious || 0)) {
+      setError('odometer', {
+        message: 'Este campo não pode ser maior que o campo anterior',
+      })
+      return
+    }
+
+    if (data.counter < (data.last || 0)) {
+      setError('counter', {
+        message: 'Este campo não pode ser menor que anterior',
+      })
+      return
+    }
+
+    const response = await api.post('fuelling/', {
+      ...data,
+      equipmentId: data.equipment,
+      type: data.type,
+      fuelId: data.fuel,
+      value: data.unitary,
     })
 
     if (response.status !== 201) return
-
     toast({ title: 'Abastecimento criado com sucesso', variant: 'success' })
 
-    queryClient.refetchQueries(['fuelling/new-fuelling'])
+    queryClient.refetchQueries(['fuelling/data'])
   }
 
   function handleNextStep() {
@@ -95,6 +102,12 @@ export function FuelForm({ mode, ...props }: SupplyModalProps) {
           <SheetTitle>Cadastrar abastecimento</SheetTitle>
         </div>
         <FormProvider {...createSupplyForm}>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+            <motion.div
+              className="h-full bg-violet-500"
+              animate={{ width: `${percentSteps}%` }}
+            />
+          </div>
           <form
             id="fuellingForm"
             onSubmit={handleSubmit(handleCreateFuelling)}

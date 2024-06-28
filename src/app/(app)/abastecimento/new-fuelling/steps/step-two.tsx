@@ -24,9 +24,9 @@ export function StepTwo() {
         <Form.ErrorMessage field="accomplished" />
       </Form.Field>
       <Form.Field>
-        <Form.Label htmlFor="unitary">Odômetro:</Form.Label>
-        <Form.Input type="number" name="unitary" id="unitary" />
-        <Form.ErrorMessage field="unitary" />
+        <Form.Label htmlFor="last">Contador anterior:</Form.Label>
+        <Form.Input type="number" name="last" id="last" readOnly />
+        <Form.ErrorMessage field="last" />
       </Form.Field>
       <Form.Field>
         <Form.Label htmlFor="counter">Contador atual:</Form.Label>

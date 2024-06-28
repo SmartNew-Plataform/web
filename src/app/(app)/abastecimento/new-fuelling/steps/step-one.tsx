@@ -4,13 +4,16 @@ import { TankResponse } from '@/@types/fuelling-tank'
 import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { api } from '@/lib/api'
-import { useFuelling } from '@/store/fuelling/fuelling'
 import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-export function StepOne() {
-  const { setCurrentCompartment } = useFuelling()
+type EquipmentResponse = SelectData & {
+  type: 'KM/L' | 'L/HR'
+  counter: number
+}
 
+export function StepOne() {
   async function loadSelects() {
     const response = await api
       .get<{ data: TankResponse[] }>(`fuelling/tank`)
@@ -21,11 +24,24 @@ export function StepOne() {
     const responsePost = await api
       .get<{ data: SelectData[] }>(`fuelling/list-fuel-station`)
       .then((response) => response.data)
+    const responseDriver = await api
+      .get<{ data: SelectData[] }>(`fuelling/list-driver`)
+      .then((response) => response.data)
+    const responseEquipament = await api
+      .get<EquipmentResponse[]>(`fuelling/list-equipment`)
+      .then((response) => response.data)
 
     return {
       tank: response.data,
       train: responseTrain.data,
       post: responsePost.data,
+      driver: responseDriver.data,
+      equipment: responseEquipament.map(({ type, counter, label, value }) => ({
+        value,
+        label,
+        counter,
+        type,
+      })),
     }
   }
 
@@ -34,7 +50,7 @@ export function StepOne() {
     queryFn: loadSelects,
   })
 
-  const { watch } = useFormContext()
+  const { watch, setValue } = useFormContext()
   const mode = watch('mode')
   const supplier = watch('typeSupplier') as 'tank' | 'train' | 'post'
 
@@ -72,21 +88,34 @@ export function StepOne() {
       )
     : undefined
   const compartmentOptions = supplierMethodData?.compartment
-    ? supplierMethodData?.compartment.map(({ fuel, id }) => ({
+    ? supplierMethodData?.compartment.map(({ fuel, id, odometer }) => ({
         label: fuel.label,
         value: id.toString(),
+        odometer,
       }))
     : undefined
 
   const compartmentValue = watch('compartment')
+  const odometer = compartmentOptions?.find(
+    ({ value }) => value === compartmentValue,
+  )?.odometer
+
+  const equipmentValue = watch('equipment')
+  const counter = selects?.equipment.find(
+    ({ value }) => value === equipmentValue,
+  )?.counter
+
+  useEffect(() => {
+    setValue('last', counter)
+  }, [equipmentValue])
 
   return (
     <>
       <Form.Field>
         <Form.Label>Tipo:</Form.Label>
         <Form.Select
-          name="mode"
-          id="mode"
+          name="type"
+          id="type"
           options={[
             {
               label: 'Interno',
@@ -98,8 +127,22 @@ export function StepOne() {
             },
           ]}
         />
-        <Form.ErrorMessage field="mode" />
+        <Form.ErrorMessage field="type" />
       </Form.Field>
+
+      {isLoadingSelects ? (
+        <Form.SkeletonField />
+      ) : (
+        <Form.Field>
+          <Form.Label htmlFor="equipment">Equipamento:</Form.Label>
+          <Form.Select
+            name="equipment"
+            id="equipment"
+            options={selects?.equipment}
+          />
+          <Form.ErrorMessage field="equipment" />
+        </Form.Field>
+      )}
 
       {mode === 'internal' ? (
         <Form.Field>
@@ -164,10 +207,28 @@ export function StepOne() {
           <Form.ErrorMessage field="compartment" />
         </Form.Field>
       )}
+      {selects?.driver && (
+        <Form.Field>
+          <Form.Label htmlFor="driver">Motorista:</Form.Label>
+          <Form.Select name="driver" id="driver" options={selects?.driver} />
+          <Form.ErrorMessage field="driver" />
+        </Form.Field>
+      )}
       <Form.Field>
-        <Form.Label htmlFor="drive">Motorista:</Form.Label>
-        <Form.Input name="drive" id="drive" />
-        <Form.ErrorMessage field="drive" />
+        <Form.Label htmlFor="odometerPrevious">Odômetro anterior:</Form.Label>
+        <Form.Input
+          type="number"
+          name="odometerPrevious"
+          id="odometerPrevious"
+          value={odometer || 0}
+          readOnly
+        />
+        <Form.ErrorMessage field="odometerPrevious" />
+      </Form.Field>
+      <Form.Field>
+        <Form.Label htmlFor="previous">Odômetro atual:</Form.Label>
+        <Form.Input type="number" name="previous" id="previous" />
+        <Form.ErrorMessage field="previous" />
       </Form.Field>
     </>
   )

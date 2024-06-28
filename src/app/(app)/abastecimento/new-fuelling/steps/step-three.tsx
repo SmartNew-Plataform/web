@@ -1,30 +1,6 @@
 import { Form } from '@/components/form'
-import { api } from '@/lib/api'
-import { useQuery } from '@tanstack/react-query'
-
-type EquipmentResponse = {
-  id: number
-  equipmentCode: string
-  description: string
-}
 
 export function StepThree() {
-  async function loadSelects() {
-    const response = await api
-      .get<{ data: EquipmentResponse[] }>(`system/equipment`)
-      .then((response) => response.data)
-    return {
-      equipment: response.data.map(({ id, equipmentCode, description }) => ({
-        value: id.toString(),
-        label: `${equipmentCode} - ${description}`,
-      })),
-    }
-  }
-
-  const { data: selects, isLoading: isLoadingSelects } = useQuery({
-    queryKey: ['system/list-equipment'],
-    queryFn: loadSelects,
-  })
   return (
     <>
       <Form.Field>
@@ -43,33 +19,11 @@ export function StepThree() {
         <Form.Input type="date" name="date" id="date" />
         <Form.ErrorMessage field="date" />
       </Form.Field>
-      {isLoadingSelects ? (
-        <Form.SkeletonField />
-      ) : (
-        <Form.Field>
-          <Form.Label htmlFor="equipment">Equipamento:</Form.Label>
-          <Form.Select
-            name="equipment"
-            id="equipment"
-            options={selects?.equipment}
-          />
-          <Form.ErrorMessage field="equipment" />
-        </Form.Field>
-      )}
-      {isLoadingSelects ? (
-        <Form.SkeletonField />
-      ) : (
-        <Form.Field>
-          <Form.Label htmlFor="fuel">Combustível:</Form.Label>
-          <Form.Select name="fuel" id="fuel" options={selects?.equipment} />
-          <Form.ErrorMessage field="fuel" />
-        </Form.Field>
-      )}
 
       <Form.Field>
-        <Form.Label htmlFor="previous">Contador anterior:</Form.Label>
-        <Form.Input type="number" name="previous" id="previous" />
-        <Form.ErrorMessage field="previous" />
+        <Form.Label htmlFor="fuel">Combustível:</Form.Label>
+        <Form.Select name="fuel" id="fuel" />
+        <Form.ErrorMessage field="fuel" />
       </Form.Field>
 
       <Form.Field>

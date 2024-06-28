@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import dayjs from 'dayjs'
+import { Pencil, Trash2 } from 'lucide-react'
 
 export function Table() {
   async function fetchSelects() {
@@ -34,9 +35,6 @@ export function Table() {
             <Button variant="destructive" size="icon-xs">
               <Trash2 size={12} />
             </Button>
-            <Button variant="outline" size="icon-xs">
-              <Plus size={12} />
-            </Button>
           </div>
         )
       },
@@ -55,12 +53,16 @@ export function Table() {
       header: 'Nota fiscal',
     },
     {
-      accessorKey: 'request',
-      header: 'Numero requisição',
+      accessorKey: 'requestNumber',
+      header: 'Número requerimento',
     },
     {
       accessorKey: 'date',
       header: 'Data abastecimento',
+      cell({ getValue }) {
+        const date = getValue() as string
+        return dayjs(date).format('DD/MM/YYYY')
+      },
     },
     {
       accessorKey: 'equipment',
@@ -75,7 +77,7 @@ export function Table() {
       header: 'Contador atual',
     },
     {
-      accessorKey: 'previous',
+      accessorKey: 'counterLast',
       header: 'Contador anterior',
     },
     {
@@ -87,11 +89,11 @@ export function Table() {
       header: 'Quantidade',
     },
     {
-      accessorKey: 'accomplished',
+      accessorKey: 'consumption',
       header: 'Cons Realizado',
     },
     {
-      accessorKey: 'unitary',
+      accessorKey: 'value',
       header: 'Valor UN',
     },
     {
