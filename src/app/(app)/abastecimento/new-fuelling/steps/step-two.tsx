@@ -34,20 +34,15 @@ export function StepTwo() {
         <Form.ErrorMessage field="counter" />
       </Form.Field>
       <Form.Field>
-        <Form.Label htmlFor="unitary">Valor Unitário:</Form.Label>
-        <Form.Input
-          placeholder="5,96"
-          type="number"
-          name="unitary"
-          id="unitary"
-        />
-        <Form.ErrorMessage field="unitary" />
+        <Form.Label htmlFor="value">Valor Unitário:</Form.Label>
+        <Form.Input placeholder="5,96" type="number" name="value" id="value" />
+        <Form.ErrorMessage field="value" />
       </Form.Field>
-      <Form.Field>
+      {/* <Form.Field>
         <Form.Label htmlFor="total">Custo total:</Form.Label>
         <Form.Input type="number" name="total" id="total" />
         <Form.ErrorMessage field="total" />
-      </Form.Field>
+      </Form.Field> */}
     </>
   )
 }

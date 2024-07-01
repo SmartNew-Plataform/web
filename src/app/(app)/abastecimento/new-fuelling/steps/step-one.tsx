@@ -51,7 +51,7 @@ export function StepOne() {
   })
 
   const { watch, setValue } = useFormContext()
-  const mode = watch('mode')
+  const mode = watch('type')
   const supplier = watch('typeSupplier') as 'tank' | 'train' | 'post'
 
   const typeSupplierOptions = {
@@ -87,6 +87,7 @@ export function StepOne() {
         (item) => item.value === supplierMethodValue,
       )
     : undefined
+
   const compartmentOptions = supplierMethodData?.compartment
     ? supplierMethodData?.compartment.map(({ fuel, id, odometer }) => ({
         label: fuel.label,
@@ -96,6 +97,7 @@ export function StepOne() {
     : undefined
 
   const compartmentValue = watch('compartment')
+
   const odometer = compartmentOptions?.find(
     ({ value }) => value === compartmentValue,
   )?.odometer
@@ -104,6 +106,19 @@ export function StepOne() {
   const counter = selects?.equipment.find(
     ({ value }) => value === equipmentValue,
   )?.counter
+
+  const selectedCompartment = compartmentOptions?.find(
+    (option) => option.value === compartmentValue,
+  )
+  const selectedFuel = compartmentOptions?.find(
+    (id) => id.value === compartmentValue,
+  )
+
+  useEffect(() => {
+    if (selectedCompartment) {
+      setValue('fuel', selectedCompartment.label)
+    }
+  }, [selectedFuel])
 
   useEffect(() => {
     setValue('last', counter)
@@ -119,11 +134,11 @@ export function StepOne() {
           options={[
             {
               label: 'Interno',
-              value: 'internal',
+              value: 'INTERNO',
             },
             {
               label: 'Externo',
-              value: 'external',
+              value: 'EXTERNO',
             },
           ]}
         />
@@ -144,7 +159,7 @@ export function StepOne() {
         </Form.Field>
       )}
 
-      {mode === 'internal' ? (
+      {mode === 'INTERNO' ? (
         <Form.Field>
           <Form.Label>Tipo de abastecedor:</Form.Label>
           <Form.Select
@@ -207,6 +222,7 @@ export function StepOne() {
           <Form.ErrorMessage field="compartment" />
         </Form.Field>
       )}
+
       {selects?.driver && (
         <Form.Field>
           <Form.Label htmlFor="driver">Motorista:</Form.Label>
@@ -226,9 +242,9 @@ export function StepOne() {
         <Form.ErrorMessage field="odometerPrevious" />
       </Form.Field>
       <Form.Field>
-        <Form.Label htmlFor="previous">Odômetro atual:</Form.Label>
-        <Form.Input type="number" name="previous" id="previous" />
-        <Form.ErrorMessage field="previous" />
+        <Form.Label htmlFor="odometer">Odômetro atual:</Form.Label>
+        <Form.Input type="number" name="odometer" id="odometer" />
+        <Form.ErrorMessage field="odometer" />
       </Form.Field>
     </>
   )

@@ -22,7 +22,7 @@ export function StepThree() {
 
       <Form.Field>
         <Form.Label htmlFor="fuel">Combustível:</Form.Label>
-        <Form.Select name="fuel" id="fuel" />
+        <Form.Input name="fuel" id="fuel" readOnly />
         <Form.ErrorMessage field="fuel" />
       </Form.Field>
 
@@ -32,9 +32,8 @@ export function StepThree() {
         <Form.ErrorMessage field="comments" />
       </Form.Field>
       <Form.Field className="pb-4">
-        <Form.Label htmlFor="comments">Imagens</Form.Label>
+        <Form.Label htmlFor="images">Imagens</Form.Label>
         <Form.ImagePicker accept="image/*" name="images" />
-        <Form.ErrorMessage field="comments" />
       </Form.Field>
     </>
   )

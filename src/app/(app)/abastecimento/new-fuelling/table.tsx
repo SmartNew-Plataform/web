@@ -1,23 +1,42 @@
 'use client'
 import { ListFuelling } from '@/@types/fuelling-fuelling'
+import { AlertModal } from '@/components/alert-modal'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Pencil, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 
 export function Table() {
+  const [fuellingIdToDelete, setFuellingIdToDelete] = useState<
+    number | undefined
+  >()
+
   async function fetchSelects() {
     const response = await api.get('fuelling/info').then((res) => res.data)
     return response.data
   }
 
-  const { data } = useQuery({
-    queryKey: ['fuelling/data'],
+  const { data, refetch } = useQuery({
+    queryKey: ['fuelling/delete/data'],
     queryFn: fetchSelects,
   })
+
+  async function handleDeleteFuelling() {
+    const response = await api.delete(`fuelling/${fuellingIdToDelete}`)
+
+    if (response.status !== 200) return
+
+    toast({
+      title: 'Abastecimento deletado com sucesso!',
+      variant: 'success',
+    })
+    refetch()
+  }
 
   const columns: ColumnDef<ListFuelling>[] = [
     {
@@ -25,6 +44,7 @@ export function Table() {
       header: '',
       cell({ row }) {
         const id = row.getValue('id') as string
+        const data = row.original
         console.log(id)
 
         return (
@@ -32,7 +52,11 @@ export function Table() {
             <Button size="icon-xs">
               <Pencil size={12} />
             </Button>
-            <Button variant="destructive" size="icon-xs">
+            <Button
+              onClick={() => setFuellingIdToDelete(data.id)}
+              variant="destructive"
+              size="icon-xs"
+            >
               <Trash2 size={12} />
             </Button>
           </div>
@@ -105,5 +129,17 @@ export function Table() {
       header: 'Observações',
     },
   ]
-  return <DataTable columns={columns} data={data || []} />
+  return (
+    <>
+      <DataTable columns={columns} data={data || []} />
+
+      <AlertModal
+        open={!!fuellingIdToDelete}
+        onOpenChange={(open) =>
+          setFuellingIdToDelete(open ? fuellingIdToDelete : undefined)
+        }
+        onConfirm={handleDeleteFuelling}
+      />
+    </>
+  )
 }

@@ -1,8 +1,7 @@
 'use client'
-import { FuellingType } from '@/@types/fuelling-fuelling'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
-import { toast } from '@/components/ui/use-toast'
+import { useToast } from '@/components/ui/use-toast'
 import { WizardForm } from '@/components/wizard-form'
 import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
 import { useWizardForm } from '@/hooks/use-wizard-form'
@@ -21,8 +20,7 @@ import { StepTwo } from './steps/step-two'
 const createSupplyFormSchema = z.object({
   type: z.string({ required_error: 'Este campo é obrigatório!' }),
   typeSupplier: z.string({ required_error: 'Este campo é obrigatório!' }),
-  drive: z.string({ required_error: 'Este campo é obrigatório!' }),
-  receipt: z.string({ required_error: 'Este campo é obrigatório!' }),
+  driver: z.string({ required_error: 'Este campo é obrigatório!' }),
   odometerPrevious: z.coerce.number().optional().nullable(),
   odometer: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   request: z.string({ required_error: 'Este campo é obrigatório!' }),
@@ -30,11 +28,10 @@ const createSupplyFormSchema = z.object({
   equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   last: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
-  fuel: z.string({ required_error: 'Informe o combustível!' }).optional(),
+  fuel: z.string().optional(),
   quantity: z.coerce.number({ required_error: 'Informe a quantidade!' }),
   accomplished: z.coerce.number({ required_error: 'Informe o consumo!' }),
-  unitary: z.coerce.number({ required_error: 'Informe o valor unitário!' }),
-  total: z.coerce.number({ required_error: 'Informe o custo total!' }),
+  value: z.coerce.number({ required_error: 'Informe o valor unitário!' }),
   compartment: z.string({ required_error: 'Este campo é obrigatório!' }),
   tank: z.string().optional(),
   train: z.string().optional(),
@@ -44,50 +41,42 @@ export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
 
 interface SupplyModalProps extends ComponentProps<typeof Sheet> {
   mode: 'create' | 'edit'
-  defaultValues?: FuellingType
+  defaultValues?: SupplyFormData
 }
 
-export function FuelForm({ mode, ...props }: SupplyModalProps) {
+export function FuelForm({ defaultValues, mode, ...props }: SupplyModalProps) {
   const createSupplyForm = useForm<SupplyFormData>({
     resolver: zodResolver(createSupplyFormSchema),
+    defaultValues,
   })
 
   const {
     handleSubmit,
-    setError,
+    reset,
     formState: { isSubmitting },
   } = createSupplyForm
 
+  const { toast } = useToast()
   const queryClient = useQueryClient()
+
   const createActiveWizardForm = useWizardForm()
   const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
 
   async function handleCreateFuelling(data: SupplyFormData) {
-    if (data.odometer > (data?.odometerPrevious || 0)) {
-      setError('odometer', {
-        message: 'Este campo não pode ser maior que o campo anterior',
-      })
-      return
-    }
-
-    if (data.counter < (data.last || 0)) {
-      setError('counter', {
-        message: 'Este campo não pode ser menor que anterior',
-      })
-      return
-    }
-
-    const response = await api.post('fuelling/', {
+    const response = api.post('fuelling/', {
       ...data,
       equipmentId: data.equipment,
       type: data.type,
-      fuelId: data.fuel,
-      value: data.unitary,
+      fuelId: data.compartment,
+      value: data.value,
     })
 
     if (response.status !== 201) return
-    toast({ title: 'Abastecimento criado com sucesso', variant: 'success' })
 
+    toast({
+      title: 'Diverso criado com sucesso!',
+      variant: 'success',
+    })
     queryClient.refetchQueries(['fuelling/data'])
   }
 
@@ -125,6 +114,7 @@ export function FuelForm({ mode, ...props }: SupplyModalProps) {
               </WizardFormStep>
             </WizardForm>
           </form>
+
           <div className="flex w-full justify-between gap-3 bg-white pt-4">
             <Button
               type="submit"
