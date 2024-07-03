@@ -13,6 +13,12 @@ type EquipmentResponse = SelectData & {
   counter: number
 }
 
+type FuelType = {
+  value: string
+  label: string
+  unity: string
+}
+
 export function StepOne() {
   async function loadSelects() {
     const response = await api
@@ -30,6 +36,9 @@ export function StepOne() {
     const responseEquipament = await api
       .get<EquipmentResponse[]>(`fuelling/list-equipment`)
       .then((response) => response.data)
+    const responseFuel = await api
+      .get<{ data: FuelType[] }>(`fuelling/list-fuel`)
+      .then((response) => response.data)
 
     return {
       tank: response.data,
@@ -42,11 +51,12 @@ export function StepOne() {
         counter,
         type,
       })),
+      fuel: responseFuel.data,
     }
   }
 
   const { data: selects, isLoading: isLoadingSelects } = useQuery({
-    queryKey: ['fuelling/list-tank'],
+    queryKey: ['fuelling/list-fuel'],
     queryFn: loadSelects,
   })
 
@@ -107,21 +117,13 @@ export function StepOne() {
     ({ value }) => value === equipmentValue,
   )?.counter
 
-  const selectedCompartment = compartmentOptions?.find(
-    (option) => option.value === compartmentValue,
-  )
-  const selectedFuel = compartmentOptions?.find(
-    (id) => id.value === compartmentValue,
-  )
-
-  useEffect(() => {
-    if (selectedCompartment) {
-      setValue('fuel', selectedCompartment.label)
-    }
-  }, [selectedFuel])
+  const typeConsumption = selects?.equipment.find(
+    ({ value }) => value === equipmentValue,
+  )?.type
 
   useEffect(() => {
     setValue('last', counter)
+    setValue('typeEquipment', typeConsumption)
   }, [equipmentValue])
 
   return (
@@ -159,7 +161,7 @@ export function StepOne() {
         </Form.Field>
       )}
 
-      {mode === 'INTERNO' ? (
+      {mode === 'EXTERNO' ? (
         <Form.Field>
           <Form.Label>Tipo de abastecedor:</Form.Label>
           <Form.Select
@@ -208,10 +210,10 @@ export function StepOne() {
             id={supplier}
             options={typeSupplierOptions[supplier].options}
           />
-          <Form.ErrorMessage field={supplier} />
+          <Form.ErrorMessage field="supplier" />
         </Form.Field>
       )}
-      {compartmentOptions && (
+      {compartmentOptions ? (
         <Form.Field>
           <Form.Label>Compartimento:</Form.Label>
           <Form.Select
@@ -221,8 +223,14 @@ export function StepOne() {
           />
           <Form.ErrorMessage field="compartment" />
         </Form.Field>
+      ) : undefined}
+      {selects?.fuel && (
+        <Form.Field>
+          <Form.Label htmlFor="fuel">Combustível:</Form.Label>
+          <Form.Select name="fuel" id="fuel" options={selects?.fuel} />
+          <Form.ErrorMessage field="fuel" />
+        </Form.Field>
       )}
-
       {selects?.driver && (
         <Form.Field>
           <Form.Label htmlFor="driver">Motorista:</Form.Label>

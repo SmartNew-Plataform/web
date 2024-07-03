@@ -1,13 +1,10 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
-import { useToast } from '@/components/ui/use-toast'
 import { WizardForm } from '@/components/wizard-form'
 import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
 import { useWizardForm } from '@/hooks/use-wizard-form'
-import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { ComponentProps } from 'react'
@@ -21,20 +18,26 @@ const createSupplyFormSchema = z.object({
   type: z.string({ required_error: 'Este campo é obrigatório!' }),
   typeSupplier: z.string({ required_error: 'Este campo é obrigatório!' }),
   driver: z.string({ required_error: 'Este campo é obrigatório!' }),
-  odometerPrevious: z.coerce.number().optional().nullable(),
+  odometerPrevious: z.coerce.number().optional(),
   odometer: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
+  receipt: z.coerce.string({ required_error: 'Este campo é obrigatório!' }),
   request: z.string({ required_error: 'Este campo é obrigatório!' }),
-  date: z.coerce.string({ required_error: 'Informe a data do abastecimento!' }),
+  date: z.string({ required_error: 'Informe a data do abastecimento!' }),
   equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   last: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
-  fuel: z.string().optional(),
+  fuel: z.string({ required_error: 'Selecione o combustível' }),
   quantity: z.coerce.number({ required_error: 'Informe a quantidade!' }),
-  accomplished: z.coerce.number({ required_error: 'Informe o consumo!' }),
+  consumption: z.coerce.number(),
   value: z.coerce.number({ required_error: 'Informe o valor unitário!' }),
-  compartment: z.string({ required_error: 'Este campo é obrigatório!' }),
+  compartment: z
+    .string({ required_error: 'Este campo é obrigatório!' })
+    .optional(),
   tank: z.string().optional(),
   train: z.string().optional(),
+  post: z.string().optional(),
+  supplier: z.string().optional(),
+  comments: z.string().optional(),
 })
 
 export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
@@ -42,9 +45,14 @@ export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
 interface SupplyModalProps extends ComponentProps<typeof Sheet> {
   mode: 'create' | 'edit'
   defaultValues?: SupplyFormData
+  onSubmit: (data: SupplyFormData) => Promise<void>
 }
 
-export function FuelForm({ defaultValues, mode, ...props }: SupplyModalProps) {
+export function FuelForm({
+  onSubmit,
+  defaultValues,
+  ...props
+}: SupplyModalProps) {
   const createSupplyForm = useForm<SupplyFormData>({
     resolver: zodResolver(createSupplyFormSchema),
     defaultValues,
@@ -56,28 +64,13 @@ export function FuelForm({ defaultValues, mode, ...props }: SupplyModalProps) {
     formState: { isSubmitting },
   } = createSupplyForm
 
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
-
   const createActiveWizardForm = useWizardForm()
   const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
 
-  async function handleCreateFuelling(data: SupplyFormData) {
-    const response = api.post('fuelling/', {
-      ...data,
-      equipmentId: data.equipment,
-      type: data.type,
-      fuelId: data.compartment,
-      value: data.value,
-    })
+  async function handleSubmitIntermediate(data: SupplyFormData) {
+    await onSubmit(data)
 
-    if (response.status !== 201) return
-
-    toast({
-      title: 'Diverso criado com sucesso!',
-      variant: 'success',
-    })
-    queryClient.refetchQueries(['fuelling/data'])
+    reset()
   }
 
   function handleNextStep() {
@@ -99,7 +92,7 @@ export function FuelForm({ defaultValues, mode, ...props }: SupplyModalProps) {
           </div>
           <form
             id="fuellingForm"
-            onSubmit={handleSubmit(handleCreateFuelling)}
+            onSubmit={handleSubmit(handleSubmitIntermediate)}
             className="mt-4 flex h-full w-full flex-col gap-3 overflow-auto overflow-x-hidden"
           >
             <WizardForm {...createActiveWizardForm}>

@@ -21,12 +21,6 @@ export function StepThree() {
       </Form.Field>
 
       <Form.Field>
-        <Form.Label htmlFor="fuel">Combustível:</Form.Label>
-        <Form.Input name="fuel" id="fuel" readOnly />
-        <Form.ErrorMessage field="fuel" />
-      </Form.Field>
-
-      <Form.Field>
         <Form.Label htmlFor="comments">Observações:</Form.Label>
         <Form.Input name="comments" id="comments" />
         <Form.ErrorMessage field="comments" />

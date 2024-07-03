@@ -10,11 +10,14 @@ import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { FuelForm, SupplyFormData } from './fuelForm'
 
 export function Table() {
   const [fuellingIdToDelete, setFuellingIdToDelete] = useState<
     number | undefined
   >()
+
+  const [fuellingIdToEdit, setFuellingIdToEdit] = useState<number | undefined>()
 
   async function fetchSelects() {
     const response = await api.get('fuelling/info').then((res) => res.data)
@@ -22,7 +25,7 @@ export function Table() {
   }
 
   const { data, refetch } = useQuery({
-    queryKey: ['fuelling/delete/data'],
+    queryKey: ['fuelling/data'],
     queryFn: fetchSelects,
   })
 
@@ -33,6 +36,31 @@ export function Table() {
 
     toast({
       title: 'Abastecimento deletado com sucesso!',
+      variant: 'success',
+    })
+    refetch()
+  }
+
+  async function handleEditFuelling(data: SupplyFormData) {
+    const response = api.put(`fuelling/${fuellingIdToEdit}`, {
+      ...data,
+      equipmentId: data.equipment,
+      type: data.type,
+      fuelStationId: data.post,
+      trainId: data.train,
+      tankId: data.tank,
+      fuelId: data.fuel,
+      compartmentId: data.compartment,
+      numberRequest: data.request,
+      fiscalNumber: data.receipt,
+      value: data.value,
+      currentCounter: data.last,
+      observation: data.comments,
+    })
+    if ((await response).status !== 201) return
+
+    toast({
+      title: 'Abastecimento editado com sucesso!',
       variant: 'success',
     })
     refetch()
@@ -49,7 +77,7 @@ export function Table() {
 
         return (
           <div className="flex gap-2">
-            <Button size="icon-xs">
+            <Button size="icon-xs" onClick={() => setFuellingIdToEdit(data.id)}>
               <Pencil size={12} />
             </Button>
             <Button
@@ -139,6 +167,15 @@ export function Table() {
           setFuellingIdToDelete(open ? fuellingIdToDelete : undefined)
         }
         onConfirm={handleDeleteFuelling}
+      />
+
+      <FuelForm
+        open={!!fuellingIdToEdit}
+        onOpenChange={(open) =>
+          setFuellingIdToEdit(open ? fuellingIdToEdit : undefined)
+        }
+        mode="edit"
+        onSubmit={handleEditFuelling}
       />
     </>
   )
