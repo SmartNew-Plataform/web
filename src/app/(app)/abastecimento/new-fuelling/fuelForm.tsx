@@ -44,18 +44,19 @@ export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
 
 interface SupplyModalProps extends ComponentProps<typeof Sheet> {
   mode: 'create' | 'edit'
-  defaultValues?: SupplyFormData
+  initialValues?: SupplyFormData
   onSubmit: (data: SupplyFormData) => Promise<void>
 }
 
 export function FuelForm({
   onSubmit,
-  defaultValues,
+  initialValues,
+  mode,
   ...props
 }: SupplyModalProps) {
   const createSupplyForm = useForm<SupplyFormData>({
     resolver: zodResolver(createSupplyFormSchema),
-    defaultValues,
+    defaultValues: initialValues ?? {},
   })
 
   const {
@@ -81,7 +82,11 @@ export function FuelForm({
     <Sheet {...props}>
       <SheetContent className="flex max-h-screen w-1/4 flex-col overflow-x-hidden">
         <div className="mt-4 flex items-end justify-between border-b border-zinc-200 pb-4">
-          <SheetTitle>Cadastrar abastecimento</SheetTitle>
+          <SheetTitle>
+            {mode === 'edit'
+              ? 'Editar abastecimento'
+              : 'Cadastrar abastecimento'}
+          </SheetTitle>{' '}
         </div>
         <FormProvider {...createSupplyForm}>
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">

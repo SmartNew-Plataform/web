@@ -21,6 +21,7 @@ export function Table() {
 
   async function fetchSelects() {
     const response = await api.get('fuelling/info').then((res) => res.data)
+
     return response.data
   }
 
@@ -42,28 +43,59 @@ export function Table() {
   }
 
   async function handleEditFuelling(data: SupplyFormData) {
-    const response = api.put(`fuelling/${fuellingIdToEdit}`, {
-      ...data,
-      equipmentId: data.equipment,
-      type: data.type,
-      fuelStationId: data.post,
-      trainId: data.train,
-      tankId: data.tank,
-      fuelId: data.fuel,
-      compartmentId: data.compartment,
-      numberRequest: data.request,
-      fiscalNumber: data.receipt,
-      value: data.value,
-      currentCounter: data.last,
-      observation: data.comments,
-    })
-    if ((await response).status !== 201) return
+    try {
+      const currentDataResponse = await api.get(`fuelling/${fuellingIdToEdit}`)
+      const currentData = currentDataResponse.data
 
-    toast({
-      title: 'Abastecimento editado com sucesso!',
-      variant: 'success',
-    })
-    refetch()
+      const updatedData = {
+        ...currentData,
+        type: data.type ?? currentData.type,
+        typeSupplier: data.typeSupplier ?? currentData.typeSupplier,
+        driver: data.driver ?? currentData.driver,
+        odometerLast: data.odometerPrevious ?? currentData.odometerLast,
+        currentCounter: data.odometer ?? currentData.currentCounter,
+        fiscalNumber: data.receipt ?? currentData.fiscalNumber,
+        numberRequest: data.request ?? currentData.numberRequest,
+        date: data.date ?? currentData.date,
+        equipmentId: data.equipment ?? currentData.equipmentId,
+        counter: data.counter ?? currentData.counter,
+        counterLast: data.last ?? currentData.counterLast,
+        fuelId: data.fuel ?? currentData.fuelId,
+        quantity: data.quantity ?? currentData.quantity,
+        consumption: data.consumption ?? currentData.consumption,
+        value: data.value ?? currentData.value,
+        compartmentId: data.compartment ?? currentData.compartmentId,
+        tankId: data.tank ?? currentData.tankId,
+        trainId: data.train ?? currentData.trainId,
+        fuelStationId: data.post ?? currentData.fuelStationId,
+        supplier: data.supplier ?? currentData.supplier,
+        observation: data.comments ?? currentData.observation,
+      }
+
+      const response = await api.put(
+        `fuelling/${fuellingIdToEdit}`,
+        updatedData,
+      )
+
+      if (response.status === 200) {
+        toast({
+          title: 'Abastecimento editado com sucesso!',
+          variant: 'success',
+        })
+        refetch()
+      } else {
+        toast({
+          title: 'Erro ao editar abastecimento',
+          description: 'Não foi possível editar o abastecimento.',
+        })
+      }
+    } catch (error) {
+      console.error('Erro ao editar abastecimento:', error)
+      toast({
+        title: 'Erro ao editar abastecimento',
+        description: 'Ocorreu um erro ao tentar editar o abastecimento.',
+      })
+    }
   }
 
   const columns: ColumnDef<ListFuelling>[] = [

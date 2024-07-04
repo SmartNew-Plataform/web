@@ -36,6 +36,8 @@ export function Header() {
       value: data.value,
       currentCounter: data.last,
       observation: data.comments,
+      counterLast: data.last,
+      odometerLast: data.odometerPrevious,
     })
 
     if ((await response).status !== 201) return

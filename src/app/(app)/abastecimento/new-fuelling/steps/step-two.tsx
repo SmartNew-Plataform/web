@@ -32,14 +32,19 @@ export function StepTwo() {
   return (
     <>
       <Form.Field>
-        <Form.Label htmlFor="quantity">Quantidade de litros:</Form.Label>
+        <Form.Label htmlFor="odometerPrevious">Odômetro anterior:</Form.Label>
         <Form.Input
-          placeholder="17,0"
           type="number"
-          name="quantity"
-          id="quantity"
+          name="odometerPrevious"
+          id="odometerPrevious"
+          readOnly
         />
-        <Form.ErrorMessage field="quantity" />
+        <Form.ErrorMessage field="odometerPrevious" />
+      </Form.Field>
+      <Form.Field>
+        <Form.Label htmlFor="odometer">Odômetro atual:</Form.Label>
+        <Form.Input type="number" name="odometer" id="odometer" readOnly />
+        <Form.ErrorMessage field="odometer" />
       </Form.Field>
 
       <Form.Field>

@@ -112,6 +112,13 @@ export function StepOne() {
     ({ value }) => value === compartmentValue,
   )?.odometer
 
+  const quantity = watch('quantity')
+
+  const quantityValue = parseFloat(quantity)
+
+  const odometerCurrent =
+    odometer !== undefined ? odometer + quantityValue : undefined
+
   const equipmentValue = watch('equipment')
   const counter = selects?.equipment.find(
     ({ value }) => value === equipmentValue,
@@ -125,6 +132,11 @@ export function StepOne() {
     setValue('last', counter)
     setValue('typeEquipment', typeConsumption)
   }, [equipmentValue])
+
+  useEffect(() => {
+    setValue('odometerPrevious', odometer)
+    setValue('odometer', odometerCurrent)
+  }, [compartmentValue, quantity])
 
   return (
     <>
@@ -239,20 +251,9 @@ export function StepOne() {
         </Form.Field>
       )}
       <Form.Field>
-        <Form.Label htmlFor="odometerPrevious">Odômetro anterior:</Form.Label>
-        <Form.Input
-          type="number"
-          name="odometerPrevious"
-          id="odometerPrevious"
-          value={odometer || 0}
-          readOnly
-        />
-        <Form.ErrorMessage field="odometerPrevious" />
-      </Form.Field>
-      <Form.Field>
-        <Form.Label htmlFor="odometer">Odômetro atual:</Form.Label>
-        <Form.Input type="number" name="odometer" id="odometer" />
-        <Form.ErrorMessage field="odometer" />
+        <Form.Label htmlFor="quantity">Quantidade de litros:</Form.Label>
+        <Form.Input type="number" name="quantity" id="quantity" />
+        <Form.ErrorMessage field="quantity" />
       </Form.Field>
     </>
   )
