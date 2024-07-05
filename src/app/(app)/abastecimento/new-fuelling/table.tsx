@@ -19,9 +19,10 @@ export function Table() {
 
   const [fuellingIdToEdit, setFuellingIdToEdit] = useState<number | undefined>()
 
+  const [editingFuelData, setEditingFuelData] = useState()
+
   async function fetchSelects() {
     const response = await api.get('fuelling/info').then((res) => res.data)
-
     return response.data
   }
 
@@ -42,40 +43,85 @@ export function Table() {
     refetch()
   }
 
+  async function fecthFuelling(id: number) {
+    try {
+      const response = await api.get(`fuelling/${id}`)
+      if (response.status === 200) {
+        console.log(response.data)
+        const { data } = response.data
+
+        const editableTemp = {
+          type: data.type,
+          typeSupplier: data.tank
+            ? 'tank'
+            : data.train
+              ? 'train'
+              : data.post
+                ? 'post'
+                : null,
+          driver: data?.driver?.value ?? null,
+          odometerPrevious: data.odometerLast,
+          odometer: data.odometer,
+          receipt: data.requestNumber,
+          request: data.fiscalNumber,
+          date: dayjs(data.date).format('YYYY-MM-DD'),
+          equipment: data.equipment.value.toString(),
+          counter: data.counter,
+          last: data.counterLast,
+          fuel: '14',
+          quantity: data.quantidade,
+          consumption: Number(data.consumption),
+          value: data.value,
+          compartment: data.tankFuelling
+            ? data.tankFuelling.value.toString()
+            : data.trainFuelling
+              ? data.trainFuelling.value.toString()
+              : null,
+          tank: data?.tank?.value.toString() ?? null,
+          train: data?.train?.value.toString() ?? null,
+          post: data?.post?.value.toString() ?? null,
+          supplier: data?.supplier ?? null,
+          comments: data?.observation ?? '',
+        }
+        console.log(editableTemp)
+
+        setEditingFuelData(editableTemp)
+        setFuellingIdToEdit(id)
+        refetch()
+      } else {
+        toast({
+          title: 'Erro ao buscar abastecimento',
+          description: 'Não foi possível buscar os dados do abastecimento.',
+        })
+      }
+    } catch (error) {
+      console.error('Erro ao buscar abastecimento:', error)
+      toast({
+        title: 'Erro ao buscar abastecimento',
+        description:
+          'Ocorreu um erro ao tentar buscar os dados do abastecimento.',
+      })
+    }
+  }
   async function handleEditFuelling(data: SupplyFormData) {
     try {
-      const currentDataResponse = await api.get(`fuelling/${fuellingIdToEdit}`)
-      const currentData = currentDataResponse.data
-
-      const updatedData = {
-        ...currentData,
-        type: data.type ?? currentData.type,
-        typeSupplier: data.typeSupplier ?? currentData.typeSupplier,
-        driver: data.driver ?? currentData.driver,
-        odometerLast: data.odometerPrevious ?? currentData.odometerLast,
-        currentCounter: data.odometer ?? currentData.currentCounter,
-        fiscalNumber: data.receipt ?? currentData.fiscalNumber,
-        numberRequest: data.request ?? currentData.numberRequest,
-        date: data.date ?? currentData.date,
-        equipmentId: data.equipment ?? currentData.equipmentId,
-        counter: data.counter ?? currentData.counter,
-        counterLast: data.last ?? currentData.counterLast,
-        fuelId: data.fuel ?? currentData.fuelId,
-        quantity: data.quantity ?? currentData.quantity,
-        consumption: data.consumption ?? currentData.consumption,
-        value: data.value ?? currentData.value,
-        compartmentId: data.compartment ?? currentData.compartmentId,
-        tankId: data.tank ?? currentData.tankId,
-        trainId: data.train ?? currentData.trainId,
-        fuelStationId: data.post ?? currentData.fuelStationId,
-        supplier: data.supplier ?? currentData.supplier,
-        observation: data.comments ?? currentData.observation,
-      }
-
-      const response = await api.put(
-        `fuelling/${fuellingIdToEdit}`,
-        updatedData,
-      )
+      const response = await api.put(`fuelling/${fuellingIdToEdit}`, {
+        ...data,
+        equipmentId: data.equipment,
+        type: data.type,
+        fuelStationId: data.post,
+        trainId: data.train,
+        tankId: data.tank,
+        fuelId: data.fuel,
+        compartmentId: data.compartment,
+        numberRequest: data.request,
+        fiscalNumber: data.receipt,
+        value: data.value,
+        currentCounter: data.last,
+        observation: data.comments,
+        counterLast: data.last,
+        odometerLast: data.odometerPrevious,
+      })
 
       if (response.status === 200) {
         toast({
@@ -103,13 +149,13 @@ export function Table() {
       accessorKey: 'id',
       header: '',
       cell({ row }) {
-        const id = row.getValue('id') as string
+        const id = row.getValue('id') as number
         const data = row.original
         console.log(id)
 
         return (
           <div className="flex gap-2">
-            <Button size="icon-xs" onClick={() => setFuellingIdToEdit(data.id)}>
+            <Button size="icon-xs" onClick={() => fecthFuelling(data.id)}>
               <Pencil size={12} />
             </Button>
             <Button
@@ -206,6 +252,7 @@ export function Table() {
         onOpenChange={(open) =>
           setFuellingIdToEdit(open ? fuellingIdToEdit : undefined)
         }
+        defaultValues={editingFuelData}
         mode="edit"
         onSubmit={handleEditFuelling}
       />

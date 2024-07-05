@@ -7,7 +7,7 @@ import { useWizardForm } from '@/hooks/use-wizard-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
-import { ComponentProps } from 'react'
+import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { StepOne } from './steps/step-one'
@@ -22,7 +22,7 @@ const createSupplyFormSchema = z.object({
   odometer: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   receipt: z.coerce.string({ required_error: 'Este campo é obrigatório!' }),
   request: z.string({ required_error: 'Este campo é obrigatório!' }),
-  date: z.string({ required_error: 'Informe a data do abastecimento!' }),
+  date: z.coerce.date({ required_error: 'Informe a data do abastecimento!' }),
   equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   last: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
@@ -43,20 +43,19 @@ const createSupplyFormSchema = z.object({
 export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
 
 interface SupplyModalProps extends ComponentProps<typeof Sheet> {
-  mode: 'create' | 'edit'
-  initialValues?: SupplyFormData
   onSubmit: (data: SupplyFormData) => Promise<void>
+  defaultValues?: SupplyFormData
+  mode: 'create' | 'edit'
 }
 
 export function FuelForm({
   onSubmit,
-  initialValues,
   mode,
+  defaultValues,
   ...props
 }: SupplyModalProps) {
   const createSupplyForm = useForm<SupplyFormData>({
     resolver: zodResolver(createSupplyFormSchema),
-    defaultValues: initialValues ?? {},
   })
 
   const {
@@ -64,18 +63,23 @@ export function FuelForm({
     reset,
     formState: { isSubmitting },
   } = createSupplyForm
-
   const createActiveWizardForm = useWizardForm()
   const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
+
+  useEffect(() => {
+    if (defaultValues) {
+      reset(defaultValues)
+    }
+  }, [defaultValues, reset])
+
+  function handleNextStep() {
+    paginate({ newDirection: 1 })
+  }
 
   async function handleSubmitIntermediate(data: SupplyFormData) {
     await onSubmit(data)
 
     reset()
-  }
-
-  function handleNextStep() {
-    paginate({ newDirection: 1 })
   }
 
   return (

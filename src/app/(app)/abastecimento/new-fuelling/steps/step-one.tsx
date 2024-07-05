@@ -8,12 +8,12 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-type EquipmentResponse = SelectData & {
+export type EquipmentResponse = SelectData & {
   type: 'KM/L' | 'L/HR'
   counter: number
 }
 
-type FuelType = {
+export type FuelType = {
   value: string
   label: string
   unity: string
@@ -222,7 +222,7 @@ export function StepOne() {
             id={supplier}
             options={typeSupplierOptions[supplier].options}
           />
-          <Form.ErrorMessage field="supplier" />
+          <Form.ErrorMessage field="typeSupplier" />
         </Form.Field>
       )}
       {compartmentOptions ? (

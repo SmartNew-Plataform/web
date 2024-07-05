@@ -62,8 +62,8 @@ export function Header() {
       <FuelForm
         open={isOpen}
         onOpenChange={setIsOpen}
-        mode="create"
         onSubmit={handleCreateFuelling}
+        mode="create"
       />
     </PageHeader>
   )
