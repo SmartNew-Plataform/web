@@ -9,85 +9,71 @@ import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Pencil, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FuelForm, SupplyFormData } from './fuelForm'
+
+interface FuelingData {
+  id: number
+  type: string
+  driver: {
+    value: string
+  }
+  requestNumber: string
+  fiscalNumber: string
+  date: string
+  equipment: {
+    value: string
+  }
+  quantidade: number
+  consumption: number
+  value: number
+  observation?: string
+  odometerPrevious?: number
+  odometer?: number
+  counter?: number
+  last?: number
+  tankFuelling?: {
+    value: string
+  }
+  trainFuelling?: {
+    value: string
+  }
+  tank?: {
+    value: string
+  }
+  train?: {
+    value: string
+  }
+  post?: {
+    value: string
+  }
+  supplier?: string
+}
 
 export function Table() {
   const [fuellingIdToDelete, setFuellingIdToDelete] = useState<
     number | undefined
   >()
-
   const [fuellingIdToEdit, setFuellingIdToEdit] = useState<number | undefined>()
+  const [editingFuelData, setEditingFuelData] = useState<SupplyFormData>()
 
-  const [editingFuelData, setEditingFuelData] = useState()
+  const { data: fuelingList, refetch: refetchFuelingList } = useQuery({
+    queryKey: ['fuelling/data'],
+    queryFn: fetchFuelingList,
+  })
 
-  async function fetchSelects() {
+  async function fetchFuelingList() {
     const response = await api.get('fuelling/info').then((res) => res.data)
     return response.data
   }
 
-  const { data, refetch } = useQuery({
-    queryKey: ['fuelling/data'],
-    queryFn: fetchSelects,
-  })
-
-  async function handleDeleteFuelling() {
-    const response = await api.delete(`fuelling/${fuellingIdToDelete}`)
-
-    if (response.status !== 200) return
-
-    toast({
-      title: 'Abastecimento deletado com sucesso!',
-      variant: 'success',
-    })
-    refetch()
-  }
-
-  async function fecthFuelling(id: number) {
+  async function fetchFueling(id: number) {
     try {
-      const response = await api.get(`fuelling/${id}`)
+      const response = await api.get<FuelingData>(`fuelling/${id}`)
       if (response.status === 200) {
-        console.log(response.data)
         const { data } = response.data
-
-        const editableTemp = {
-          type: data.type,
-          typeSupplier: data.tank
-            ? 'tank'
-            : data.train
-              ? 'train'
-              : data.post
-                ? 'post'
-                : null,
-          driver: data?.driver?.value ?? null,
-          odometerPrevious: data.odometerLast,
-          odometer: data.odometer,
-          receipt: data.requestNumber,
-          request: data.fiscalNumber,
-          date: dayjs(data.date).format('YYYY-MM-DD'),
-          equipment: data.equipment.value.toString(),
-          counter: data.counter,
-          last: data.counterLast,
-          fuel: '14',
-          quantity: data.quantidade,
-          consumption: Number(data.consumption),
-          value: data.value,
-          compartment: data.tankFuelling
-            ? data.tankFuelling.value.toString()
-            : data.trainFuelling
-              ? data.trainFuelling.value.toString()
-              : null,
-          tank: data?.tank?.value.toString() ?? null,
-          train: data?.train?.value.toString() ?? null,
-          post: data?.post?.value.toString() ?? null,
-          supplier: data?.supplier ?? null,
-          comments: data?.observation ?? '',
-        }
-        console.log(editableTemp)
-
-        setEditingFuelData(editableTemp)
+        setEditingFuelData(mapFuelingDataToSupplyFormData(data))
         setFuellingIdToEdit(id)
-        refetch()
       } else {
         toast({
           title: 'Erro ao buscar abastecimento',
@@ -103,14 +89,59 @@ export function Table() {
       })
     }
   }
+
+  useEffect(() => {
+    if (fuellingIdToEdit !== undefined) {
+      fetchFueling(fuellingIdToEdit)
+    }
+  }, [fuellingIdToEdit])
+
+  function mapFuelingDataToSupplyFormData(data: FuelingData): SupplyFormData {
+    return {
+      type: data.type,
+      typeSupplier: data.tank
+        ? 'tank'
+        : data.train
+          ? 'train'
+          : data.post
+            ? 'post'
+            : '',
+      driver: data.driver?.value ?? '',
+      receipt: data.requestNumber,
+      request: data.fiscalNumber,
+      date: dayjs(data.date).format('YYYY-MM-DD'),
+      equipment: data.equipment.value.toString(),
+      fuel: '14',
+      quantity: data.quantidade,
+      consumption: Number(data.consumption),
+      value: data.value,
+      comments: data?.observation ?? '',
+      odometerPrevious: data.odometerPrevious ?? 0,
+      odometer: data.odometer ?? 0,
+      counter: data.counter ?? 0,
+      last: data.last ?? 0,
+      compartment: data.tankFuelling
+        ? data.tankFuelling.value.toString()
+        : data.trainFuelling
+          ? data.trainFuelling.value.toString()
+          : '',
+      tank: data?.tank?.value.toString() ?? '',
+      train: data?.train?.value.toString() ?? '',
+      post: data?.post?.value ?? '',
+      supplier: data?.supplier ?? '',
+    }
+  }
+
   async function handleEditFuelling(data: SupplyFormData) {
+    const fuelStationId = data.post ? String(data.post) : null
+    const trainId = data.train ? String(data.train) : null
     try {
       const response = await api.put(`fuelling/${fuellingIdToEdit}`, {
         ...data,
         equipmentId: data.equipment,
         type: data.type,
-        fuelStationId: data.post,
-        trainId: data.train,
+        fuelStationId,
+        trainId,
         tankId: data.tank,
         fuelId: data.fuel,
         compartmentId: data.compartment,
@@ -128,7 +159,8 @@ export function Table() {
           title: 'Abastecimento editado com sucesso!',
           variant: 'success',
         })
-        refetch()
+        refetchFuelingList()
+        setFuellingIdToEdit(undefined)
       } else {
         toast({
           title: 'Erro ao editar abastecimento',
@@ -139,7 +171,32 @@ export function Table() {
       console.error('Erro ao editar abastecimento:', error)
       toast({
         title: 'Erro ao editar abastecimento',
-        description: 'Ocorreu um erro ao tentar editar o abastecimento.',
+        description: 'Você só pode editar o ultimo abastecimento feito.',
+      })
+    }
+  }
+
+  async function handleDeleteFuelling() {
+    try {
+      const response = await api.delete(`fuelling/${fuellingIdToDelete}`)
+      if (response.status === 200) {
+        toast({
+          title: 'Abastecimento deletado com sucesso!',
+          variant: 'success',
+        })
+        refetchFuelingList()
+        setFuellingIdToDelete(undefined)
+      } else {
+        toast({
+          title: 'Erro ao deletar abastecimento',
+          description: 'Não foi possível deletar o abastecimento.',
+        })
+      }
+    } catch (error) {
+      console.error('Erro ao deletar abastecimento:', error)
+      toast({
+        title: 'Erro ao deletar abastecimento',
+        description: 'Você só pode deletar o ultimo abastecimento feito.',
       })
     }
   }
@@ -149,13 +206,12 @@ export function Table() {
       accessorKey: 'id',
       header: '',
       cell({ row }) {
-        const id = row.getValue('id') as number
+        // const id = row.getValue('id') as number
         const data = row.original
-        console.log(id)
 
         return (
           <div className="flex gap-2">
-            <Button size="icon-xs" onClick={() => fecthFuelling(data.id)}>
+            <Button size="icon-xs" onClick={() => fetchFueling(data.id)}>
               <Pencil size={12} />
             </Button>
             <Button
@@ -235,9 +291,10 @@ export function Table() {
       header: 'Observações',
     },
   ]
+
   return (
     <>
-      <DataTable columns={columns} data={data || []} />
+      <DataTable columns={columns} data={fuelingList || []} />
 
       <AlertModal
         open={!!fuellingIdToDelete}

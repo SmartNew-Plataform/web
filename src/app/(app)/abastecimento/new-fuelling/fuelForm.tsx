@@ -22,7 +22,7 @@ const createSupplyFormSchema = z.object({
   odometer: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   receipt: z.coerce.string({ required_error: 'Este campo é obrigatório!' }),
   request: z.string({ required_error: 'Este campo é obrigatório!' }),
-  date: z.coerce.date({ required_error: 'Informe a data do abastecimento!' }),
+  date: z.coerce.string({ required_error: 'Informe a data do abastecimento!' }),
   equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   last: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
@@ -56,21 +56,17 @@ export function FuelForm({
 }: SupplyModalProps) {
   const createSupplyForm = useForm<SupplyFormData>({
     resolver: zodResolver(createSupplyFormSchema),
+    defaultValues: defaultValues ?? {},
   })
 
   const {
     handleSubmit,
     reset,
+    setValue,
     formState: { isSubmitting },
   } = createSupplyForm
   const createActiveWizardForm = useWizardForm()
   const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
-
-  useEffect(() => {
-    if (defaultValues) {
-      reset(defaultValues)
-    }
-  }, [defaultValues, reset])
 
   function handleNextStep() {
     paginate({ newDirection: 1 })
@@ -81,6 +77,17 @@ export function FuelForm({
 
     reset()
   }
+
+  useEffect(() => {
+    if (defaultValues) {
+      Object.keys(defaultValues).forEach((key) => {
+        setValue(
+          key as keyof SupplyFormData,
+          defaultValues[key as keyof SupplyFormData],
+        )
+      })
+    }
+  }, [defaultValues, setValue])
 
   return (
     <Sheet {...props}>
