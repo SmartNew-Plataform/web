@@ -8,9 +8,11 @@ export interface TankType {
   branch: SelectData
 }
 
-export interface TankResponse {
+export interface TankAndTrainResponse {
   id: number
   tank: string
+  train: string
+  tag: string
   model: string
   stock: number
   odometer: number

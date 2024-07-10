@@ -23,7 +23,7 @@ interface ModalCompartmentFormProps extends ComponentProps<typeof Dialog> {
   onSubmit: (data: CompartmentFormData) => void
   defaultValues?: CompartmentFormData
   mode?: 'create' | 'edit'
-  tankId?: string
+  trainId?: string
 }
 
 export function ModalCompartmentForm({
@@ -57,7 +57,7 @@ export function ModalCompartmentForm({
   }
 
   const { data } = useQuery({
-    queryKey: ['fuelling/tank/fuel/selects'],
+    queryKey: ['fuelling/train/fuel/selects'],
     queryFn: fetchSelects,
   })
 

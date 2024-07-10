@@ -1,4 +1,4 @@
-import { TankResponse } from '@/@types/fuelling-tank'
+import { TankAndTrainResponse } from '@/@types/fuelling-tank'
 import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ import { z } from 'zod'
 
 interface TrainModalProps extends ComponentProps<typeof Dialog> {
   mode: 'create' | 'edit'
-  defaultValues?: TankResponse
+  defaultValues?: TankAndTrainResponse
 }
 
 const trainFormSchema = z.object({
@@ -28,7 +28,7 @@ const trainFormSchema = z.object({
 
 type TrainFormData = z.infer<typeof trainFormSchema>
 
-export function TankModal({ mode, defaultValues, ...props }: TrainModalProps) {
+export function TrainModal({ mode, defaultValues, ...props }: TrainModalProps) {
   const trainForm = useForm<TrainFormData>({
     resolver: zodResolver(trainFormSchema),
   })
@@ -41,47 +41,6 @@ export function TankModal({ mode, defaultValues, ...props }: TrainModalProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
-  async function handleCreateTrain({
-    tag,
-    description,
-    capacity,
-    branch,
-  }: TrainFormData) {
-    const response = await api.post('fuelling/tank', {
-      model: tag,
-      tank: description,
-      capacity,
-      branchId: branch,
-    })
-
-    if (response.status !== 201) return
-
-    toast({ title: 'Tanque criado com sucesso', variant: 'success' })
-
-    queryClient.refetchQueries(['fuelling/create/data'])
-  }
-
-  async function handleEditTrain({
-    tag,
-    description,
-    capacity,
-    branch,
-  }: TrainFormData) {
-    const response = await api.put(`fuelling/tank/${defaultValues?.id}`, {
-      model: tag,
-      tank: description,
-      capacity,
-      branchId: branch,
-    })
-    if (response.status !== 200) return
-
-    toast({
-      title: 'Tanque atualizado com sucesso!',
-      variant: 'success',
-    })
-    queryClient.refetchQueries(['fuelling/create/data'])
-  }
-
   async function fetchSelects() {
     const response = await api
       .get<{ data: SelectData[] }>('system/list-branch')
@@ -92,18 +51,59 @@ export function TankModal({ mode, defaultValues, ...props }: TrainModalProps) {
     }
   }
 
+  async function handleCreateTrain({
+    tag,
+    description,
+    capacity,
+    branch,
+  }: TrainFormData) {
+    const response = await api.post('fuelling/train', {
+      tag,
+      name: description,
+      capacity,
+      branchId: branch,
+    })
+
+    if (response.status !== 201) return
+
+    toast({ title: 'Tanque criado com sucesso', variant: 'success' })
+
+    queryClient.refetchQueries(['fuelling/train/data'])
+  }
+
+  async function handleEditTrain({
+    tag,
+    description,
+    capacity,
+    branch,
+  }: TrainFormData) {
+    const response = await api.put(`fuelling/train/${defaultValues?.id}`, {
+      tag,
+      name: description,
+      capacity,
+      branchId: branch,
+    })
+    if (response.status !== 200) return
+
+    toast({
+      title: 'Tanque atualizado com sucesso!',
+      variant: 'success',
+    })
+    queryClient.refetchQueries(['fuelling/train/data'])
+  }
+
   const { data: selects } = useQuery({
-    queryKey: ['fuelling/create/selects'],
+    queryKey: ['fuelling/create/train'],
     queryFn: fetchSelects,
   })
 
   useEffect(() => {
     if (mode === 'edit') {
       reset({
-        tag: defaultValues?.model,
+        tag: defaultValues?.tag,
         branch: defaultValues?.branch.value,
         capacity: defaultValues?.capacity,
-        description: defaultValues?.tank,
+        description: defaultValues?.train,
       })
     }
   }, [mode, defaultValues])

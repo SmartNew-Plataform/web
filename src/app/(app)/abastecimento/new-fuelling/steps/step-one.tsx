@@ -1,6 +1,6 @@
 'use client'
 import { TrainData } from '@/@types/fuelling-fuelling'
-import { TankResponse } from '@/@types/fuelling-tank'
+import { TankAndTrainResponse } from '@/@types/fuelling-tank'
 import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { api } from '@/lib/api'
@@ -22,7 +22,7 @@ export type FuelType = {
 export function StepOne() {
   async function loadSelects() {
     const response = await api
-      .get<{ data: TankResponse[] }>(`fuelling/tank`)
+      .get<{ data: TankAndTrainResponse[] }>(`fuelling/tank`)
       .then((response) => response.data)
     const responseTrain = await api
       .get<{ data: TrainData[] }>(`fuelling/train`)

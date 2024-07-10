@@ -1,5 +1,5 @@
 'use client'
-import { ListFuelling } from '@/@types/fuelling-fuelling'
+import { FuelingData, ListFuelling } from '@/@types/fuelling-fuelling'
 import { AlertModal } from '@/components/alert-modal'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -11,44 +11,6 @@ import dayjs from 'dayjs'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { FuelForm, SupplyFormData } from './fuelForm'
-
-interface FuelingData {
-  id: number
-  type: string
-  driver: {
-    value: string
-  }
-  requestNumber: string
-  fiscalNumber: string
-  date: string
-  equipment: {
-    value: string
-  }
-  quantidade: number
-  consumption: number
-  value: number
-  observation?: string
-  odometerPrevious?: number
-  odometer?: number
-  counter?: number
-  last?: number
-  tankFuelling?: {
-    value: string
-  }
-  trainFuelling?: {
-    value: string
-  }
-  tank?: {
-    value: string
-  }
-  train?: {
-    value: string
-  }
-  post?: {
-    value: string
-  }
-  supplier?: string
-}
 
 export function Table() {
   const [fuellingIdToDelete, setFuellingIdToDelete] = useState<
@@ -111,7 +73,7 @@ export function Table() {
       request: data.fiscalNumber,
       date: dayjs(data.date).format('YYYY-MM-DD'),
       equipment: data.equipment.value.toString(),
-      fuel: '14',
+      fuel: data.fuel.value.toString(),
       quantity: data.quantidade,
       consumption: Number(data.consumption),
       value: data.value,

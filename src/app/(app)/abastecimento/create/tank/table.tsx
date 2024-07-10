@@ -1,5 +1,5 @@
 'use client'
-import { TankResponse } from '@/@types/fuelling-tank'
+import { TankAndTrainResponse } from '@/@types/fuelling-tank'
 import { AlertModal } from '@/components/alert-modal'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,7 @@ export function Table() {
     queryFn: fetchSelects,
   })
 
-  const [editData, setEditData] = useState<TankResponse | undefined>()
+  const [editData, setEditData] = useState<TankAndTrainResponse | undefined>()
   const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
   const [tankIdToCompartment, setTankIdToCompartment] = useState<
     string | undefined
@@ -41,7 +41,7 @@ export function Table() {
     refetch()
   }
 
-  const columns: ColumnDef<TankResponse>[] = [
+  const columns: ColumnDef<TankAndTrainResponse>[] = [
     {
       accessorKey: 'id',
       header: '',

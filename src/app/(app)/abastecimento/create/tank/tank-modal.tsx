@@ -1,4 +1,4 @@
-import { TankResponse } from '@/@types/fuelling-tank'
+import { TankAndTrainResponse } from '@/@types/fuelling-tank'
 import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ import { z } from 'zod'
 
 interface TankModalProps extends ComponentProps<typeof Dialog> {
   mode: 'create' | 'edit'
-  defaultValues?: TankResponse
+  defaultValues?: TankAndTrainResponse
 }
 
 const tankFormSchema = z.object({
@@ -29,17 +29,27 @@ const tankFormSchema = z.object({
 type TankFormData = z.infer<typeof tankFormSchema>
 
 export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
-  const diverseForm = useForm<TankFormData>({
+  const tankForm = useForm<TankFormData>({
     resolver: zodResolver(tankFormSchema),
   })
   const {
     reset,
     handleSubmit,
     formState: { isSubmitting },
-  } = diverseForm
+  } = tankForm
 
   const { toast } = useToast()
   const queryClient = useQueryClient()
+
+  async function fetchSelects() {
+    const response = await api
+      .get<{ data: SelectData[] }>('system/list-branch')
+      .then((res) => res.data)
+
+    return {
+      branch: response.data,
+    }
+  }
 
   async function handleCreateTank({
     tag,
@@ -82,16 +92,6 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     queryClient.refetchQueries(['fuelling/create/data'])
   }
 
-  async function fetchSelects() {
-    const response = await api
-      .get<{ data: SelectData[] }>('system/list-branch')
-      .then((res) => res.data)
-
-    return {
-      branch: response.data,
-    }
-  }
-
   const { data: selects } = useQuery({
     queryKey: ['fuelling/create/selects'],
     queryFn: fetchSelects,
@@ -111,7 +111,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   return (
     <Dialog {...props}>
       <DialogContent>
-        <FormProvider {...diverseForm}>
+        <FormProvider {...tankForm}>
           <form
             className="flex w-full flex-col gap-2"
             onSubmit={handleSubmit(

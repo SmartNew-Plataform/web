@@ -19,7 +19,7 @@ const createActiveFormSchema = z.object({})
 export type ActiveFormData = z.infer<typeof createActiveFormSchema>
 
 interface ActiveFormProps extends ComponentProps<typeof Sheet> {
-  tankId: string
+  trainId: string
 }
 
 interface TankFormProps {
@@ -30,7 +30,7 @@ interface TankFormProps {
   id: number
 }
 
-export function FuelModal({ tankId, ...props }: ActiveFormProps) {
+export function FuelModal({ trainId, ...props }: ActiveFormProps) {
   const [createModalOpen, setCreatModalOpen] = useState(false)
   const [createEditModalOpen, setCreateEditModalOpen] = useState<
     { fuel: string; capacity: number; id: number } | undefined
@@ -41,19 +41,19 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
 
   async function fetchCompartment() {
     const response = await api
-      .get(`fuelling/tank/${tankId}`)
+      .get(`fuelling/train/${trainId}`)
       .then((response) => response.data)
     return response.data.compartment
   }
   const queryClient = useQueryClient()
 
   const { data, refetch } = useQuery<TankFormProps[]>({
-    queryKey: ['fuelling/tank/compartment', tankId],
+    queryKey: ['fuelling/train/compartment', trainId],
     queryFn: fetchCompartment,
   })
 
   async function handleCreateCompartment(data: CompartmentFormData) {
-    const response = await api.post(`fuelling/tank/${tankId}/compartment`, {
+    const response = await api.post(`fuelling/train/${trainId}/compartment`, {
       fuelId: data.fuel,
       capacity: data.capacity,
     })
@@ -64,7 +64,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
       title: `Compartimento criado com sucesso`,
       variant: 'success',
     })
-    queryClient.refetchQueries(['fuelling/tank/compartment'])
+    queryClient.refetchQueries(['fuelling/train/compartment'])
   }
 
   async function handleEditCompartment({
@@ -72,7 +72,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     fuel,
   }: CompartmentFormData) {
     const response = await api.put(
-      `fuelling/tank/${tankId}/compartment/${createEditModalOpen?.id}`,
+      `fuelling/train/${trainId}/compartment/${createEditModalOpen?.id}`,
       { fuelId: fuel, capacity },
     )
 
@@ -82,12 +82,12 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
       title: `Compartimento editado com sucesso`,
       variant: 'success',
     })
-    queryClient.refetchQueries(['fuelling/tank/compartment'])
+    queryClient.refetchQueries(['fuelling/train/compartment'])
   }
 
-  async function handleDeleteTank() {
+  async function handleDeleteTrain() {
     const response = await api.delete(
-      `fuelling/tank/${tankId}/compartment/${compartmentIdToDelete}`,
+      `fuelling/train/${trainId}/compartment/${compartmentIdToDelete}`,
     )
 
     if (response.status !== 200) return
@@ -154,7 +154,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
         <ModalCompartmentForm
           mode="edit"
           defaultValues={createEditModalOpen}
-          tankId={''}
+          trainId={''}
           onSubmit={handleEditCompartment}
           open={!!createEditModalOpen}
           onOpenChange={(open) =>
@@ -167,7 +167,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
           onOpenChange={(open) =>
             setCompartmentIdToDelete(open ? compartmentIdToDelete : undefined)
           }
-          onConfirm={handleDeleteTank}
+          onConfirm={handleDeleteTrain}
         />
       </SheetContent>
     </Sheet>

@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
-import { TankModal } from './train-modal'
+import { TrainModal } from './train-modal'
 
 export function Header() {
   const [open, setOpen] = useState(false)
@@ -22,7 +22,7 @@ export function Header() {
           novo equipamento
         </Button>
       </div>
-      <TankModal mode="create" open={open} onOpenChange={setOpen} />
+      <TrainModal mode="create" open={open} onOpenChange={setOpen} />
     </PageHeader>
   )
 }

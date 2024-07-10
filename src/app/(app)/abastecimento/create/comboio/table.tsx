@@ -1,5 +1,5 @@
 'use client'
-import { TankResponse } from '@/@types/fuelling-tank'
+import { TankAndTrainResponse } from '@/@types/fuelling-tank'
 import { AlertModal } from '@/components/alert-modal'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -10,13 +10,11 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { FuelModal } from './SheetFuelModal'
-import { TankModal } from './train-modal'
+import { TrainModal } from './train-modal'
 
 export function Table() {
   async function fetchSelects() {
-    const response = await api
-      .get('fuelling/list-train')
-      .then((res) => res.data)
+    const response = await api.get('fuelling/train').then((res) => res.data)
     return response.data
   }
 
@@ -25,14 +23,14 @@ export function Table() {
     queryFn: fetchSelects,
   })
 
-  const [editData, setEditData] = useState<TankResponse | undefined>()
+  const [editData, setEditData] = useState<TankAndTrainResponse | undefined>()
   const [trainIdToDelete, setTrainIdToDelete] = useState<number | undefined>()
   const [trainIdToCompartment, setTrainIdToCompartment] = useState<
     string | undefined
   >(undefined)
 
-  async function handleDeleteTank() {
-    const response = await api.delete(`fuelling/tank/${trainIdToDelete}`)
+  async function handleDeleteTrain() {
+    const response = await api.delete(`fuelling/train/${trainIdToDelete}`)
 
     if (response.status !== 200) return
 
@@ -43,7 +41,7 @@ export function Table() {
     refetch()
   }
 
-  const columns: ColumnDef<TankResponse>[] = [
+  const columns: ColumnDef<TankAndTrainResponse>[] = [
     {
       accessorKey: 'id',
       header: '',
@@ -76,11 +74,11 @@ export function Table() {
       },
     },
     {
-      accessorKey: 'model',
+      accessorKey: 'tag',
       header: 'tag',
     },
     {
-      accessorKey: 'tank',
+      accessorKey: 'train',
       header: 'Descrição',
     },
     {
@@ -100,14 +98,14 @@ export function Table() {
   return (
     <>
       <DataTable columns={columns} data={data || []} />
-      <TankModal
+      <TrainModal
         mode="edit"
         open={!!editData}
         defaultValues={editData}
         onOpenChange={(open) => setEditData(open ? editData : undefined)}
       />
       <FuelModal
-        tankId={trainIdToCompartment || ''}
+        trainId={trainIdToCompartment || ''}
         open={!!trainIdToCompartment}
         onOpenChange={(open) => {
           setTrainIdToCompartment(open ? trainIdToCompartment : undefined)
@@ -119,7 +117,7 @@ export function Table() {
         onOpenChange={(open) =>
           setTrainIdToDelete(open ? trainIdToDelete : undefined)
         }
-        onConfirm={handleDeleteTank}
+        onConfirm={handleDeleteTrain}
       />
     </>
   )

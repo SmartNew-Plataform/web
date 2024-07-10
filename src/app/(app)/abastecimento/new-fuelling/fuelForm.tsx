@@ -19,7 +19,9 @@ const createSupplyFormSchema = z.object({
   typeSupplier: z.string({ required_error: 'Este campo é obrigatório!' }),
   driver: z.string({ required_error: 'Este campo é obrigatório!' }),
   odometerPrevious: z.coerce.number().optional(),
-  odometer: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
+  odometer: z.coerce
+    .number({ required_error: 'Este campo é obrigatório!' })
+    .optional(),
   receipt: z.coerce.string({ required_error: 'Este campo é obrigatório!' }),
   request: z.string({ required_error: 'Este campo é obrigatório!' }),
   date: z.coerce.string({ required_error: 'Informe a data do abastecimento!' }),
