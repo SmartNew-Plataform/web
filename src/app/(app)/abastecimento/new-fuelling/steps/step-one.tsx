@@ -21,37 +21,46 @@ export type FuelType = {
 
 export function StepOne() {
   async function loadSelects() {
-    const response = await api
-      .get<{ data: TankAndTrainResponse[] }>(`fuelling/tank`)
-      .then((response) => response.data)
-    const responseTrain = await api
-      .get<{ data: TrainData[] }>(`fuelling/train`)
-      .then((response) => response.data)
-    const responsePost = await api
-      .get<{ data: SelectData[] }>(`fuelling/list-fuel-station`)
-      .then((response) => response.data)
-    const responseDriver = await api
-      .get<{ data: SelectData[] }>(`fuelling/list-driver`)
-      .then((response) => response.data)
-    const responseEquipament = await api
-      .get<EquipmentResponse[]>(`fuelling/list-equipment`)
-      .then((response) => response.data)
-    const responseFuel = await api
-      .get<{ data: FuelType[] }>(`fuelling/list-fuel`)
-      .then((response) => response.data)
+    const [
+      tankResponse,
+      trainResponse,
+      postResponse,
+      driverResponse,
+      equipmentResponse,
+      fuelResponse,
+    ] = await Promise.all([
+      api
+        .get<{ data: TankAndTrainResponse[] }>(`fuelling/tank`)
+        .then((response) => response.data),
+      api
+        .get<{ data: TrainData[] }>(`fuelling/train`)
+        .then((response) => response.data),
+      api
+        .get<{ data: SelectData[] }>(`fuelling/list-fuel-station`)
+        .then((response) => response.data),
+      api
+        .get<{ data: SelectData[] }>(`fuelling/list-driver`)
+        .then((response) => response.data),
+      api
+        .get<EquipmentResponse[]>(`fuelling/list-equipment`)
+        .then((response) => response.data),
+      api
+        .get<{ data: FuelType[] }>(`fuelling/list-fuel`)
+        .then((response) => response.data),
+    ])
 
     return {
-      tank: response.data,
-      train: responseTrain.data,
-      post: responsePost.data,
-      driver: responseDriver.data,
-      equipment: responseEquipament.map(({ type, counter, label, value }) => ({
+      tank: tankResponse.data,
+      train: trainResponse.data,
+      post: postResponse.data,
+      driver: driverResponse.data,
+      equipment: equipmentResponse.map(({ type, counter, label, value }) => ({
         value,
         label,
         counter,
         type,
       })),
-      fuel: responseFuel.data,
+      fuel: fuelResponse.data,
     }
   }
 
@@ -67,36 +76,40 @@ export function StepOne() {
   const typeSupplierOptions = {
     tank: {
       label: 'Tanque',
-      options: selects?.tank.map(({ id, tank, compartmentAll }) => ({
-        label: tank,
-        value: id.toString(),
-        compartment: compartmentAll,
-      })),
+      options:
+        selects?.tank.map(({ id, tank, compartmentAll }) => ({
+          label: tank,
+          value: id.toString(),
+          compartment: compartmentAll,
+        })) || [],
     },
     train: {
       label: 'Comboio',
-      options: selects?.train.map(({ id, train, compartmentAll }) => ({
-        label: train,
-        value: id.toString(),
-        compartment: compartmentAll,
-      })),
+      options:
+        selects?.train.map(({ id, train, compartmentAll }) => ({
+          label: train,
+          value: id.toString(),
+          compartment: compartmentAll,
+        })) || [],
     },
     post: {
       label: 'Posto',
-      options: selects?.post.map(({ label, value }) => ({
-        label,
-        value,
-        compartment: undefined,
-      })),
+      options:
+        selects?.post.map(({ label, value }) => ({
+          label,
+          value,
+          compartment: [],
+        })) || [],
     },
   }
 
   const supplierMethodValue = watch(supplier)
-  const supplierMethodData = supplier
-    ? typeSupplierOptions[supplier].options?.find(
-        (item) => item.value === supplierMethodValue,
-      )
-    : undefined
+  const supplierMethodData =
+    supplier && typeSupplierOptions[supplier]?.options
+      ? typeSupplierOptions[supplier]?.options.find(
+          (item) => item.value === supplierMethodValue,
+        )
+      : undefined
 
   const compartmentOptions = supplierMethodData?.compartment
     ? supplierMethodData?.compartment.map(({ fuel, id, odometer }) => ({
