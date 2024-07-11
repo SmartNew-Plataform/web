@@ -1,3 +1,5 @@
+'use client'
+import { TrainData } from '@/@types/fuelling-fuelling'
 import { TankAndTrainResponse } from '@/@types/fuelling-tank'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
@@ -5,10 +7,10 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 
 interface TankModalProps extends ComponentProps<typeof Dialog> {
@@ -37,18 +39,64 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     formState: { isSubmitting },
   } = tankForm
 
+  async function loadSelects() {
+    const response = await api
+      .get<{ data: TankAndTrainResponse[] }>(`fuelling/tank`)
+      .then((response) => response.data)
+    const responseTrain = await api
+      .get<{ data: TrainData[] }>(`fuelling/train`)
+      .then((response) => response.data)
+
+    return {
+      tank: response.data,
+      train: responseTrain.data,
+    }
+  }
+
+  const { data: selects, isLoading: isLoadingSelects } = useQuery({
+    queryKey: ['fuelling/inlet'],
+    queryFn: loadSelects,
+  })
+
+  const { watch } = useFormContext()
+  const supplier = watch('typeSupplier') as 'tank' | 'train'
+
+  const typeSupplierOptions = {
+    tank: {
+      label: 'Tanque',
+      options: selects?.tank.map(({ id, tank, compartmentAll }) => ({
+        label: tank,
+        value: id.toString(),
+        compartment: compartmentAll,
+      })),
+    },
+    train: {
+      label: 'Comboio',
+      options: selects?.train.map(({ id, train, compartmentAll }) => ({
+        label: train,
+        value: id.toString(),
+        compartment: compartmentAll,
+      })),
+    },
+  }
+
+  const supplierMethodValue = watch(supplier)
+  const supplierMethodData = supplier
+    ? typeSupplierOptions[supplier].options?.find(
+        (item) => item.value === supplierMethodValue,
+      )
+    : undefined
+
+  const compartmentOptions = supplierMethodData?.compartment
+    ? supplierMethodData?.compartment.map(({ fuel, id, odometer }) => ({
+        label: fuel.label,
+        value: id.toString(),
+        odometer,
+      }))
+    : undefined
+
   const { toast } = useToast()
   const queryClient = useQueryClient()
-
-  // async function fetchSelects() {
-  //   const response = await api
-  //     .get<{ data: SelectData[] }>('system/list-branch')
-  //     .then((res) => res.data)
-
-  //   return {
-  //     branch: response.data,
-  //   }
-  // }
 
   async function handleCreateTank({
     tag,
@@ -91,11 +139,6 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     queryClient.refetchQueries(['fuelling/create/data'])
   }
 
-  // const { data: selects } = useQuery({
-  //   queryKey: ['fuelling/create/selects'],
-  //   queryFn: fetchSelects,
-  // })
-
   useEffect(() => {
     if (mode === 'edit') {
       reset({
@@ -118,18 +161,49 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
             )}
           >
             <Form.Field>
-              <Form.Label htmlFor="tag-input">Tipo:</Form.Label>
-              <Form.Input name="tag" id="tag-input" />
-              <Form.ErrorMessage field="tag" />
+              <Form.Label htmlFor="typeSupplier">Tipo:</Form.Label>
+              <Form.Select
+                name="typeSupplier"
+                id="typeSupplier"
+                options={[
+                  {
+                    label: 'Tanque',
+                    value: 'tank',
+                  },
+                  {
+                    label: 'Comboio',
+                    value: 'train',
+                  },
+                ]}
+              />
+              <Form.ErrorMessage field="typeSupplier" />
             </Form.Field>
 
-            <Form.Field>
-              <Form.Label htmlFor="description-input">
-                Compartimento:
-              </Form.Label>
-              <Form.Input name="description" id="description-input" />
-              <Form.ErrorMessage field="description" />
-            </Form.Field>
+            {isLoadingSelects || !supplier ? (
+              <Form.SkeletonField />
+            ) : (
+              <Form.Field>
+                <Form.Label>{typeSupplierOptions[supplier].label}:</Form.Label>
+                <Form.Select
+                  name={supplier}
+                  id={supplier}
+                  options={typeSupplierOptions[supplier].options}
+                />
+                <Form.ErrorMessage field="typeSupplier" />
+              </Form.Field>
+            )}
+
+            {compartmentOptions ? (
+              <Form.Field>
+                <Form.Label>Compartimento:</Form.Label>
+                <Form.Select
+                  name="compartment"
+                  id="compartment"
+                  options={compartmentOptions}
+                />
+                <Form.ErrorMessage field="compartment" />
+              </Form.Field>
+            ) : undefined}
 
             <Form.Field>
               <Form.Label htmlFor="capacity-input">Quantidade:</Form.Label>
@@ -138,9 +212,9 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="branch-input">Abastecedor:</Form.Label>
-              <Form.Select name="branch" id="branch-input" />
-              <Form.ErrorMessage field="branch" />
+              <Form.Label htmlFor="fuelling-input">Abastecedor:</Form.Label>
+              <Form.Select name="fuelling" id="fuelling" />
+              <Form.ErrorMessage field="fuelling" />
             </Form.Field>
 
             <Form.Field>

@@ -33,7 +33,7 @@ export function Table() {
     try {
       const response = await api.get<FuelingData>(`fuelling/${id}`)
       if (response.status === 200) {
-        const { data } = response.data
+        const data = response.data
         setEditingFuelData(mapFuelingDataToSupplyFormData(data))
         setFuellingIdToEdit(id)
       } else {

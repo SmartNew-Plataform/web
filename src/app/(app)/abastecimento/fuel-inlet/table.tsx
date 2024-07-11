@@ -7,7 +7,7 @@ import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { FuelModal } from './SheetFuelModal'
 import { TankModal } from './inlet-modal'
@@ -35,7 +35,7 @@ export function Table() {
     if (response.status !== 200) return
 
     toast({
-      title: 'Tanque deletado com sucesso!',
+      title: 'Entrada deletado com sucesso!',
       variant: 'success',
     })
     refetch()
@@ -62,13 +62,13 @@ export function Table() {
             >
               <Trash2 size={12} />
             </Button>
-            <Button
+            {/* <Button
               onClick={() => setTankIdToCompartment(id)}
               variant="outline"
               size="icon-xs"
             >
               <Plus size={12} />
-            </Button>
+            </Button> */}
           </div>
         )
       },

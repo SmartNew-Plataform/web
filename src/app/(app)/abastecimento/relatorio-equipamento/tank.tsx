@@ -25,7 +25,11 @@ export function Tank({ type, fuel, fuelLevel, fuelCapacity }: TankProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className={styles.fuelContainer}>
-        {type === 'internal' ? <TruckSvg id={id} /> : <PumpSvg id={id} />}
+        {type === 'internal' ? (
+          <TruckSvg id={Number(id)} />
+        ) : (
+          <PumpSvg id={Number(id)} />
+        )}
         <div style={{ clipPath: `url(#${id})` }} className={styles.fuelPump}>
           <motion.div
             animate={{ height: `${fuelLevelPercent}%`, background }}
