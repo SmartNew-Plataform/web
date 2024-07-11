@@ -25,6 +25,7 @@ export function useWizardForm() {
     direction,
     paginate,
     setSteps,
+    indexStep,
     lastStep,
     firstStep,
     percentSteps,
