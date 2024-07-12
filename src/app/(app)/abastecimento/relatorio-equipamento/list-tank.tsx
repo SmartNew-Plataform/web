@@ -5,16 +5,16 @@ import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'next/navigation'
 import { Tank } from './tank'
 
-interface TankType {
+interface TypeTank {
   name: string
   type: 'internal' | 'external'
   maxCapacity: number
   quantity: number
 }
 
-interface ListTankType {
+export interface ListTankType {
   name: string
-  tank: TankType[]
+  tank: TypeTank[]
 }
 
 export function ListTank() {
@@ -37,18 +37,6 @@ export function ListTank() {
     queryFn: fetchTankList,
     refetchInterval: 30000,
   })
-
-  // const data = Array.from({ length: 3 }).map((_, i) => ({
-  //   name: `Tanque ${i + 1}`,
-  //   tank: Array.from({ length: 3 }).map((_, index) => ({
-  //     name: 'Gasosa',
-  //     type: i % 2 ? 'external' : 'internal',
-  //     maxCapacity: Number(`${index + 1}0`),
-  //     quantity: Number(`${index + 1}0`) / index + 1,
-  //   })),
-  // })) as ListTankType[]
-
-  console.log(data)
 
   return (
     <div className="flex max-h-full flex-col gap-4 overflow-auto">

@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useUserStore } from '@/store/user-store'
-import { AreaChart, Plus, XCircle } from 'lucide-react'
+import { AreaChart, Fuel, MessageSquare, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
@@ -81,8 +81,21 @@ export function HeaderFuelling() {
               query: { token: searchParams.get('token') },
             }}
           >
-            <XCircle className="h-4 w-4" />
+            <Fuel className="h-4 w-4" />
             Abastecimentos
+          </Link>
+        </Button>
+
+        <Button asChild variant="ghost">
+          <Link
+            target="_blank"
+            href={{
+              pathname: '/abastecimento/relatorio-equipamento',
+              query: { token: searchParams.get('token') },
+            }}
+          >
+            <MessageSquare className="h-4 w-4" />
+            Relatórios
           </Link>
         </Button>
       </div>

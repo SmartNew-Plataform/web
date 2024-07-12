@@ -1,4 +1,4 @@
-export function PumpSvg({ id }: { id: number }) {
+export function PumpSvg({ id }: { id: string }) {
   return (
     <svg
       width="200"
