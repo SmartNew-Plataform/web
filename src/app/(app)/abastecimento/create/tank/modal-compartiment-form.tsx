@@ -79,7 +79,7 @@ export function ModalCompartmentForm({
               <Form.ErrorMessage field="fuel" />
             </Form.Field>
             <Form.Field>
-              <Form.Label htmlFor="capacity-input">Capacidade:</Form.Label>
+              <Form.Label htmlFor="capacity-input">Saldo:</Form.Label>
               <Form.Input type="number" name="capacity" id="capacity-input" />
               <Form.ErrorMessage field="capacity" />
             </Form.Field>
