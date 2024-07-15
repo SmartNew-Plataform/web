@@ -70,6 +70,12 @@ export function ModalCompartmentForm({
             className="flex w-full flex-col gap-2"
           >
             <Form.Field>
+              <Form.Label htmlFor="compartment">Compartimento:</Form.Label>
+              <Form.Select name="compartment" id="compartment" />
+              <Form.ErrorMessage field="fuel" />
+            </Form.Field>
+
+            <Form.Field>
               <Form.Label htmlFor="fuel-input">Combustível:</Form.Label>
               <Form.Select
                 name="fuel"

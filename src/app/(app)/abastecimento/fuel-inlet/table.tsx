@@ -7,14 +7,15 @@ import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { Pencil, Trash2 } from 'lucide-react'
+import dayjs from 'dayjs'
+import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { FuelModal } from './SheetFuelModal'
 import { TankModal } from './inlet-modal'
 
 export function Table() {
   async function fetchSelects() {
-    const response = await api.get('fuelling/tank').then((res) => res.data)
+    const response = await api.get('fuelling/input').then((res) => res.data)
     return response.data
   }
 
@@ -62,36 +63,40 @@ export function Table() {
             >
               <Trash2 size={12} />
             </Button>
-            {/* <Button
+            <Button
               onClick={() => setTankIdToCompartment(id)}
               variant="outline"
               size="icon-xs"
             >
               <Plus size={12} />
-            </Button> */}
+            </Button>
           </div>
         )
       },
     },
     {
-      accessorKey: 'tag',
-      header: 'Tanque - Comboio',
+      accessorKey: 'fiscalNumber',
+      header: 'Nota fiscal',
     },
     {
-      accessorKey: 'Combustível',
-      header: 'Combustível',
+      accessorKey: 'bound.text',
+      header: 'Equipamento abastecido',
     },
     {
-      accessorKey: 'Quantidade',
-      header: 'Quantidade',
+      accessorKey: 'provider.text',
+      header: 'Fornecedor',
     },
     {
-      accessorKey: 'Abastecedor',
-      header: 'Abastecedor',
+      accessorKey: 'total',
+      header: 'Valor total',
     },
     {
-      accessorKey: 'Data',
+      accessorKey: 'data',
       header: 'Data',
+      cell({ getValue }) {
+        const date = getValue() as string
+        return dayjs(date).format('DD/MM/YYYY')
+      },
     },
   ]
 

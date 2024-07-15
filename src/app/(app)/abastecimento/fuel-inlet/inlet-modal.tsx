@@ -1,13 +1,14 @@
 'use client'
 import { TrainData } from '@/@types/fuelling-fuelling'
 import { TankAndTrainResponse } from '@/@types/fuelling-tank'
+import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -19,12 +20,15 @@ interface TankModalProps extends ComponentProps<typeof Dialog> {
 }
 
 const tankFormSchema = z.object({
-  description: z.string({ required_error: 'Este campo e obrigatório!' }).min(1),
-  tag: z
+  typeSupplier: z
+    .string({ required_error: 'Este campo e obrigatório!' })
+    .min(1),
+  type: z
     .string({ required_error: 'Este campo e obrigatório!' })
     .min(1, 'Este campo e obrigatório!'),
-  capacity: z.coerce.number().min(0),
-  branch: z.string({ required_error: 'Escolha uma filial!' }),
+  fiscalNumber: z.coerce.number().min(0),
+  provider: z.string({ required_error: 'Escolha uma filial!' }),
+  date: z.string({ required_error: 'Informe a data' }),
 })
 
 type TankFormData = z.infer<typeof tankFormSchema>
@@ -36,6 +40,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   const {
     reset,
     handleSubmit,
+    watch,
     formState: { isSubmitting },
   } = tankForm
 
@@ -46,27 +51,66 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     const responseTrain = await api
       .get<{ data: TrainData[] }>(`fuelling/train`)
       .then((response) => response.data)
+    const responseDriver = await api
+      .get<{ data: SelectData[] }>(`fuelling/list-driver`)
+      .then((response) => response.data)
+    const responseProvider = await api
+      .get<SelectData[]>(`system/list-provider`)
+      .then((response) => response.data)
 
     return {
       tank: response.data,
       train: responseTrain.data,
+      driver: responseDriver.data,
+      provider: responseProvider.map(({ value, label }) => ({
+        value,
+        label,
+      })),
     }
+  }
+
+  const { data: selects, isLoading: isLoadingSelects } = useQuery({
+    queryKey: ['fuelling/fuel-inlet'],
+    queryFn: loadSelects,
+  })
+
+  const type = watch('typeSupplier') as 'tank' | 'train'
+
+  const typeSupplierOptions = {
+    tank: {
+      label: 'Tanque',
+      options:
+        selects?.tank.map(({ id, tank, compartmentAll }) => ({
+          label: tank,
+          value: id.toString(),
+          compartment: compartmentAll,
+        })) || [],
+    },
+    train: {
+      label: 'Comboio',
+      options:
+        selects?.train.map(({ id, train, compartmentAll }) => ({
+          label: train,
+          value: id.toString(),
+          compartment: compartmentAll,
+        })) || [],
+    },
   }
 
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
   async function handleCreateTank({
-    tag,
-    description,
-    capacity,
-    branch,
+    type,
+    typeSupplier,
+    fiscalNumber,
+    provider,
   }: TankFormData) {
-    const response = await api.post('fuelling/tank', {
-      model: tag,
-      tank: description,
-      capacity,
-      branchId: branch,
+    const response = await api.post('fuelling/input', {
+      type,
+      typeSupplier,
+      fiscalNumber,
+      provider,
     })
 
     if (response.status !== 201) return
@@ -77,10 +121,10 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   }
 
   async function handleEditTank({
-    tag,
-    description,
-    capacity,
-    branch,
+    type: tag,
+    typeSupplier: description,
+    fiscalNumber: capacity,
+    provider: branch,
   }: TankFormData) {
     const response = await api.put(`fuelling/tank/${defaultValues?.id}`, {
       model: tag,
@@ -100,10 +144,10 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   useEffect(() => {
     if (mode === 'edit') {
       reset({
-        tag: defaultValues?.model,
-        branch: defaultValues?.branch.value,
-        capacity: defaultValues?.capacity,
-        description: defaultValues?.tank,
+        type: defaultValues?.model,
+        provider: defaultValues?.branch.value,
+        fiscalNumber: defaultValues?.capacity,
+        typeSupplier: defaultValues?.tank,
       })
     }
   }, [mode, defaultValues])
@@ -137,27 +181,33 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
               <Form.ErrorMessage field="typeSupplier" />
             </Form.Field>
 
+            {isLoadingSelects || !type ? (
+              <Form.SkeletonField />
+            ) : (
+              <Form.Field>
+                <Form.Label>{typeSupplierOptions[type].label}:</Form.Label>
+                <Form.Select
+                  name={type}
+                  id={type}
+                  options={typeSupplierOptions[type].options}
+                />
+                <Form.ErrorMessage field="supplier" />
+              </Form.Field>
+            )}
+
             <Form.Field>
-              <Form.Label>Tanque ou comboio:</Form.Label>
-              <Form.Select name="supplier" id="supplier" />
-              <Form.ErrorMessage field="typeSupplier" />
+              <Form.Label htmlFor="fiscalNumber">Nota fiscal:</Form.Label>
+              <Form.Input type="number" name="fiscalNumber" id="fiscalNumber" />
+              <Form.ErrorMessage field="fiscalNumber" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label>Compartimento:</Form.Label>
-              <Form.Select name="compartment" id="compartment" />
-              <Form.ErrorMessage field="compartment" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="capacity-input">Quantidade:</Form.Label>
-              <Form.Input name="capacity" id="capacity-input" type="number" />
-              <Form.ErrorMessage field="capacity" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="fuelling-input">Abastecedor:</Form.Label>
-              <Form.Select name="fuelling" id="fuelling" />
+              <Form.Label htmlFor="provider">Fornecedor:</Form.Label>
+              <Form.Select
+                name="provider"
+                id="provider"
+                options={selects?.provider}
+              />
               <Form.ErrorMessage field="fuelling" />
             </Form.Field>
 
