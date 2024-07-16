@@ -9,10 +9,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Pencil, Plus, Trash } from 'lucide-react'
 import { ComponentProps, useState } from 'react'
 import { z } from 'zod'
-import {
-  CompartmentFormData,
-  ModalCompartmentForm,
-} from './modal-compartiment-form'
+import { InletFormData, ModalInletForm } from './modal-inlet-form'
 
 const createActiveFormSchema = z.object({})
 
@@ -52,10 +49,10 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     queryFn: fetchCompartment,
   })
 
-  async function handleCreateCompartment(data: CompartmentFormData) {
-    const response = await api.post(`fuelling/tank/${tankId}/compartment`, {
+  async function handleCreateCompartment(data: InletFormData) {
+    const response = await api.post(`fuelling/input/${tankId}`, {
       fuelId: data.fuel,
-      capacity: data.capacity,
+      capacity: data.quantity,
     })
 
     if (response.status !== 201) return
@@ -67,13 +64,10 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     queryClient.refetchQueries(['fuelling/tank/compartment'])
   }
 
-  async function handleEditCompartment({
-    capacity,
-    fuel,
-  }: CompartmentFormData) {
+  async function handleEditCompartment({ quantity, fuel }: InletFormData) {
     const response = await api.put(
       `fuelling/tank/${tankId}/compartment/${createEditModalOpen?.id}`,
-      { fuelId: fuel, capacity },
+      { fuelId: fuel, quantity },
     )
 
     if (response.status !== 200) return
@@ -103,7 +97,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     <Sheet {...props}>
       <SheetContent className="flex max-h-screen w-1/4 flex-col overflow-x-hidden">
         <div className="mt-4 flex items-end justify-between border-b border-zinc-200 pb-4">
-          <SheetTitle>Compartimentos</SheetTitle>
+          <SheetTitle>Entradas realizadas</SheetTitle>
           <Button onClick={() => setCreatModalOpen(true)}>
             <Plus size={16} />
             Novo
@@ -145,13 +139,13 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
           })}
         </div>
 
-        <ModalCompartmentForm
+        <ModalInletForm
           onSubmit={handleCreateCompartment}
           open={createModalOpen}
           onOpenChange={setCreatModalOpen}
         />
 
-        <ModalCompartmentForm
+        <ModalInletForm
           mode="edit"
           defaultValues={createEditModalOpen}
           tankId={''}

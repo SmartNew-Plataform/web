@@ -1,5 +1,5 @@
 'use client'
-import { TankAndTrainResponse } from '@/@types/fuelling-tank'
+import { FuelInlet } from '@/@types/fuelling-tank'
 import { AlertModal } from '@/components/alert-modal'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -24,7 +24,7 @@ export function Table() {
     queryFn: fetchSelects,
   })
 
-  const [editData, setEditData] = useState<TankAndTrainResponse | undefined>()
+  const [editData, setEditData] = useState<FuelInlet | undefined>()
   const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
   const [tankIdToCompartment, setTankIdToCompartment] = useState<
     string | undefined
@@ -42,14 +42,13 @@ export function Table() {
     refetch()
   }
 
-  const columns: ColumnDef<TankAndTrainResponse>[] = [
+  const columns: ColumnDef<FuelInlet>[] = [
     {
       accessorKey: 'id',
       header: '',
       cell({ row }) {
         const id = row.getValue('id') as string
         const data = row.original
-        console.log(id)
 
         return (
           <div className="flex gap-2">
@@ -91,7 +90,7 @@ export function Table() {
       header: 'Valor total',
     },
     {
-      accessorKey: 'data',
+      accessorKey: 'date',
       header: 'Data',
       cell({ getValue }) {
         const date = getValue() as string

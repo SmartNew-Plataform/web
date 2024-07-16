@@ -30,3 +30,13 @@ export interface TankAndTrainResponse {
     }
   }>
 }
+
+export interface FuelInlet {
+  id: number
+  bound: SelectData
+  provider: SelectData
+  date: string
+  typeSupplier: SelectData
+  type: SelectData
+  fiscalNumber: string
+}

@@ -10,34 +10,36 @@ import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const compartmentFormSchema = z.object({
+const inletFormSchema = z.object({
+  compartment: z.string({ required_error: 'Informe o compartimento' }),
   fuel: z
     .string({ required_error: 'Este campo é obrigatório!' })
     .min(1, 'Este campo e obrigatório'),
-  capacity: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
+  quantity: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
+  value: z.number({ required_error: 'Este campo é obrigatório!' }),
 })
 
-export type CompartmentFormData = z.infer<typeof compartmentFormSchema>
+export type InletFormData = z.infer<typeof inletFormSchema>
 
-interface ModalCompartmentFormProps extends ComponentProps<typeof Dialog> {
-  onSubmit: (data: CompartmentFormData) => void
-  defaultValues?: CompartmentFormData
+interface ModalInletFormProps extends ComponentProps<typeof Dialog> {
+  onSubmit: (data: InletFormData) => void
+  defaultValues?: InletFormData
   mode?: 'create' | 'edit'
   tankId?: string
 }
 
-export function ModalCompartmentForm({
+export function ModalInletForm({
   onSubmit,
   mode = 'create',
   defaultValues,
   ...props
-}: ModalCompartmentFormProps) {
-  const CompartmentDiverseForm = useForm<CompartmentFormData>({
-    resolver: zodResolver(compartmentFormSchema),
+}: ModalInletFormProps) {
+  const InletDiverseForm = useForm<InletFormData>({
+    resolver: zodResolver(inletFormSchema),
   })
-  const { handleSubmit, reset } = CompartmentDiverseForm
+  const { handleSubmit, reset } = InletDiverseForm
 
-  async function intermadeSubmit(data: CompartmentFormData) {
+  async function intermadeSubmit(data: InletFormData) {
     await onSubmit(data)
     if (mode === 'create') reset({ fuel: '' })
   }
@@ -47,12 +49,12 @@ export function ModalCompartmentForm({
   }, [defaultValues, reset])
 
   async function fetchSelects() {
-    const response = await api
+    const responseFuel = await api
       .get(`fuelling/list-fuel`)
       .then((res) => res.data.data)
 
     return {
-      fuel: response,
+      fuel: responseFuel,
     }
   }
 
@@ -64,7 +66,7 @@ export function ModalCompartmentForm({
   return (
     <Dialog {...props}>
       <DialogContent>
-        <FormProvider {...CompartmentDiverseForm}>
+        <FormProvider {...InletDiverseForm}>
           <form
             onSubmit={handleSubmit(intermadeSubmit)}
             className="flex w-full flex-col gap-2"
@@ -72,22 +74,23 @@ export function ModalCompartmentForm({
             <Form.Field>
               <Form.Label htmlFor="compartment">Compartimento:</Form.Label>
               <Form.Select name="compartment" id="compartment" />
-              <Form.ErrorMessage field="fuel" />
+              <Form.ErrorMessage field="compartment" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="fuel-input">Combustível:</Form.Label>
-              <Form.Select
-                name="fuel"
-                id="fuel-input"
-                options={data?.fuel || []}
-              />
+              <Form.Label htmlFor="fuel">Combustível:</Form.Label>
+              <Form.Select name="fuel" id="fuel" options={data?.fuel || []} />
               <Form.ErrorMessage field="fuel" />
             </Form.Field>
             <Form.Field>
-              <Form.Label htmlFor="capacity-input">Capacidade:</Form.Label>
-              <Form.Input type="number" name="capacity" id="capacity-input" />
-              <Form.ErrorMessage field="capacity" />
+              <Form.Label htmlFor="quantity">Quantidade:</Form.Label>
+              <Form.Input type="number" name="quantity" id="quantity" />
+              <Form.ErrorMessage field="quantity" />
+            </Form.Field>
+            <Form.Field>
+              <Form.Label htmlFor="value">Valor:</Form.Label>
+              <Form.Input type="number" name="value" id="value" />
+              <Form.ErrorMessage field="value" />
             </Form.Field>
             <Button type="submit">
               <Save size={16} />

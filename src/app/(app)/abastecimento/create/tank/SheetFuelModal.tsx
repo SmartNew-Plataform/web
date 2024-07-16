@@ -116,7 +116,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
                 <CardContent className="relative pt-5">
                   <p>{fuel.label}</p>
                   <p>Capacidade: {capacity}L</p>
-                  <p>Quantidade: {quantity}</p>
+                  <p>Saldo: {quantity}</p>
                   <div className="absolute right-4 top-4 flex gap-2">
                     <Button
                       onClick={() => setCompartmentIdToDelete(id)}

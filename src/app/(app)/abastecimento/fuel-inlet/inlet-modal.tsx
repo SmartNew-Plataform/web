@@ -1,6 +1,6 @@
 'use client'
 import { TrainData } from '@/@types/fuelling-fuelling'
-import { TankAndTrainResponse } from '@/@types/fuelling-tank'
+import { FuelInlet, TankAndTrainResponse } from '@/@types/fuelling-tank'
 import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -16,19 +17,19 @@ import { z } from 'zod'
 
 interface TankModalProps extends ComponentProps<typeof Dialog> {
   mode: 'create' | 'edit'
-  defaultValues?: TankAndTrainResponse
+  defaultValues?: FuelInlet
 }
 
 const tankFormSchema = z.object({
+  type: z.coerce.string({ required_error: 'Este campo e obrigatório!' }),
   typeSupplier: z
     .string({ required_error: 'Este campo e obrigatório!' })
     .min(1),
-  type: z
-    .string({ required_error: 'Este campo e obrigatório!' })
-    .min(1, 'Este campo e obrigatório!'),
-  fiscalNumber: z.coerce.number().min(0),
-  provider: z.string({ required_error: 'Escolha uma filial!' }),
-  date: z.string({ required_error: 'Informe a data' }),
+  fiscalNumber: z.coerce.string().min(0),
+  provider: z.coerce.string({ required_error: 'Escolha uma filial!' }),
+  date: z.coerce.date({ required_error: 'Informe a data' }),
+  tank: z.string().optional(),
+  train: z.string().optional(),
 })
 
 type TankFormData = z.infer<typeof tankFormSchema>
@@ -69,7 +70,11 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     }
   }
 
-  const { data: selects, isLoading: isLoadingSelects } = useQuery({
+  const {
+    data: selects,
+    isLoading: isLoadingSelects,
+    refetch,
+  } = useQuery({
     queryKey: ['fuelling/fuel-inlet'],
     queryFn: loadSelects,
   })
@@ -100,17 +105,15 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
-  async function handleCreateTank({
-    type,
-    typeSupplier,
-    fiscalNumber,
-    provider,
-  }: TankFormData) {
+  async function handleCreateTank(data: TankFormData) {
     const response = await api.post('fuelling/input', {
-      type,
-      typeSupplier,
-      fiscalNumber,
-      provider,
+      type: data.type,
+      trainId: data.train,
+      tankId: data.tank,
+      typeSupplier: data.typeSupplier,
+      fiscalNumber: data.fiscalNumber,
+      providerId: data.provider,
+      date: data.date,
     })
 
     if (response.status !== 201) return
@@ -118,24 +121,22 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     toast({ title: 'Tanque criado com sucesso', variant: 'success' })
 
     queryClient.refetchQueries(['fuelling/create/data'])
+    refetch()
   }
 
-  async function handleEditTank({
-    type: tag,
-    typeSupplier: description,
-    fiscalNumber: capacity,
-    provider: branch,
-  }: TankFormData) {
+  async function handleEditTank(data: TankFormData) {
     const response = await api.put(`fuelling/tank/${defaultValues?.id}`, {
-      model: tag,
-      tank: description,
-      capacity,
-      branchId: branch,
+      trainId: data.train,
+      tankId: data.tank,
+      typeSupplier: data.typeSupplier,
+      fiscalNumber: data.fiscalNumber,
+      providerId: data.provider,
+      date: data.date,
     })
     if (response.status !== 200) return
 
     toast({
-      title: 'Tanque atualizado com sucesso!',
+      title: 'Entrada atualizada com sucesso!',
       variant: 'success',
     })
     queryClient.refetchQueries(['fuelling/create/data'])
@@ -144,10 +145,11 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   useEffect(() => {
     if (mode === 'edit') {
       reset({
-        type: defaultValues?.model,
-        provider: defaultValues?.branch.value,
-        fiscalNumber: defaultValues?.capacity,
-        typeSupplier: defaultValues?.tank,
+        typeSupplier: defaultValues?.type.value,
+        type: defaultValues?.bound.value,
+        fiscalNumber: defaultValues?.fiscalNumber,
+        provider: defaultValues?.provider.value,
+        date: dayjs(defaultValues?.date).format('YYYY-MM-DD'),
       })
     }
   }, [mode, defaultValues])
@@ -191,7 +193,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
                   id={type}
                   options={typeSupplierOptions[type].options}
                 />
-                <Form.ErrorMessage field="supplier" />
+                <Form.ErrorMessage field="type" />
               </Form.Field>
             )}
 
@@ -208,7 +210,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
                 id="provider"
                 options={selects?.provider}
               />
-              <Form.ErrorMessage field="fuelling" />
+              <Form.ErrorMessage field="provider" />
             </Form.Field>
 
             <Form.Field>
@@ -216,6 +218,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
               <Form.Input type="date" name="date" id="date" />
               <Form.ErrorMessage field="date" />
             </Form.Field>
+
             <Button
               type="submit"
               disabled={isSubmitting}
