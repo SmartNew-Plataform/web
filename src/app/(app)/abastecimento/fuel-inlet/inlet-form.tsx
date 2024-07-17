@@ -32,6 +32,7 @@ export function ModalInletForm({
   onSubmit,
   mode = 'create',
   defaultValues,
+  tankId,
   ...props
 }: ModalInletFormProps) {
   const InletDiverseForm = useForm<InletFormData>({
@@ -59,7 +60,7 @@ export function ModalInletForm({
   }
 
   const { data } = useQuery({
-    queryKey: ['fuelling/tank/fuel/selects'],
+    queryKey: ['fuelling/tank/fuel/selects', tankId],
     queryFn: fetchSelects,
   })
 

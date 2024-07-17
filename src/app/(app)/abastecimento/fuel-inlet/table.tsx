@@ -10,8 +10,8 @@ import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { TankModal } from './Primary-modal'
 import { FuelModal } from './SheetFuelModal'
-import { TankModal } from './inlet-modal'
 
 export function Table() {
   async function fetchSelects() {
