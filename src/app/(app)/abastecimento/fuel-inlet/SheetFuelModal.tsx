@@ -9,10 +9,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Pencil, Plus, Trash } from 'lucide-react'
 import { ComponentProps, useState } from 'react'
 import { z } from 'zod'
-import {
-  CompartmentFormData,
-  ModalCompartmentForm,
-} from '../create/comboio/modal-compartiment-form'
+import { CompartmentFormData } from '../create/comboio/modal-compartiment-form'
+import { InletFormData, ModalInletForm } from './inlet-form'
 
 const createActiveFormSchema = z.object({})
 
@@ -26,6 +24,8 @@ interface TankFormProps {
   id: number
   fiscalNumber: string
   date: string
+  value: number
+  compartmentId: number
   type: {
     label: string
     value: string
@@ -41,18 +41,18 @@ interface TankFormProps {
   user: string
   quantity: number
   total: number
-  product: Array<{
+  product: {
     id: number
     compartmentId: number
     value: number
     quantity: number
-  }>
+  }
 }
 
 export function FuelModal({ tankId, ...props }: ActiveFormProps) {
   const [createModalOpen, setCreatModalOpen] = useState(false)
   const [createEditModalOpen, setCreateEditModalOpen] = useState<
-    { fuel: string; capacity: number; id: number } | undefined
+    TankFormProps | undefined
   >()
   const [compartmentIdToDelete, setCompartmentIdToDelete] = useState<
     number | undefined
@@ -71,10 +71,11 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     queryFn: fetchCompartment,
   })
 
-  async function handleCreateCompartment(data: CompartmentFormData) {
+  async function handleCreateCompartment(data: InletFormData) {
     const response = await api.post(`fuelling/input/${tankId}`, {
-      fuelId: data.fuel,
-      capacity: data.capacity,
+      fuelId: data.compartmentid,
+      capacity: data.quantity,
+      value: data.value,
     })
 
     if (response.status !== 201) return
@@ -129,12 +130,12 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
           </Button>
         </div>
         <div className="flex h-full flex-col gap-4 overflow-auto">
-          {data?.map(({ id, product }) => (
+          {data?.map(({ id, value, quantity, compartmentId }) => (
             <Card key={id}>
               <CardContent className="relative pt-5">
-                <p>Titulo</p>
-                <p>Capacidade: L</p>
-                <p>Quantidade: L </p>
+                <p>{compartmentId}</p>
+                <p>Quantidade: {quantity} L </p>
+                <p>Valor: {value} R$</p>
                 <div className="absolute right-4 top-4 flex gap-2">
                   <Button
                     onClick={() => setCompartmentIdToDelete(id)}
@@ -162,13 +163,13 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
           ))}
         </div>
 
-        <ModalCompartmentForm
+        <ModalInletForm
           onSubmit={handleCreateCompartment}
           open={createModalOpen}
           onOpenChange={setCreatModalOpen}
         />
 
-        <ModalCompartmentForm
+        <ModalInletForm
           mode="edit"
           defaultValues={createEditModalOpen}
           trainId={''}

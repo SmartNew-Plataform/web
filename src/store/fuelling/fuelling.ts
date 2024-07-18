@@ -26,3 +26,18 @@ export const useFuelling = create<FuellingData>((set) => {
     },
   }
 })
+
+interface TankState {
+  tankId: string | undefined
+  compartments: { id: string; label: string }[]
+  setTankId: (tankId: string) => void
+  setCompartments: (compartments: { id: string; label: string }[]) => void
+}
+
+export const useTankStore = create<TankState>((set) => ({
+  tankId: undefined,
+  compartments: [],
+  setTankId: (tankId) => set((state) => ({ ...state, tankId })),
+  setCompartments: (compartments) =>
+    set((state) => ({ ...state, compartments })),
+}))

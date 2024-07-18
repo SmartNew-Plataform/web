@@ -102,6 +102,21 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     },
   }
 
+  // const supplierMethodValue = watch(type)
+  // const supplierMethodData =
+  //   type && typeSupplierOptions[type]?.options
+  //     ? typeSupplierOptions[type]?.options.find(
+  //         (item) => item.value === supplierMethodValue,
+  //       )
+  //     : undefined
+
+  // const compartmentOptions = supplierMethodData?.compartment
+  //   ? supplierMethodData?.compartment.map(({ fuel, id }) => ({
+  //       label: fuel.label,
+  //       value: id.toString(),
+  //     }))
+  //   : undefined
+
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
@@ -152,7 +167,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
         date: dayjs(defaultValues?.date).format('YYYY-MM-DD'),
       })
     }
-  }, [mode, defaultValues])
+  }, [mode, defaultValues, reset])
 
   return (
     <Dialog {...props}>
@@ -191,7 +206,10 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
                 <Form.Select
                   name={type}
                   id={type}
-                  options={typeSupplierOptions[type].options}
+                  options={typeSupplierOptions[type].options.map((option) => ({
+                    label: option.label,
+                    value: option.value,
+                  }))}
                 />
                 <Form.ErrorMessage field="type" />
               </Form.Field>
