@@ -5,6 +5,7 @@ import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { InputInlet } from '@/store/fuelling/input-inlet'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
@@ -23,7 +24,7 @@ export function Table() {
     queryKey: ['fuelling/create/data'],
     queryFn: fetchSelects,
   })
-
+  const { tank, train, setCompartment } = InputInlet()
   const [editData, setEditData] = useState<FuelInlet | undefined>()
   const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
   const [tankIdToCompartment, setTankIdToCompartment] = useState<
@@ -63,7 +64,31 @@ export function Table() {
               <Trash2 size={12} />
             </Button>
             <Button
-              onClick={() => setTankIdToCompartment(id)}
+              onClick={() => {
+                if (data.type.value === 'tank') {
+                  const findTank = tank.find(
+                    (value) => value.value === data.bound.value,
+                  )
+
+                  if (!findTank) {
+                    console.log(data.bound.value, tank)
+                    return false
+                  }
+
+                  setCompartment(findTank.comparment.map((value) => value))
+                } else if (data.type.value === 'train') {
+                  const findTrain = train.find(
+                    (value) => value.value === data.bound.value,
+                  )
+
+                  if (!findTrain) {
+                    return false
+                  }
+
+                  setCompartment(findTrain.comparment.map((value) => value))
+                }
+                setTankIdToCompartment(id)
+              }}
               variant="outline"
               size="icon-xs"
             >

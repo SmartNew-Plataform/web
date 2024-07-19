@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { InputInlet } from '@/store/fuelling/input-inlet'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -27,7 +28,7 @@ const tankFormSchema = z.object({
     .min(1),
   fiscalNumber: z.coerce.string().min(0),
   provider: z.coerce.string({ required_error: 'Escolha uma filial!' }),
-  date: z.coerce.date({ required_error: 'Informe a data' }),
+  date: z.coerce.string({ required_error: 'Informe a data' }),
   tank: z.string().optional(),
   train: z.string().optional(),
 })
@@ -35,6 +36,7 @@ const tankFormSchema = z.object({
 type TankFormData = z.infer<typeof tankFormSchema>
 
 export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
+  const { setTank, setTrain } = InputInlet()
   const tankForm = useForm<TankFormData>({
     resolver: zodResolver(tankFormSchema),
   })
@@ -58,6 +60,36 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     const responseProvider = await api
       .get<SelectData[]>(`system/list-provider`)
       .then((response) => response.data)
+
+    setTank(
+      response.data.map((value) => {
+        return {
+          value: value.id.toString(),
+          label: value.tank,
+          comparment: value.compartmentAll.map((compart) => {
+            return {
+              value: compart.id.toString(),
+              label: compart.fuel.label,
+            }
+          }),
+        }
+      }),
+    )
+
+    setTrain(
+      responseTrain.data.map((value) => {
+        return {
+          value: value.id.toString(),
+          label: value.train,
+          comparment: value.compartmentAll.map((compart) => {
+            return {
+              value: compart.id.toString(),
+              label: compart.fuel.label,
+            }
+          }),
+        }
+      }),
+    )
 
     return {
       tank: response.data,
@@ -102,21 +134,6 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     },
   }
 
-  // const supplierMethodValue = watch(type)
-  // const supplierMethodData =
-  //   type && typeSupplierOptions[type]?.options
-  //     ? typeSupplierOptions[type]?.options.find(
-  //         (item) => item.value === supplierMethodValue,
-  //       )
-  //     : undefined
-
-  // const compartmentOptions = supplierMethodData?.compartment
-  //   ? supplierMethodData?.compartment.map(({ fuel, id }) => ({
-  //       label: fuel.label,
-  //       value: id.toString(),
-  //     }))
-  //   : undefined
-
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
@@ -140,7 +157,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   }
 
   async function handleEditTank(data: TankFormData) {
-    const response = await api.put(`fuelling/tank/${defaultValues?.id}`, {
+    const response = await api.put(`fuelling/input/${defaultValues?.id}`, {
       trainId: data.train,
       tankId: data.tank,
       typeSupplier: data.typeSupplier,
@@ -217,7 +234,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
 
             <Form.Field>
               <Form.Label htmlFor="fiscalNumber">Nota fiscal:</Form.Label>
-              <Form.Input type="number" name="fiscalNumber" id="fiscalNumber" />
+              <Form.Input name="fiscalNumber" id="fiscalNumber" />
               <Form.ErrorMessage field="fiscalNumber" />
             </Form.Field>
 

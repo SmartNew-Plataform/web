@@ -2,6 +2,7 @@
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { InputInlet } from '@/store/fuelling/input-inlet'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
@@ -9,9 +10,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const inletFormSchema = z.object({
-  compartmentid: z.string({ required_error: 'Informe o compartimento' }),
+  compartmentId: z.string({ required_error: 'Informe o compartimento' }),
   quantity: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
-  value: z.number({ required_error: 'Este campo é obrigatório!' }),
+  value: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
 })
 
 export type InletFormData = z.infer<typeof inletFormSchema>
@@ -21,7 +22,6 @@ interface ModalInletFormProps extends ComponentProps<typeof Dialog> {
   defaultValues?: InletFormData
   mode?: 'create' | 'edit'
   tankId?: string
-  compartmentOptions?: { label: string; value: string }[] | undefined
 }
 
 export function ModalInletForm({
@@ -29,9 +29,9 @@ export function ModalInletForm({
   mode = 'create',
   defaultValues,
   tankId,
-  compartmentOptions,
   ...props
 }: ModalInletFormProps) {
+  const { compartment } = InputInlet()
   const InletDiverseForm = useForm<InletFormData>({
     resolver: zodResolver(inletFormSchema),
   })
@@ -39,7 +39,7 @@ export function ModalInletForm({
 
   async function intermadeSubmit(data: InletFormData) {
     await onSubmit(data)
-    if (mode === 'create') reset({ compartmentid: '' })
+    if (mode === 'create') reset({ compartmentId: '' })
   }
 
   useEffect(() => {
@@ -56,14 +56,18 @@ export function ModalInletForm({
           >
             <Form.Field>
               <Form.Label htmlFor="compartment">Compartimento:</Form.Label>
-              <Form.Select name="compartmentid" id="compartmentid">
-                {compartmentOptions?.map((option) => (
-                  <option key={option.value} value={option.value}>
+              <Form.Select
+                name="compartmentId"
+                id="compartmentId"
+                options={compartment}
+              >
+                {compartment?.map((option, index) => (
+                  <option key={index} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </Form.Select>
-              <Form.ErrorMessage field="compartmentid" />
+              <Form.ErrorMessage field="compartmentId" />
             </Form.Field>
 
             <Form.Field>
