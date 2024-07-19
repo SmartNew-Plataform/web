@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { InputInlet } from '@/store/fuelling/input-inlet'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -35,6 +36,7 @@ const tankFormSchema = z.object({
 type TankFormData = z.infer<typeof tankFormSchema>
 
 export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
+  const {setTank, setTrain} = InputInlet()
   const tankForm = useForm<TankFormData>({
     resolver: zodResolver(tankFormSchema),
   })
@@ -58,6 +60,32 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     const responseProvider = await api
       .get<SelectData[]>(`system/list-provider`)
       .then((response) => response.data)
+
+    setTank(response.data.map(value => {
+      return {
+        value: value.id.toString(),
+        label: value.tank,
+        comparment: value.compartmentAll.map(compart => {
+          return {
+            value: compart.id.toString(),
+            label: compart.fuel.label
+          }
+        })
+      }
+    }))
+
+    setTrain(responseTrain.data.map(value => {
+      return {
+        value: value.id.toString(),
+        label: value.train,
+        comparment: value.compartmentAll.map(compart => {
+          return {
+            value: compart.id.toString(),
+            label: compart.fuel.label
+          }
+        })
+      }
+    }))
 
     return {
       tank: response.data,
@@ -164,7 +192,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
         type: defaultValues?.bound.value,
         fiscalNumber: defaultValues?.fiscalNumber,
         provider: defaultValues?.provider.value,
-        date: dayjs(defaultValues?.date).format('YYYY-MM-DD'),
+        date: dayjs(defaultValues?.date).toDate(),
       })
     }
   }, [mode, defaultValues, reset])

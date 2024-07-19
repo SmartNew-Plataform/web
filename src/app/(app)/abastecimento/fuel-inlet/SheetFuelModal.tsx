@@ -25,7 +25,7 @@ interface TankFormProps {
   fiscalNumber: string
   date: string
   value: number
-  compartmentId: number
+  compartmentId: string
   type: {
     label: string
     value: string
@@ -67,13 +67,13 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
   const queryClient = useQueryClient()
 
   const { data, refetch } = useQuery<TankFormProps[]>({
-    queryKey: ['fuelling/input/compartment', tankId],
+    queryKey: [`fuelling/input/compartment`, tankId],
     queryFn: fetchCompartment,
   })
 
   async function handleCreateCompartment(data: InletFormData) {
     const response = await api.post(`fuelling/input/${tankId}`, {
-      fuelId: data.compartmentid,
+      fuelId: Number(data.compartmentId),
       capacity: data.quantity,
       value: data.value,
     })
@@ -84,7 +84,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
       title: `Compartimento criado com sucesso`,
       variant: 'success',
     })
-    queryClient.refetchQueries(['fuelling/input/compartment'])
+    queryClient.refetchQueries([`fuelling/input/compartment`])
   }
 
   async function handleEditCompartment({
@@ -102,7 +102,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
       title: `Compartimento editado com sucesso`,
       variant: 'success',
     })
-    queryClient.refetchQueries(['fuelling/input/compartment'])
+    queryClient.refetchQueries([`fuelling/input/compartment`])
   }
 
   async function handleDeleteTrain() {

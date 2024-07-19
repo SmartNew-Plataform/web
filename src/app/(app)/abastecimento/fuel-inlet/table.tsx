@@ -12,6 +12,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { TankModal } from './Primary-modal'
 import { FuelModal } from './SheetFuelModal'
+import { InputInlet } from '@/store/fuelling/input-inlet'
 
 export function Table() {
   async function fetchSelects() {
@@ -23,7 +24,7 @@ export function Table() {
     queryKey: ['fuelling/create/data'],
     queryFn: fetchSelects,
   })
-
+  const {tank,train,setCompartment} = InputInlet()
   const [editData, setEditData] = useState<FuelInlet | undefined>()
   const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
   const [tankIdToCompartment, setTankIdToCompartment] = useState<
@@ -63,7 +64,32 @@ export function Table() {
               <Trash2 size={12} />
             </Button>
             <Button
-              onClick={() => setTankIdToCompartment(id)}
+              onClick={() => {
+                console.log(data)
+                console.log("id =>", data.bound.value)
+                if(data.type.value === 'tank'){
+                  console.log("tank => ",tank)
+                  const findTank = tank.find(value => value.value === data.bound.value)
+
+                  if(!findTank){
+                    console.log(data.bound.value,tank)
+                    return false
+                  }
+
+                  setCompartment(findTank.comparment.map(value => value))
+                }else if(data.type.value === 'train'){
+                  console.log("Train => ", train)
+                  const findTrain = train.find(value => value.value === data.bound.value)
+
+                  if(!findTrain){
+                    console.log(data.bound.value,train)
+                    return false
+                  }
+
+                  setCompartment(findTrain.comparment.map(value => value))
+                }
+                setTankIdToCompartment(id)
+              }}
               variant="outline"
               size="icon-xs"
             >
