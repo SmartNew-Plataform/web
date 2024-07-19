@@ -26,7 +26,7 @@ interface TankFormProps {
   fiscalNumber: string
   date: string
   value: number
-  compartmentId: number
+  compartmentId: string
   type: {
     label: string
     value: string
@@ -70,6 +70,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
 
   const { data, refetch } = useQuery<TankFormProps[]>({
     queryKey: [`fuelling/input`, tankId],
+
     queryFn: fetchCompartment,
   })
 
@@ -79,6 +80,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     const response = await api.post(`fuelling/input/${tankId}/product`, {
       compartmentId: String(data.compartmentId),
       quantity: data.quantity,
+
       value: data.value,
     })
 
@@ -88,6 +90,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
       title: `Entrada criada com sucesso`,
       variant: 'success',
     })
+
     queryClient.refetchQueries([`fuelling/input`, tankId])
   }
 
@@ -107,6 +110,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
       title: `Entrada editada com sucesso`,
       variant: 'success',
     })
+
     queryClient.refetchQueries([`fuelling/input/${tankId}`])
   }
 

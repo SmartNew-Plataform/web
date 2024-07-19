@@ -24,7 +24,9 @@ export function Table() {
     queryKey: ['fuelling/create/data'],
     queryFn: fetchSelects,
   })
+
   const { tank, train, setCompartment } = InputInlet()
+
   const [editData, setEditData] = useState<FuelInlet | undefined>()
   const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
   const [tankIdToCompartment, setTankIdToCompartment] = useState<

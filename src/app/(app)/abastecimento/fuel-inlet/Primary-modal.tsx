@@ -37,6 +37,7 @@ type TankFormData = z.infer<typeof tankFormSchema>
 
 export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   const { setTank, setTrain } = InputInlet()
+
   const tankForm = useForm<TankFormData>({
     resolver: zodResolver(tankFormSchema),
   })
