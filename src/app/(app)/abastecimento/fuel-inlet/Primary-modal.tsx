@@ -222,7 +222,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
               <Form.Field>
                 <Form.Label>{typeSupplierOptions[type].label}:</Form.Label>
                 <Form.Select
-                  name={type}
+                  name="type"
                   id={type}
                   options={typeSupplierOptions[type].options.map((option) => ({
                     label: option.label,
