@@ -32,11 +32,16 @@ export function Table() {
   async function fetchFueling(id: number) {
     try {
       const response = await api.get<FuelingData>(`fuelling/${id}`)
+
       if (response.status === 200) {
         const data = response.data
-        setEditingFuelData(mapFuelingDataToSupplyFormData(data))
+        console.log('Dados recebidos do abastecimento:', data)
+        const mappedData = mapFuelingDataToSupplyFormData(data.data)
+        console.log('Dados mapeados:', mappedData)
+        setEditingFuelData(mappedData)
         setFuellingIdToEdit(id)
       } else {
+        console.error('Erro ao buscar abastecimento:', response.statusText)
         toast({
           title: 'Erro ao buscar abastecimento',
           description: 'Não foi possível buscar os dados do abastecimento.',
@@ -69,28 +74,28 @@ export function Table() {
             ? 'post'
             : '',
       driver: data.driver?.value ?? '',
-      receipt: data.requestNumber,
-      request: data.fiscalNumber,
+      receipt: data.requestNumber ?? '',
+      request: data.fiscalNumber ?? '',
       date: dayjs(data.date).format('YYYY-MM-DD'),
       equipment: data.equipment.value.toString(),
       fuel: data.fuel.value.toString(),
-      quantity: data.quantidade,
-      consumption: Number(data.consumption),
+      quantity: Number(data.quantidade),
+      consumption: data.consumption ?? 0,
       value: data.value,
-      comments: data?.observation ?? '',
+      comments: data.observation ?? '',
       odometerPrevious: data.odometerPrevious ?? 0,
       odometer: data.odometer ?? 0,
       counter: data.counter ?? 0,
       last: data.last ?? 0,
       compartment: data.tankFuelling
         ? data.tankFuelling.value.toString()
-        : data.trainFuelling
+        : data.trainFuelling?.value.toString()
           ? data.trainFuelling.value.toString()
           : '',
-      tank: data?.tank?.value.toString() ?? '',
-      train: data?.train?.value.toString() ?? '',
-      post: data?.post?.value ?? '',
-      supplier: data?.supplier ?? '',
+      tank: data.tank?.value ?? '',
+      train: data.train?.value ?? '',
+      post: data.post?.value ?? '',
+      supplier: data.supplier ?? '',
     }
   }
 

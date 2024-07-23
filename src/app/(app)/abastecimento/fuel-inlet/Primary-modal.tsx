@@ -140,7 +140,6 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
 
   async function handleCreateTank(data: TankFormData) {
     const response = await api.post('fuelling/input', {
-      type: data.type,
       trainId: data.train,
       tankId: data.tank,
       typeSupplier: data.typeSupplier,
@@ -179,13 +178,13 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     if (mode === 'edit') {
       reset({
         typeSupplier: defaultValues?.type.value,
-        type: defaultValues?.bound.value,
+        [type]: defaultValues?.bound.value,
         fiscalNumber: defaultValues?.fiscalNumber,
         provider: defaultValues?.provider.value,
         date: dayjs(defaultValues?.date).format('YYYY-MM-DD'),
       })
     }
-  }, [mode, defaultValues, reset])
+  }, [mode, defaultValues, reset, type])
 
   return (
     <Dialog {...props}>
@@ -222,7 +221,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
               <Form.Field>
                 <Form.Label>{typeSupplierOptions[type].label}:</Form.Label>
                 <Form.Select
-                  name="type"
+                  name={type}
                   id={type}
                   options={typeSupplierOptions[type].options.map((option) => ({
                     label: option.label,

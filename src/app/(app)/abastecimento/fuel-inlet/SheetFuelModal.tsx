@@ -80,7 +80,6 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     const response = await api.post(`fuelling/input/${tankId}/product`, {
       compartmentId: String(data.compartmentId),
       quantity: data.quantity,
-
       value: data.value,
     })
 
