@@ -75,8 +75,6 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
   })
 
   async function handleCreateCompartment(data: InletFormData) {
-    console.log(data.compartmentId)
-
     const response = await api.post(`fuelling/input/${tankId}/product`, {
       compartmentId: String(data.compartmentId),
       quantity: data.quantity,

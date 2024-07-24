@@ -55,7 +55,7 @@ export function ModalInletForm({
             className="flex w-full flex-col gap-2"
           >
             <Form.Field>
-              <Form.Label htmlFor="compartment">Compartimento:</Form.Label>
+              <Form.Label htmlFor="compartmentId">Compartimento:</Form.Label>
               <Form.Select
                 name="compartmentId"
                 id="compartmentId"
