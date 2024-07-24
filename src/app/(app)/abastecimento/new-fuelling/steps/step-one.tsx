@@ -144,12 +144,12 @@ export function StepOne() {
   useEffect(() => {
     setValue('last', counter)
     setValue('typeEquipment', typeConsumption)
-  }, [equipmentValue])
+  }, [equipmentValue, setValue, counter, typeConsumption])
 
   useEffect(() => {
     setValue('odometerPrevious', odometer)
     setValue('odometer', odometerCurrent)
-  }, [compartmentValue, quantity])
+  }, [compartmentValue, quantity, setValue, odometer, odometerCurrent])
 
   return (
     <>

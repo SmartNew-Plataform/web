@@ -45,43 +45,28 @@ export interface TrainData {
 }
 
 export interface FuelingData {
-  id: number
-  type: string
-  driver: {
-    value: string
-  }
-  fuel: {
-    label: string
+  data: {
+    id: number
+    type: string
+    driver: { value: string }
+    fuel: { label: string; value: number }
+    requestNumber: string
+    fiscalNumber: string
+    date: string
+    equipment: { value: string }
+    quantidade: number
+    consumption: number
     value: number
+    observation?: string
+    odometerPrevious?: number
+    odometer?: number
+    counter?: number
+    last?: number
+    tankFuelling?: { value: string }
+    trainFuelling?: { value: string }
+    tank?: { value: string }
+    train?: { value: string }
+    post?: { value: string }
+    supplier?: string
   }
-  requestNumber: string
-  fiscalNumber: string
-  date: string
-  equipment: {
-    value: string
-  }
-  quantidade: number
-  consumption: number
-  value: number
-  observation?: string
-  odometerPrevious?: number
-  odometer?: number
-  counter?: number
-  last?: number
-  tankFuelling?: {
-    value: string
-  }
-  trainFuelling?: {
-    value: string
-  }
-  tank?: {
-    value: string
-  }
-  train?: {
-    value: string
-  }
-  post?: {
-    value: string
-  }
-  supplier?: string
 }

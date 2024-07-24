@@ -36,7 +36,7 @@ export function Table() {
       if (response.status === 200) {
         const data = response.data
         console.log('Dados recebidos do abastecimento:', data)
-        const mappedData = mapFuelingDataToSupplyFormData(data.data)
+        const mappedData = mapFuelingDataToSupplyFormData(data)
         console.log('Dados mapeados:', mappedData)
         setEditingFuelData(mappedData)
         setFuellingIdToEdit(id)
@@ -65,37 +65,36 @@ export function Table() {
 
   function mapFuelingDataToSupplyFormData(data: FuelingData): SupplyFormData {
     return {
-      type: data.type,
-      typeSupplier: data.tank
+      type: data.data.type,
+      typeSupplier: data.data.tank
         ? 'tank'
-        : data.train
+        : data.data.train
           ? 'train'
-          : data.post
+          : data.data.post
             ? 'post'
             : '',
-      driver: data.driver?.value ?? '',
-      receipt: data.requestNumber ?? '',
-      request: data.fiscalNumber ?? '',
-      date: dayjs(data.date).format('YYYY-MM-DD'),
-      equipment: data.equipment.value.toString(),
-      fuel: data.fuel.value.toString(),
-      quantity: Number(data.quantidade),
-      consumption: data.consumption ?? 0,
-      value: data.value,
-      comments: data.observation ?? '',
-      odometerPrevious: data.odometerPrevious ?? 0,
-      odometer: data.odometer ?? 0,
-      counter: data.counter ?? 0,
-      last: data.last ?? 0,
-      compartment: data.tankFuelling
-        ? data.tankFuelling.value.toString()
-        : data.trainFuelling?.value.toString()
-          ? data.trainFuelling.value.toString()
+      driver: data.data.driver?.value ?? '',
+      receipt: data.data.requestNumber ?? '',
+      request: data.data.fiscalNumber ?? '',
+      date: dayjs(data.data.date).format('YYYY-MM-DD'),
+      equipment: data.data.equipment.value.toString(),
+      fuel: data.data.fuel.value.toString(),
+      quantity: Number(data.data.quantidade),
+      consumption: data.data.consumption ?? 0,
+      value: data.data.value,
+      comments: data.data.observation ?? '',
+      odometerPrevious: data.data.odometerPrevious ?? 0,
+      odometer: data.data.odometer ?? 0,
+      counter: data.data.counter ?? 0,
+      last: data.data.last ?? 0,
+      compartment: data.data.tankFuelling
+        ? data.data.tankFuelling.value.toString()
+        : data.data.trainFuelling?.value.toString()
+          ? data.data.trainFuelling.value.toString()
           : '',
-      tank: data.tank?.value ?? '',
-      train: data.train?.value ?? '',
-      post: data.post?.value ?? '',
-      supplier: data.supplier ?? '',
+      tank: data.data.tank?.value.toString() ?? '',
+      train: data.data.train?.value.toString() ?? '',
+      post: data.data.post?.value.toString() ?? '',
     }
   }
 
@@ -193,22 +192,22 @@ export function Table() {
       },
     },
     {
-      accessorKey: 'driver',
-      header: 'Motorista',
+      accessorKey: 'id',
+      header: 'ID',
     },
     {
       accessorKey: 'fuelStation',
       header: 'Nome do Posto',
     },
 
-    {
-      accessorKey: 'fiscalNumber',
-      header: 'Nota fiscal',
-    },
-    {
-      accessorKey: 'requestNumber',
-      header: 'Número requerimento',
-    },
+    // {
+    //   accessorKey: 'fiscalNumber',
+    //   header: 'Nota fiscal',
+    // },
+    // {
+    //   accessorKey: 'requestNumber',
+    //   header: 'Número requerimento',
+    // },
     {
       accessorKey: 'date',
       header: 'Data abastecimento',
