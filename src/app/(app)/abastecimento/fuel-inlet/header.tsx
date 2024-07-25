@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
-import { TankModal } from './inlet-modal'
+import { TankModal } from './Primary-modal'
 
 export function Header() {
   const [open, setOpen] = useState(false)

@@ -86,18 +86,38 @@ export function HeaderFuelling() {
           </Link>
         </Button>
 
-        <Button asChild variant="ghost">
-          <Link
-            target="_blank"
-            href={{
-              pathname: '/abastecimento/relatorio-equipamento',
-              query: { token: searchParams.get('token') },
-            }}
-          >
-            <MessageSquare className="h-4 w-4" />
-            Relatórios
-          </Link>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              <MessageSquare className="h-4 w-4" />
+              Relatórios
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
+                  pathname: '/abastecimento/relatorio',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Relatório Combustível
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
+                  pathname: '/abastecimento/relatorio-equipamento',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Relatório Equipamento
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </Header>
   )
