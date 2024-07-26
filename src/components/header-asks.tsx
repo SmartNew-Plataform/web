@@ -92,7 +92,7 @@ export function Header() {
 
       <Button asChild>
         <Link
-          href={`https://pdf.smartnewsistemas.com.br/generator/checklist/asks/?id=${hash}`}
+          href={`https://pdf.smartnewservices.com.br/generator/checklist/asks/?id=${hash}`}
           target="_blank"
           rel="noopener noreferrer"
         >
