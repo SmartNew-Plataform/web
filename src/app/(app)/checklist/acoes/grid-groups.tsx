@@ -87,7 +87,7 @@ export function GridGroups() {
   function handleGeneratePdf(actionId: string) {
     const hash = CryptoJS.AES.encrypt(actionId, 'action-item')
     window.open(
-      `https://pdf.smartnewsistemas.com.br/generator/checklist/action?id=${hash}`,
+      `https://pdf.smartnewservices.com.br/generator/checklist/action?id=${hash}`,
     )
   }
 
@@ -104,7 +104,7 @@ export function GridGroups() {
 
     if (!data?.rows) return
     show()
-    await fetch('https://excel-api.smartnewsistemas.com.br/exportDefault', {
+    await fetch('https://excel-api.smartnewservices.com.br/exportDefault', {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
