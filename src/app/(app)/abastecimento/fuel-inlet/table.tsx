@@ -23,6 +23,7 @@ export function Table() {
   const { data, refetch } = useQuery({
     queryKey: ['fuelling/create/data'],
     queryFn: fetchSelects,
+    refetchInterval: 1 * 60 * 1000,
   })
 
   const { tank, train, setCompartment } = InputInlet()

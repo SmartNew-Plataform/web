@@ -21,6 +21,7 @@ export function Table() {
   const { data, refetch } = useQuery({
     queryKey: ['fuelling/train/data'],
     queryFn: fetchSelects,
+    refetchInterval: 1 * 60 * 1000,
   })
 
   const [editData, setEditData] = useState<TankAndTrainResponse | undefined>()

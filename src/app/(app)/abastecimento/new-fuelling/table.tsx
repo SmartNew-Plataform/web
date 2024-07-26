@@ -22,6 +22,7 @@ export function Table() {
   const { data: fuelingList, refetch: refetchFuelingList } = useQuery({
     queryKey: ['fuelling/data'],
     queryFn: fetchFuelingList,
+    refetchInterval: 1 * 60 * 1000,
   })
 
   async function fetchFuelingList() {
