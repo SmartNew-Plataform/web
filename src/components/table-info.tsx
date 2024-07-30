@@ -7,13 +7,17 @@ import { useCoreScreensStore } from '@/store/core-screens-store'
 
 export function TableInfo() {
   const { infoScreen } = useCoreScreensStore()
-
+  // console.log('columns => ', columns)
   async function fetchDataTable(params: { index: number; perPage: number }) {
-    return api
+    const data = await api
       .get('/smart-list/check-list', {
         params,
       })
       .then((res) => res.data)
+
+    // console.log(data[0])
+
+    return data
   }
 
   return (
