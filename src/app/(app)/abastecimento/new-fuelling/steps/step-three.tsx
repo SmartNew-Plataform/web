@@ -25,10 +25,6 @@ export function StepThree() {
         <Form.Input name="comments" id="comments" />
         <Form.ErrorMessage field="comments" />
       </Form.Field>
-      <Form.Field className="pb-4">
-        <Form.Label htmlFor="images">Imagens</Form.Label>
-        <Form.ImagePicker accept="image/*" name="images" />
-      </Form.Field>
     </>
   )
 }
