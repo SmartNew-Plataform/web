@@ -41,7 +41,7 @@ export const columns: ColumnDef<InfoData>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Id
+          N° Checklist
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -56,7 +56,7 @@ export const columns: ColumnDef<InfoData>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Modelo
+          Tipo Checklist
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
       )

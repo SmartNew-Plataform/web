@@ -1,12 +1,11 @@
 'use client'
 import { DataTable } from '@/components/data-table'
+import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
+import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Expand } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useServiceOrder } from '@/store/maintenance/service-order'
-import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 // import { useEffect, useState } from 'react'
 
@@ -31,53 +30,9 @@ const serviceOrderFromSchema = z.object({
 export type ServiceOrderFormData = z.infer<typeof serviceOrderFromSchema>
 
 export function TableServiceOrder() {
-  // const [data, setData] = useState([])
-  const { setSelects } = useServiceOrder()
-
-  async function fetchSelects() {
-    const [branch, allEquipment, allTypeMaintenance] = await Promise.all([
-      await api.get('system/list-branch').then((res) => res.data.data),
-      await api.get('system/equipment').then((res) => res.data.data),
-      await api.get('maintenance/type').then((res) => res.data.data),
-    ])
-    // console.log('branch => ', branch)
-
-    setSelects({
-      branch: branch.map(
-        ({ value, label }: { value: string; label: string }) => {
-          return {
-            value,
-            label,
-          }
-        },
-      ),
-      equipment: allEquipment.map(
-        (value: { id: number; equipmentCode: string; description: string }) => {
-          return {
-            value: value.id.toString(),
-            label: `${value.equipmentCode} - ${value.description}`,
-          }
-        },
-      ),
-      typeMaintenance: allTypeMaintenance.map(
-        (value: { id: number; typeMaintenance: string }) => {
-          return {
-            value: value.id.toString(),
-            label: value.typeMaintenance,
-          }
-        },
-      ),
-    })
-  }
-
-  const { data: ServiceOrderFormData } = useQuery({
+  const { data: serviceOrderFormData, isLoading } = useQuery({
     queryKey: ['maintenance-service-order-table'],
     queryFn: fetchDataTable,
-  })
-
-  useQuery({
-    queryKey: ['maintenance-service-order-selects'],
-    queryFn: fetchSelects,
   })
 
   async function fetchDataTable(): Promise<ServiceOrderFormData[]> {
@@ -178,33 +133,11 @@ export function TableServiceOrder() {
     },
   ]
 
-  // useEffect(() => {
-  //   async function fetchDataTable(params: { index: number; perPage: number }) {
-  //     const response = await api
-  //       .get('/maintenance/service-order/list-table', {
-  //         params,
-  //       })
-  //       .then((res) => res.data)
-
-  //     // console.log('response => ', response)
-
-  //     setData(response.data)
-  //     // return {
-  //     //   rows: data,
-  //     //   pageCount: 10,
-  //     // }
-  //   }
-
-  //   fetchDataTable({ index: 0, perPage: 10 })
-  // }, [])
-  // console.log('data=> ', data)
   return (
     <DataTable
       columns={columns}
-      data={ServiceOrderFormData || []}
-      // filterText={infoScreen?.filter?.filterText}
-      // dateFrom={infoScreen?.filter?.period?.from}
-      // dateTo={infoScreen?.filter?.period?.to}
+      data={serviceOrderFormData || []}
+      isLoading={isLoading}
     />
   )
 }

@@ -1,15 +1,17 @@
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { WizardForm } from '@/components/wizard-form'
+import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
 import { useWizardForm } from '@/hooks/use-wizard-form'
+import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { motion } from 'framer-motion'
+import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { ComponentProps } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { motion } from 'framer-motion'
-import { WizardForm } from '@/components/wizard-form'
-import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { StepOne } from './steps/step-one'
+import { StepTwo } from './steps/step-two'
 
 interface ServiceOrderFormProps extends ComponentProps<typeof Sheet> {
   // onSubmit: (data: ActiveFormData) => Promise<void>
@@ -19,19 +21,44 @@ interface ServiceOrderFormProps extends ComponentProps<typeof Sheet> {
 }
 
 const createServiceFormSchema = z.object({
+  requester: z.string({ required_error: 'O solicitante e obrigatório!' }),
   equipment: z.string({ required_error: 'O equipamento e obrigatório!' }),
+  hourMeter: z.coerce.number({ required_error: 'O horímetro é obrigatório!' }),
+  odometer: z.coerce.number({ required_error: 'O odômetro é obrigatório!' }),
   branch: z.string({ required_error: 'A filial e obrigatória!' }),
   typeMaintenance: z.string({
     required_error: 'O tipo de manutenção e obrigatório!',
   }),
+  maintenanceSector: z.string({
+    required_error: 'O setor de manutenção e obrigatório!',
+  }),
+  status: z.string({ required_error: 'O status é obrigatório!' }),
+  requestDate: z.string({
+    required_error: 'A data de solicitação é obrigatório!',
+  }),
+  observation: z.string({ required_error: 'A observação e obrigatória!' }),
+
+  orderBonded: z.string().optional(),
+  stoppedMachine: z.boolean().optional(),
+  stoppedDate: z.string().optional(),
+  deadlineDate: z.string().optional(),
+  closingDate: z.string().optional(),
+  dueDate: z.string().optional(),
+  maintenanceDiagnosis: z.string().optional(),
+  solution: z.string().optional(),
+  executorObservation: z.string().optional(),
 })
 
 export type ServiceFormData = z.infer<typeof createServiceFormSchema>
 
-export function ServiceOrderForm({ ...props }: ServiceOrderFormProps) {
+export function ServiceOrderForm({
+  children,
+  ...props
+}: ServiceOrderFormProps) {
   const createServiceForm = useForm<ServiceFormData>({
     resolver: zodResolver(createServiceFormSchema),
   })
+  const { handleSubmit } = createServiceForm
 
   const createServiceWizardForm = useWizardForm()
 
@@ -42,8 +69,14 @@ export function ServiceOrderForm({ ...props }: ServiceOrderFormProps) {
     paginate({ newDirection: 1 })
   }
 
+  async function handleSubmitIntermediate(data: ServiceFormData) {
+    console.log(data)
+    const response = await api.post('maintenance/service-order', {})
+  }
+
   return (
     <Sheet {...props}>
+      <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="flex max-h-screen w-min flex-col overflow-x-hidden">
         <FormProvider {...createServiceForm}>
           <h2 className="mt-4 text-xl font-semibold text-slate-600">
@@ -57,7 +90,7 @@ export function ServiceOrderForm({ ...props }: ServiceOrderFormProps) {
           </div>
           <form
             id="service-form"
-            // onSubmit={handleSubmit(handleSubmitIntermediate)}
+            onSubmit={handleSubmit(handleSubmitIntermediate)}
             className="mt-4 flex h-full w-full flex-col gap-3 overflow-auto overflow-x-hidden"
           >
             <WizardForm {...createServiceWizardForm}>
@@ -65,7 +98,7 @@ export function ServiceOrderForm({ ...props }: ServiceOrderFormProps) {
                 <StepOne />
               </WizardFormStep>
               <WizardFormStep>
-                <StepOne />
+                <StepTwo />
               </WizardFormStep>
             </WizardForm>
           </form>
@@ -81,13 +114,7 @@ export function ServiceOrderForm({ ...props }: ServiceOrderFormProps) {
             </Button>
 
             <div className="flex gap-3">
-              <Button
-                loading={false}
-                disabled={true}
-                type="submit"
-                variant="success"
-                form="active-form"
-              >
+              <Button type="submit" variant="success" form="service-form">
                 <Save size={16} />
                 Salvar
               </Button>
