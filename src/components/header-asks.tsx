@@ -58,7 +58,7 @@ export function Header() {
           </FormProvider>
 
           <div className="flex flex-col gap-1 pl-2">
-            <strong className="uppercase text-slate-700">Id:</strong>
+            <strong className="uppercase text-slate-700">N° checklist:</strong>
             <span className="text-slate-800">{checklistAsksScreen.id}</span>
           </div>
           <div className="flex flex-col gap-1 pl-2">

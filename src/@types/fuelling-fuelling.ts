@@ -61,7 +61,7 @@ export interface FuelingData {
     odometerPrevious?: number
     odometer?: number
     counter?: number
-    last?: number
+    counterLast?: number
     tankFuelling?: { value: string }
     trainFuelling?: { value: string }
     tank?: { value: string }

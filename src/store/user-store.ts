@@ -1,24 +1,7 @@
+import { ModuleData, UserData } from '@/@types/profile'
 import { api } from '@/lib/api'
 import { AxiosError } from 'axios'
 import { create } from 'zustand'
-
-type ModuleData = {
-  icon: string
-  name: string
-  id: number
-  order: number
-  access: boolean
-}
-
-type UserData = {
-  login: string
-  name: string
-  clientId: string
-  group: {
-    description: string
-    id: number
-  }
-}
 
 interface UserStoreData {
   modules: Array<ModuleData> | null

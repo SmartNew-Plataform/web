@@ -44,7 +44,7 @@ const createSupplyFormSchema = z.object({
 
 export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
 
-interface SupplyModalProps extends ComponentProps<typeof Sheet> {
+export interface SupplyModalProps extends ComponentProps<typeof Sheet> {
   onSubmit: (data: SupplyFormData) => Promise<void>
   defaultValues?: SupplyFormData
   mode: 'create' | 'edit'
@@ -65,7 +65,7 @@ export function FuelForm({
     handleSubmit,
     reset,
     setValue,
-    formState: { isSubmitting },
+    formState: { isSubmitting, isValid, isDirty },
   } = createSupplyForm
   const createActiveWizardForm = useWizardForm()
   const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
@@ -108,6 +108,8 @@ export function FuelForm({
               animate={{ width: `${percentSteps}%` }}
             />
           </div>
+          <p>Preencha todos os campos obrigatórios*</p>
+
           <form
             id="fuellingForm"
             onSubmit={handleSubmit(handleSubmitIntermediate)}
@@ -140,7 +142,7 @@ export function FuelForm({
             <Button
               className="w-full"
               loading={isSubmitting}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isDirty || !isValid}
               type="submit"
               variant="success"
               form="fuellingForm"

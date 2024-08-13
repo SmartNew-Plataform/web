@@ -8,9 +8,10 @@ import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Info, Pencil, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { FuelForm, SupplyFormData } from './fuelForm'
+import { ObservationModal } from './observationsModal'
 
 export function Table() {
   const [fuellingIdToDelete, setFuellingIdToDelete] = useState<
@@ -18,11 +19,13 @@ export function Table() {
   >()
   const [fuellingIdToEdit, setFuellingIdToEdit] = useState<number | undefined>()
   const [editingFuelData, setEditingFuelData] = useState<SupplyFormData>()
+  const [observationData, setObservationData] = useState<string | undefined>()
+  const [isObservationModalOpen, setIsObservationModalOpen] = useState(false)
 
   const { data: fuelingList, refetch: refetchFuelingList } = useQuery({
     queryKey: ['fuelling/data'],
     queryFn: fetchFuelingList,
-    refetchInterval: 1 * 60 * 1000,
+    refetchInterval: 1 * 30 * 1000,
   })
 
   async function fetchFuelingList() {
@@ -64,6 +67,28 @@ export function Table() {
     }
   }, [fuellingIdToEdit])
 
+  async function fetchObservation(id: number) {
+    try {
+      const response = await api.get<FuelingData>(`fuelling/${id}`)
+      if (response.status === 200) {
+        const data = response.data
+        setObservationData(data.data.observation ?? '')
+        setIsObservationModalOpen(true)
+      } else {
+        toast({
+          title: 'Erro ao buscar observação',
+          description: 'Não foi possível buscar a observação do abastecimento.',
+        })
+      }
+    } catch (error) {
+      toast({
+        title: 'Erro ao buscar observação',
+        description:
+          'Ocorreu um erro ao tentar buscar a observação do abastecimento.',
+      })
+    }
+  }
+
   function mapFuelingDataToSupplyFormData(data: FuelingData): SupplyFormData {
     return {
       type: data.data.type,
@@ -87,7 +112,7 @@ export function Table() {
       odometerPrevious: data.data.odometerPrevious ?? 0,
       odometer: data.data.odometer ?? 0,
       counter: data.data.counter ?? 0,
-      last: data.data.last ?? 0,
+      last: data.data.counterLast ?? 0,
       compartment: data.data.tankFuelling
         ? data.data.tankFuelling.value.toString()
         : data.data.trainFuelling?.value.toString()
@@ -173,12 +198,12 @@ export function Table() {
       accessorKey: 'id',
       header: '',
       cell({ row }) {
-        // const id = row.getValue('id') as number
+        const id = row.getValue('id') as number
         const data = row.original
 
         return (
           <div className="flex gap-2">
-            <Button size="icon-xs" onClick={() => fetchFueling(data.id)}>
+            <Button size="icon-xs" onClick={() => fetchFueling(id)}>
               <Pencil size={12} />
             </Button>
             <Button
@@ -187,6 +212,13 @@ export function Table() {
               size="icon-xs"
             >
               <Trash2 size={12} />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-xs"
+              onClick={() => fetchObservation(id)}
+            >
+              <Info size={16} />
             </Button>
           </div>
         )
@@ -253,10 +285,10 @@ export function Table() {
       accessorKey: 'total',
       header: 'Custo total',
     },
-    {
-      accessorKey: 'observation',
-      header: 'Observações',
-    },
+    // {
+    //   accessorKey: 'observation',
+    //   header: 'Observações',
+    // },
   ]
 
   return (
@@ -279,6 +311,12 @@ export function Table() {
         defaultValues={editingFuelData}
         mode="edit"
         onSubmit={handleEditFuelling}
+      />
+
+      <ObservationModal
+        open={isObservationModalOpen}
+        onOpenChange={setIsObservationModalOpen}
+        observation={observationData}
       />
     </>
   )

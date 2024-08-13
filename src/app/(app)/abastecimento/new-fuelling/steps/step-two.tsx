@@ -20,8 +20,8 @@ export function StepTwo() {
       const consumption = quantity / (counter - last)
       setValue('consumption', consumption.toFixed(2))
     } else if (type === 'L/HR') {
-      const consuption = (counter - last) / quantity
-      setValue('consumption', consuption.toFixed(2))
+      const consumption = (counter - last) / quantity
+      setValue('consumption', consumption.toFixed(2))
     }
   }
 
@@ -61,7 +61,6 @@ export function StepTwo() {
         <Form.Field>
           <Form.Label htmlFor="consumption">Consumo realizado:</Form.Label>
           <Form.Input
-            placeholder="100,00"
             type="number"
             name="consumption"
             id="consumption"
