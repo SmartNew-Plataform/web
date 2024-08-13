@@ -22,7 +22,7 @@ export function Header() {
   })
 
   async function handleCreateFuelling(data: SupplyFormData) {
-    const response = api.post('fuelling/', {
+    const response = await api.post('fuelling/', {
       ...data,
       equipmentId: data.equipment,
       type: data.type,
@@ -40,7 +40,7 @@ export function Header() {
       odometerLast: data.odometerPrevious,
     })
 
-    if ((await response).status !== 201) return
+    if (response.status !== 201) return
 
     toast({
       title: 'Abastecimento criado com sucesso!',
