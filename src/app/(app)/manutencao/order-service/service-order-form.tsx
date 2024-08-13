@@ -1,10 +1,12 @@
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { useToast } from '@/components/ui/use-toast'
 import { WizardForm } from '@/components/wizard-form'
 import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
 import { useWizardForm } from '@/hooks/use-wizard-form'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { ComponentProps } from 'react'
@@ -29,16 +31,17 @@ const createServiceFormSchema = z.object({
   typeMaintenance: z.string({
     required_error: 'O tipo de manutenção e obrigatório!',
   }),
-  maintenanceSector: z.string({
+  executantSector: z.string({
     required_error: 'O setor de manutenção e obrigatório!',
   }),
   status: z.string({ required_error: 'O status é obrigatório!' }),
   requestDate: z.string({
     required_error: 'A data de solicitação é obrigatório!',
   }),
-  observation: z.string({ required_error: 'A observação e obrigatória!' }),
+  equipmentFail: z.string({ required_error: 'A observação e obrigatória!' }),
 
   orderBonded: z.string().optional(),
+  maintainers: z.array(z.string()).optional(),
   stoppedMachine: z.boolean().optional(),
   stoppedDate: z.string().optional(),
   deadlineDate: z.string().optional(),
@@ -59,6 +62,8 @@ export function ServiceOrderForm({
     resolver: zodResolver(createServiceFormSchema),
   })
   const { handleSubmit } = createServiceForm
+  const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   const createServiceWizardForm = useWizardForm()
 
@@ -71,7 +76,41 @@ export function ServiceOrderForm({
 
   async function handleSubmitIntermediate(data: ServiceFormData) {
     console.log(data)
-    const response = await api.post('maintenance/service-order', {})
+    const response = await api.post('maintenance/service-order', {
+      idServiceOrderFather: data.orderBonded,
+      idBranch: data.branch,
+      idEquipment: data.equipment,
+      descriptionRequest: data.equipmentFail,
+      comments: data.maintenanceDiagnosis,
+      executanteObservations: data.executorObservation,
+      idTypeMaintenance: data.typeMaintenance,
+      statusServiceOrder: data.status,
+      dateTimeRequest: data.requestDate,
+      dateExpectedTerm: data.deadlineDate,
+      dateEnd: data.closingDate,
+      dateEquipamentoStop: data.stoppedDate,
+      timeMachineStop: data.stoppedMachine,
+      idRequester: data.requester,
+      sectorExecutante: data.executantSector,
+      maintainers: data.maintainers,
+      // dateEquipmentWorked: ,
+      // occurrence: string,
+      // causeReason: 0,
+      // statusFailure: string,
+      // servicePending: string,
+      // hasAttachment: string,
+      // idServiceRequest: 0,
+      // idProductionRegistration: 0,
+      // aux: string,
+    })
+
+    if (response.status !== 201) return
+
+    toast({
+      title: 'Ordem de serviço criada com sucesso!',
+      variant: 'success',
+    })
+    queryClient.refetchQueries(['maintenance-service-order-table'])
   }
 
   return (

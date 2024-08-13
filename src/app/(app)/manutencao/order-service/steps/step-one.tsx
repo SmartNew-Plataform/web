@@ -1,6 +1,7 @@
 'use client'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useServiceOrder } from '@/store/maintenance/service-order'
 import { Bolt } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -17,13 +18,12 @@ export function StepOne() {
     (e) => e.value === equipmentValue,
   )
   const branchText = equipmentData?.branch.label
+  const branchValue = equipmentData?.branch.value
 
   useEffect(() => {
     if (!branchText) return
-    setValue('branch', branchText)
+    setValue('branch', branchValue)
   }, [branchText])
-
-  console.log(selects)
 
   return (
     <>
@@ -70,7 +70,8 @@ export function StepOne() {
 
       <Form.Field>
         <Form.Label htmlFor="branch">Cliente:</Form.Label>
-        <Form.Input name="branch" id="branch" readOnly value={branchText} />
+        <Input readOnly value={branchText} />
+        <Form.Input type="hidden" name="branch" id="branch" readOnly />
         <Form.ErrorMessage field="branch" />
       </Form.Field>
 
@@ -102,13 +103,13 @@ export function StepOne() {
 
       {selects.maintenanceSector ? (
         <Form.Field>
-          <Form.Label htmlFor="maintenanceSector">Setor Manutenção:</Form.Label>
+          <Form.Label htmlFor="executantSector">Setor Executante:</Form.Label>
           <Form.Select
-            name="maintenanceSector"
-            id="maintenanceSector"
+            name="executantSector"
+            id="executantSector"
             options={selects.maintenanceSector}
           />
-          <Form.ErrorMessage field="maintenanceSector" />
+          <Form.ErrorMessage field="executantSector" />
         </Form.Field>
       ) : (
         <Form.SkeletonField />
@@ -126,14 +127,14 @@ export function StepOne() {
 
       <Form.Field>
         <Form.Label htmlFor="requestDate">Data Solicitação:</Form.Label>
-        <Form.Textarea id="requestDate" name="requestDate" />
+        <Form.Input type="date" id="requestDate" name="requestDate" />
         <Form.ErrorMessage field="requestDate" />
       </Form.Field>
 
       <Form.Field>
-        <Form.Label htmlFor="observation">Observação:</Form.Label>
-        <Form.Textarea id="observation" name="observation" />
-        <Form.ErrorMessage field="observation" />
+        <Form.Label htmlFor="equipmentFail">Falha Equipamento:</Form.Label>
+        <Form.Textarea id="equipmentFail" name="equipmentFail" />
+        <Form.ErrorMessage field="equipmentFail" />
       </Form.Field>
 
       <RequesterModal
