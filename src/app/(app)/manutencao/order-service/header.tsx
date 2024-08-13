@@ -23,16 +23,16 @@ export function Header() {
     ] = await Promise.all([
       await api.get('system/list-branch').then((res) => res.data.data),
       await api.get('system/equipment').then((res) => res.data.data),
-      await api.get('maintenance/type').then((res) => res.data.data),
       await api
-        .get('/maintenance/sector-executing')
+        .get('/system/choices/type-maintenance')
+        .then((res) => res.data.data),
+      await api
+        .get('/system/choices/sector-executing')
         .then((res) => res.data.data),
       await api
         .get('/maintenance/service-order/status')
         .then((res) => res.data.data),
-      await api
-        .get('/maintenance/service-order/list-requester')
-        .then((res) => res.data.data),
+      await api.get('/system/choices/requester').then((res) => res.data.data),
     ])
     // console.log('branch => ', branch)
 

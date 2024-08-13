@@ -1,3 +1,4 @@
+import { ColumnDef } from '@tanstack/react-table'
 import { create } from 'zustand'
 
 export interface IChildren {
@@ -9,25 +10,31 @@ export interface IImportationForData {
 }
 
 interface IImportationData {
-  columns: undefined | Array<object>
+  columns: undefined | Array<ColumnDef<object>>
   rows: undefined | Array<object>
-  data: IImportationForData[] & {
-    children?: IImportationForData[]
-  }
+  data: Array<IImportationForData & { children: IImportationForData[] }>
   indexModal: number | undefined
   children: { [key: string]: string }[] | undefined
   childrenIndex: number | undefined
-  columnItem: undefined | Array<object>
+  columnItem: undefined | Array<ColumnDef<object>>
   setIndexModal: (Params: number | undefined) => void
-  setData: (Params: { [key: string]: string }[]) => void
+  setData: (
+    Params: Array<IImportationForData & { children: IImportationForData[] }>,
+  ) => void
   setColumns: (Params: { [key: string]: string }) => void
   setRows: (Params: undefined | Array<object>) => void
   setChildren: (Params: { [key: string]: string }[] | undefined) => void
   setChildrenIndex: (index: number | undefined) => void
   setColumnItem: (Params: { [key: string]: string }) => void
+
+  changeValue: (params: {
+    value: { [key: string]: string }
+    model: 'data' | 'children'
+    id: number
+  }) => void
 }
 
-export const useImportation = create<IImportationData>((set) => {
+export const useImportation = create<IImportationData>((set, get) => {
   return {
     data: [],
     columns: [],
@@ -47,11 +54,14 @@ export const useImportation = create<IImportationData>((set) => {
     setColumns: (columns) => {
       // console.log('eu recebi essa coluna')
       // console.log(columns)
-      const keys = Object.keys(columns).map((column) => ({
-        header: column,
-        accessorKey: column,
-        typeColumn: columns[column],
-      }))
+      const keys = Object.keys(columns)
+        .filter((item) => item !== 'children')
+        .filter((item) => item !== 'sync')
+        .map((column) => ({
+          header: column,
+          accessorKey: column,
+          typeColumn: columns[column],
+        }))
 
       set({ columns: keys })
     },
@@ -71,13 +81,38 @@ export const useImportation = create<IImportationData>((set) => {
     setColumnItem: (columns) => {
       // console.log('setando coluna')
       // console.log(columns)
-      const keys = Object.keys(columns).map((column) => ({
-        header: column,
-        accessorKey: column,
-        typeColumn: columns[column],
-      }))
+      const keys = Object.keys(columns)
+        .filter((item) => item !== 'children')
+        .filter((item) => item !== 'sync')
+        .filter((item) => item !== 'id_pai')
+        .map((column) => ({
+          header: column,
+          accessorKey: column,
+          typeColumn: columns[column],
+        }))
+
+      console.log(keys)
 
       set({ columnItem: keys })
+    },
+
+    changeValue: ({ value, model, id }) => {
+      const allData = get().data
+      const childrenIndex: number | undefined =
+        typeof get()?.childrenIndex === 'number'
+          ? allData[get().childrenIndex as number].children.findIndex(
+              (item) => item.id === id.toString(),
+            )
+          : undefined
+      const currentRow =
+        model === 'data'
+          ? allData[id - 1]
+          : allData[get().childrenIndex || 0].children[childrenIndex || 0]
+      const [key, newValue] = Object.entries(value)[0]
+      console.log(key, newValue)
+      currentRow[key] = newValue
+      console.log(allData)
+      get().setData(allData)
     },
   }
 })

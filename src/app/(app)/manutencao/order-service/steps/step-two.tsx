@@ -23,9 +23,10 @@ export function StepTwo() {
 
   useEffect(() => {
     async function fetchServiceOrder() {
-      const allOrders: ServiceOrderFormData[] = await queryClient.getQueryData([
+      const allOrders = (await queryClient.getQueryData([
         'maintenance-service-order-table',
-      ])
+      ])) as ServiceOrderFormData[]
+
       const orderBondedData = allOrders.map(
         ({ id, descriptionRequest, codeServiceOrder }) => ({
           label: `${codeServiceOrder} - ${descriptionRequest}`,
@@ -46,6 +47,14 @@ export function StepTwo() {
 
   return (
     <>
+      <Form.Field>
+        <Form.Label htmlFor="maintainers">Mantenedores:</Form.Label>
+        <Form.Select
+          options={orderBondedData}
+          id="maintainers"
+          name="maintainers"
+        />
+      </Form.Field>
       <Form.Field>
         <Form.Label htmlFor="orderBonded">Ordem vinculada:</Form.Label>
         <Form.Select

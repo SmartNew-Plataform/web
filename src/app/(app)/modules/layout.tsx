@@ -1,5 +1,5 @@
-import { ComponentProps } from 'react'
+import { ReactNode } from 'react'
 
-export default function LayoutModules({ ...props }: ComponentProps<'div'>) {
-  return <div {...props} />
+export default function LayoutModules({ children }: { children: ReactNode }) {
+  return <div>{children}</div>
 }
