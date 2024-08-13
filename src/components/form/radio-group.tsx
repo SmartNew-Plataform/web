@@ -13,5 +13,5 @@ export function RadioGroup({ name, ...props }: RadioGroupProps) {
     control,
   })
 
-  return <RadioGroupLib {...field} defaultValue={field.value} {...props} />
+  return <RadioGroupLib {...field} {...props} />
 }
