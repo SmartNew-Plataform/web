@@ -75,9 +75,12 @@ export function FuelForm({
   }
 
   async function handleSubmitIntermediate(data: SupplyFormData) {
-    await onSubmit(data)
-
-    reset()
+    try {
+      await onSubmit(data)
+      reset()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   useEffect(() => {
