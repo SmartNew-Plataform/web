@@ -267,7 +267,7 @@ export function Table() {
     },
     {
       accessorKey: 'tankFuelling',
-      header: 'Combustivel',
+      header: 'Compartimento',
     },
     {
       accessorKey: 'quantidade',

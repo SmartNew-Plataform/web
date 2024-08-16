@@ -98,7 +98,7 @@ export function HeaderFuelling() {
               <Link
                 target="_blank"
                 href={{
-                  pathname: '/abastecimento/relatorio',
+                  pathname: '/abastecimento/',
                   query: { token: searchParams.get('token') },
                 }}
               >
