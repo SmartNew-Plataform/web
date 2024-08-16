@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { twMerge } from 'tailwind-merge'
 import './globals.css'
 import { Providers } from './providers'
-import { twMerge } from 'tailwind-merge'
 
 const inter = Inter({
   subsets: ['latin'],

@@ -144,12 +144,12 @@ export function StepOne() {
   useEffect(() => {
     setValue('last', counter)
     setValue('typeEquipment', typeConsumption)
-  }, [equipmentValue, setValue, counter, typeConsumption])
+  }, [equipmentValue, counter, typeConsumption])
 
   useEffect(() => {
     setValue('odometerPrevious', odometer)
     setValue('odometer', odometerCurrent)
-  }, [compartmentValue, quantity, setValue, odometer, odometerCurrent])
+  }, [compartmentValue, quantity, odometer, odometerCurrent])
 
   return (
     <>
@@ -249,13 +249,13 @@ export function StepOne() {
           <Form.ErrorMessage field="compartment" />
         </Form.Field>
       ) : undefined}
-      {selects?.fuel && (
+      {/* {selects?.fuel && (
         <Form.Field>
           <Form.Label htmlFor="fuel">Combustível:</Form.Label>
           <Form.Select name="fuel" id="fuel" options={selects?.fuel} />
           <Form.ErrorMessage field="fuel" />
         </Form.Field>
-      )}
+      )} */}
       {selects?.driver && (
         <Form.Field>
           <Form.Label htmlFor="driver">Motorista:</Form.Label>

@@ -5,7 +5,7 @@ export function Header() {
   return (
     <PageHeader>
       <h1 className="text-xl font-semibold text-slate-600">
-        Relatório de combustível
+        Posição de Estoque
       </h1>
       <div className="flex gap-4">
         <SearchInput />
