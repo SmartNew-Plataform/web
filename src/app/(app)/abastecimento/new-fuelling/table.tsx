@@ -272,18 +272,34 @@ export function Table() {
     {
       accessorKey: 'quantidade',
       header: 'Quantidade',
+      cell({ getValue }) {
+        const quantidade = Number(getValue())
+        return isNaN(quantidade) ? '-' : quantidade.toFixed(2)
+      },
     },
     {
       accessorKey: 'consumption',
       header: 'Cons Realizado',
+      cell({ getValue }) {
+        const consumption = Number(getValue())
+        return isNaN(consumption) ? '-' : consumption.toFixed(2)
+      },
     },
     {
       accessorKey: 'value',
       header: 'Valor UN',
+      cell({ getValue }) {
+        const value = Number(getValue())
+        return isNaN(value) ? '-' : value.toFixed(2)
+      },
     },
     {
       accessorKey: 'total',
-      header: 'Custo total',
+      header: 'Custo Total',
+      cell({ getValue }) {
+        const total = Number(getValue())
+        return isNaN(total) ? '-' : total.toFixed(2)
+      },
     },
     // {
     //   accessorKey: 'observation',
