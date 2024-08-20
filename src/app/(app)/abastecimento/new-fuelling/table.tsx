@@ -266,8 +266,8 @@ export function Table() {
       header: 'Contador anterior',
     },
     {
-      accessorKey: 'tankFuelling',
-      header: 'Compartimento',
+      accessorKey: 'compartment',
+      header: 'Combustível',
     },
     {
       accessorKey: 'quantidade',
