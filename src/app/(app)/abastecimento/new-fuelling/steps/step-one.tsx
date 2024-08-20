@@ -238,7 +238,7 @@ export function StepOne() {
           <Form.ErrorMessage field="typeSupplier" />
         </Form.Field>
       )}
-      {compartmentOptions ? (
+      {compartmentOptions && supplier !== 'post' ? (
         <Form.Field>
           <Form.Label>Compartimento:</Form.Label>
           <Form.Select
@@ -248,14 +248,16 @@ export function StepOne() {
           />
           <Form.ErrorMessage field="compartment" />
         </Form.Field>
-      ) : undefined}
-      {/* {selects?.fuel && (
+      ) : null}
+
+      {supplier === 'post' && selects?.fuel ? (
         <Form.Field>
           <Form.Label htmlFor="fuel">Combustível:</Form.Label>
           <Form.Select name="fuel" id="fuel" options={selects?.fuel} />
           <Form.ErrorMessage field="fuel" />
         </Form.Field>
-      )} */}
+      ) : null}
+
       {selects?.driver && (
         <Form.Field>
           <Form.Label htmlFor="driver">Motorista:</Form.Label>

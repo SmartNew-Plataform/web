@@ -30,7 +30,7 @@ const createSupplyFormSchema = z.object({
   equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   last: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
-  fuel: z.string({ required_error: 'Selecione o combustível' }),
+  fuel: z.string({ required_error: 'Selecione o combustível' }).optional(),
   quantity: z.coerce.number({ required_error: 'Informe a quantidade!' }),
   consumption: z.coerce.number(),
   value: z.coerce.number({ required_error: 'Informe o valor unitário!' }),
