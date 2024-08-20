@@ -29,7 +29,7 @@ export function Header() {
       fuelStationId: data.post,
       trainId: data.train,
       tankId: data.tank,
-      // fuelId: data.fuel,
+      fuelId: data.fuel,
       compartmentId: data.compartment,
       numberRequest: data.request,
       fiscalNumber: data.receipt,
