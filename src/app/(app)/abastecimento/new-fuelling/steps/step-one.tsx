@@ -69,7 +69,7 @@ export function StepOne() {
     queryFn: loadSelects,
   })
 
-  const { watch, setValue } = useFormContext()
+  const { watch, setValue, resetField } = useFormContext()
   const mode = watch('type')
   const supplier = watch('typeSupplier') as 'tank' | 'train' | 'post'
 
@@ -77,8 +77,8 @@ export function StepOne() {
     tank: {
       label: 'Tanque',
       options:
-        selects?.tank.map(({ id, tank, compartmentAll }) => ({
-          label: tank,
+        selects?.tank.map(({ id, tank, compartmentAll, model }) => ({
+          label: model + ' - ' + tank,
           value: id.toString(),
           compartment: compartmentAll,
         })) || [],
@@ -86,8 +86,8 @@ export function StepOne() {
     train: {
       label: 'Comboio',
       options:
-        selects?.train.map(({ id, train, compartmentAll }) => ({
-          label: train,
+        selects?.train.map(({ id, train, compartmentAll, tag }) => ({
+          label: tag + ' - ' + train,
           value: id.toString(),
           compartment: compartmentAll,
         })) || [],
@@ -140,6 +140,16 @@ export function StepOne() {
   const typeConsumption = selects?.equipment.find(
     ({ value }) => value === equipmentValue,
   )?.type
+
+  useEffect(() => {
+    if (supplier) {
+      resetField('tank')
+      resetField('train')
+      resetField('post')
+      resetField('compartment')
+      resetField('fuel')
+    }
+  }, [supplier, resetField])
 
   useEffect(() => {
     setValue('last', counter)
