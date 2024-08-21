@@ -274,7 +274,7 @@ export function Table() {
       header: 'Quantidade',
       cell({ getValue }) {
         const quantidade = Number(getValue())
-        return isNaN(quantidade) ? '-' : quantidade.toFixed(2)
+        return isNaN(quantidade) ? '-' : quantidade.toFixed(2).replace('.', ',')
       },
     },
     {
@@ -282,7 +282,9 @@ export function Table() {
       header: 'Cons Realizado',
       cell({ getValue }) {
         const consumption = Number(getValue())
-        return isNaN(consumption) ? '-' : consumption.toFixed(2)
+        return isNaN(consumption)
+          ? '-'
+          : consumption.toFixed(2).replace('.', ',')
       },
     },
     {
@@ -290,7 +292,7 @@ export function Table() {
       header: 'Valor UN',
       cell({ getValue }) {
         const value = Number(getValue())
-        return isNaN(value) ? '-' : value.toFixed(2)
+        return isNaN(value) ? '-' : value.toFixed(2).replace('.', ',')
       },
     },
     {
@@ -298,7 +300,7 @@ export function Table() {
       header: 'Custo Total',
       cell({ getValue }) {
         const total = Number(getValue())
-        return isNaN(total) ? '-' : total.toFixed(2)
+        return isNaN(total) ? '-' : total.toFixed(2).replace('.', ',')
       },
     },
     // {
