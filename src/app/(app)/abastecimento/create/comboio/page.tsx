@@ -4,7 +4,7 @@ import { Header } from './header'
 import { Table } from './table'
 
 export const metadata: Metadata = {
-  title: 'Criar comboio',
+  title: 'Cadastro Comboio',
   description: 'Plataforma da SmartNew Sistemas.',
 }
 
