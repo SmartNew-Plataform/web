@@ -2,7 +2,12 @@
 import { AlertModal } from '@/components/alert-modal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -47,7 +52,7 @@ interface TankFormProps {
     compartmentId: number
     value: number
     quantity: number
-  }
+  }[]
 }
 
 export function FuelModal({ tankId, ...props }: ActiveFormProps) {
@@ -64,11 +69,11 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     const response = await api
       .get(`fuelling/input/${tankId}`)
       .then((response) => response.data)
-    return response.data.product || []
+    return response.data || []
   }
   const queryClient = useQueryClient()
 
-  const { data, refetch } = useQuery<TankFormProps[]>({
+  const { data, refetch } = useQuery<TankFormProps>({
     queryKey: [`fuelling/input`, tankId],
 
     queryFn: fetchCompartment,
@@ -127,16 +132,19 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
 
   return (
     <Sheet {...props}>
-      <SheetContent className="flex max-h-screen w-1/4 flex-col overflow-x-hidden">
+      <SheetContent className="flex max-h-screen flex-col overflow-x-hidden">
         <div className="mt-4 flex items-end justify-between border-b border-zinc-200 pb-4">
-          <SheetTitle>Entradas realizadas</SheetTitle>
+          <div className="flex flex-col">
+            <SheetTitle>Entradas realizadas</SheetTitle>
+            <SheetDescription>{data?.bound?.text}</SheetDescription>
+          </div>
           <Button onClick={() => setCreatModalOpen(true)}>
             <Plus size={16} />
             Novo
           </Button>
         </div>
         <div className="flex h-full flex-col gap-4 overflow-auto">
-          {data?.map(({ id, value, quantity, compartmentId }) => (
+          {data?.product?.map(({ id, value, quantity, compartmentId }) => (
             <Card key={id}>
               <CardContent className="relative pt-5">
                 <p>{compartmentId}</p>

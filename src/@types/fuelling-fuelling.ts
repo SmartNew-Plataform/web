@@ -32,6 +32,7 @@ export interface ListFuelling {
 export interface TrainData {
   id: number
   train: string
+  model: string
   tag: string
   compartmentAll: Array<{
     id: number

@@ -57,6 +57,17 @@ export function HeaderFuelling() {
                 Comboio
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
+                  pathname: '/abastecimento/create/equipamentos',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Equipamentos
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -102,7 +113,7 @@ export function HeaderFuelling() {
                   query: { token: searchParams.get('token') },
                 }}
               >
-                Relatório Combustível
+                Posição de Estoque
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
