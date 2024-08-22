@@ -4,7 +4,7 @@ import { Header } from './header'
 import { ListTank } from './list-tank'
 
 export const metadata: Metadata = {
-  title: 'Relatorio combustivel',
+  title: 'Relatorio Combustivel',
   description: 'Plataforma da SmartNew Sistemas.',
 }
 
