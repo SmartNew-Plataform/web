@@ -1,10 +1,10 @@
 import { PageWrapper } from '@/components/page-wrapper'
 import { Metadata } from 'next'
 import { Header } from './header'
-import { Table } from './table'
+import Table from './table'
 
 export const metadata: Metadata = {
-  title: 'Cadastro Tanque',
+  title: 'Análise de Consumo',
   description: 'Plataforma da SmartNew Sistemas.',
 }
 

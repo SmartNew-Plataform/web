@@ -1,13 +1,5 @@
-import { PageWrapper } from '@/components/page-wrapper'
-import { Header } from './header'
-import { Table } from './table'
+import { ActivePage as ActivePageComponent } from '../../../../components/actives-page'
 
 export default function ActivePage() {
-  return (
-    <PageWrapper>
-      <Header />
-
-      <Table />
-    </PageWrapper>
-  )
+  return <ActivePageComponent />
 }

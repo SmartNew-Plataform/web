@@ -8,10 +8,21 @@ import { useCoreScreensStore } from '@/store/core-screens-store'
 export function TableInfo() {
   const { infoScreen } = useCoreScreensStore()
   // console.log('columns => ', columns)
-  async function fetchDataTable(params: { index: number; perPage: number }) {
+  async function fetchDataTable(params: {
+    index: number
+    perPage: number
+    dateFrom?: string
+    dateTo?: string
+  }) {
+    console.log(infoScreen?.filter)
+
     const data = await api
       .get('/smart-list/check-list', {
-        params,
+        params: {
+          ...params,
+          dateFrom: infoScreen?.filter?.period?.from,
+          dateTo: infoScreen?.filter?.period?.to,
+        },
       })
       .then((res) => res.data)
 
@@ -26,8 +37,6 @@ export function TableInfo() {
       columns={columns}
       fetchData={fetchDataTable}
       filterText={infoScreen?.filter?.filterText}
-      dateFrom={infoScreen?.filter?.period?.from}
-      dateTo={infoScreen?.filter?.period?.to}
     />
   )
 }

@@ -36,8 +36,8 @@ interface Checklist {
 
 const filterFormSchema = z.object({
   filterText: z.string().optional(),
-  dateFrom: z.date().optional(),
-  dateTo: z.date().optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
 })
 
 type FilterFormData = z.infer<typeof filterFormSchema>
@@ -55,12 +55,20 @@ export function HeaderInfo() {
   const { handleSubmit, reset } = formFilter
 
   function handleFilter(data: FilterFormData) {
-    changeFilter(data)
+    console.log(data)
+
+    changeFilter({
+      filterText: data.filterText,
+      period: {
+        from: data.dateFrom,
+        to: data.dateTo,
+      },
+    })
   }
 
   function handleResetFilters() {
     changeFilter({})
-    reset({ filterText: '', dateFrom: undefined, dateTo: undefined })
+    reset({ filterText: '', dateFrom: '', dateTo: '' })
   }
 
   async function fetchDataTable(params: {

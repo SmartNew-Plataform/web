@@ -22,13 +22,15 @@ const createSupplyFormSchema = z.object({
   odometer: z.coerce
     .number({ required_error: 'Este campo é obrigatório!' })
     .optional(),
-  receipt: z.coerce.string({ required_error: 'Este campo é obrigatório!' }),
-  request: z.string({ required_error: 'Este campo é obrigatório!' }),
+  receipt: z.coerce
+    .string({ required_error: 'Este campo é obrigatório!' })
+    .optional(),
+  request: z.string({ required_error: 'Este campo é obrigatório!' }).optional(),
   date: z.coerce.string({ required_error: 'Informe a data do abastecimento!' }),
   equipment: z.string({ required_error: 'Selecione o equipamento!' }),
   counter: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
   last: z.coerce.number({ required_error: 'Este campo é obrigatório!' }),
-  fuel: z.string({ required_error: 'Selecione o combustível' }),
+  fuel: z.string({ required_error: 'Selecione o combustível' }).optional(),
   quantity: z.coerce.number({ required_error: 'Informe a quantidade!' }),
   consumption: z.coerce.number(),
   value: z.coerce.number({ required_error: 'Informe o valor unitário!' }),
@@ -64,6 +66,7 @@ export function FuelForm({
   const {
     handleSubmit,
     reset,
+    setError,
     setValue,
     formState: { isSubmitting, isValid, isDirty },
   } = createSupplyForm
@@ -75,9 +78,27 @@ export function FuelForm({
   }
 
   async function handleSubmitIntermediate(data: SupplyFormData) {
-    await onSubmit(data)
+    if (data.type === 'EXTERNO') {
+      let hasError = false
+      if (!data.receipt) {
+        setError('receipt', { message: 'Este campo é obrigatório' })
+        hasError = true
+      }
+      if (!data.request) {
+        setError('request', { message: 'Este campo é obrigatório' })
+        hasError = true
+      }
+      if (hasError) {
+        return
+      }
+    }
 
-    reset()
+    try {
+      await onSubmit(data)
+      reset({ date: data.date })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   useEffect(() => {
@@ -89,7 +110,7 @@ export function FuelForm({
         )
       })
     }
-  }, [defaultValues, setValue])
+  }, [defaultValues])
 
   return (
     <Sheet {...props}>

@@ -4,11 +4,11 @@ import { Header } from './header'
 import { Table } from './table'
 
 export const metadata: Metadata = {
-  title: 'Cadastro Tanque',
+  title: 'Cadastro Equipamento',
   description: 'Plataforma da SmartNew Sistemas.',
 }
 
-export default function Page() {
+export function ActivePage() {
   return (
     <PageWrapper>
       <Header />

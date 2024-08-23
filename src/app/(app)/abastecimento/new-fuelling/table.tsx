@@ -266,24 +266,42 @@ export function Table() {
       header: 'Contador anterior',
     },
     {
-      accessorKey: 'tankFuelling',
-      header: 'Combustivel',
+      accessorKey: 'compartment',
+      header: 'Combustível',
     },
     {
       accessorKey: 'quantidade',
       header: 'Quantidade',
+      cell({ getValue }) {
+        const quantidade = Number(getValue())
+        return isNaN(quantidade) ? '-' : quantidade.toFixed(2).replace('.', ',')
+      },
     },
     {
       accessorKey: 'consumption',
       header: 'Cons Realizado',
+      cell({ getValue }) {
+        const consumption = Number(getValue())
+        return isNaN(consumption)
+          ? '-'
+          : consumption.toFixed(2).replace('.', ',')
+      },
     },
     {
       accessorKey: 'value',
       header: 'Valor UN',
+      cell({ getValue }) {
+        const value = Number(getValue())
+        return isNaN(value) ? '-' : value.toFixed(2).replace('.', ',')
+      },
     },
     {
       accessorKey: 'total',
-      header: 'Custo total',
+      header: 'Custo Total',
+      cell({ getValue }) {
+        const total = Number(getValue())
+        return isNaN(total) ? '-' : total.toFixed(2).replace('.', ',')
+      },
     },
     // {
     //   accessorKey: 'observation',

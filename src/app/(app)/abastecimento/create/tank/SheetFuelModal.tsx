@@ -2,7 +2,12 @@
 import { AlertModal } from '@/components/alert-modal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -23,11 +28,15 @@ interface ActiveFormProps extends ComponentProps<typeof Sheet> {
 }
 
 interface TankFormProps {
-  value: string
-  fuel: { label: string; value: number }
-  capacity: number
-  quantity: number
-  id: number
+  compartment: {
+    fuel: { label: string; value: number }
+    capacity: number
+    quantity: number
+    id: number
+    value: string
+  }[]
+  model: string
+  tank: string
 }
 
 export function FuelModal({ tankId, ...props }: ActiveFormProps) {
@@ -43,11 +52,11 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
     const response = await api
       .get(`fuelling/tank/${tankId}`)
       .then((response) => response.data)
-    return response.data.compartment
+    return response.data
   }
   const queryClient = useQueryClient()
 
-  const { data, refetch } = useQuery<TankFormProps[]>({
+  const { data, refetch } = useQuery<TankFormProps>({
     queryKey: ['fuelling/tank/compartment', tankId],
     queryFn: fetchCompartment,
   })
@@ -101,16 +110,21 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
 
   return (
     <Sheet {...props}>
-      <SheetContent className="flex max-h-screen w-1/4 flex-col overflow-x-hidden">
+      <SheetContent className="flex max-h-screen flex-col overflow-x-hidden">
         <div className="mt-4 flex items-end justify-between border-b border-zinc-200 pb-4">
-          <SheetTitle>Compartimentos</SheetTitle>
+          <div className="flex flex-col">
+            <SheetTitle>Compartimentos</SheetTitle>
+            <SheetDescription>
+              {data?.model + ' ' + data?.tank}
+            </SheetDescription>
+          </div>
           <Button onClick={() => setCreatModalOpen(true)}>
             <Plus size={16} />
             Novo
           </Button>
         </div>
         <div className="flex h-full flex-col gap-4 overflow-auto">
-          {data?.map(({ fuel, capacity, value, id, quantity }) => {
+          {data?.compartment?.map(({ fuel, capacity, value, id, quantity }) => {
             return (
               <Card key={value}>
                 <CardContent className="relative pt-5">

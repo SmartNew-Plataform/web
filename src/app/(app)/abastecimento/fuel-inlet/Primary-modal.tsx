@@ -67,6 +67,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
         return {
           value: value.id.toString(),
           label: value.tank,
+          model: value.model,
           comparment: value.compartmentAll.map((compart) => {
             return {
               value: compart.id.toString(),
@@ -82,6 +83,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
         return {
           value: value.id.toString(),
           label: value.train,
+          model: value.model,
           comparment: value.compartmentAll.map((compart) => {
             return {
               value: compart.id.toString(),
@@ -118,8 +120,9 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     tank: {
       label: 'Tanque',
       options:
-        selects?.tank.map(({ id, tank, compartmentAll }) => ({
+        selects?.tank.map(({ id, tank, compartmentAll, model }) => ({
           label: tank,
+          model,
           value: id.toString(),
           compartment: compartmentAll,
         })) || [],
@@ -127,8 +130,9 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     train: {
       label: 'Comboio',
       options:
-        selects?.train.map(({ id, train, compartmentAll }) => ({
+        selects?.train.map(({ id, train, compartmentAll, tag }) => ({
           label: train,
+          model: tag,
           value: id.toString(),
           compartment: compartmentAll,
         })) || [],
@@ -224,7 +228,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
                   name={type}
                   id={type}
                   options={typeSupplierOptions[type].options.map((option) => ({
-                    label: option.label,
+                    label: option.model + ' ' + option.label,
                     value: option.value,
                   }))}
                 />

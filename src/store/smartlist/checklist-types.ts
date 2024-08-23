@@ -11,8 +11,8 @@ export type FamilyData = {
 export type FilterInfoChecklist = {
   filterText?: string
   period?: {
-    from?: Date
-    to?: Date
+    from?: string
+    to?: string
   }
 }
 
