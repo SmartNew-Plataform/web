@@ -5,6 +5,7 @@ import { WizardForm } from '@/components/wizard-form'
 import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
 import { useWizardForm } from '@/hooks/use-wizard-form'
 import { api } from '@/lib/api'
+import { ApiServiceOrderMapper } from '@/lib/mappers/api-service-order-mapper'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
@@ -22,7 +23,7 @@ interface ServiceOrderFormProps extends ComponentProps<typeof Sheet> {
   data: []
 }
 
-const createServiceFormSchema = z.object({
+export const createServiceFormSchema = z.object({
   requester: z.string({ required_error: 'O solicitante e obrigatório!' }),
   equipment: z.string({ required_error: 'O equipamento e obrigatório!' }),
   hourMeter: z.coerce.number({ required_error: 'O horímetro é obrigatório!' }),
@@ -47,9 +48,9 @@ const createServiceFormSchema = z.object({
   deadlineDate: z.string().optional(),
   closingDate: z.string().optional(),
   dueDate: z.string().optional(),
-  maintenanceDiagnosis: z.string().optional(),
-  solution: z.string().optional(),
-  executorObservation: z.string().optional(),
+  maintenanceDiagnosis: z.string().optional().nullable(),
+  solution: z.string().optional().nullable(),
+  executorObservation: z.string().optional().nullable(),
 })
 
 export type ServiceFormData = z.infer<typeof createServiceFormSchema>
@@ -61,7 +62,10 @@ export function ServiceOrderForm({
   const createServiceForm = useForm<ServiceFormData>({
     resolver: zodResolver(createServiceFormSchema),
   })
-  const { handleSubmit } = createServiceForm
+  const {
+    handleSubmit,
+    formState: { isSubmitting },
+  } = createServiceForm
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
@@ -75,34 +79,8 @@ export function ServiceOrderForm({
   }
 
   async function handleSubmitIntermediate(data: ServiceFormData) {
-    console.log(data)
-    const response = await api.post('maintenance/service-order', {
-      idServiceOrderFather: data.orderBonded,
-      idBranch: data.branch,
-      idEquipment: data.equipment,
-      descriptionRequest: data.equipmentFail,
-      comments: data.maintenanceDiagnosis,
-      executanteObservations: data.executorObservation,
-      idTypeMaintenance: data.typeMaintenance,
-      statusServiceOrder: data.status,
-      dateTimeRequest: data.requestDate,
-      dateExpectedTerm: data.deadlineDate,
-      dateEnd: data.closingDate,
-      dateEquipamentoStop: data.stoppedDate,
-      timeMachineStop: data.stoppedMachine,
-      idRequester: data.requester,
-      sectorExecutante: data.executantSector,
-      maintainers: data.maintainers,
-      // dateEquipmentWorked: ,
-      // occurrence: string,
-      // causeReason: 0,
-      // statusFailure: string,
-      // servicePending: string,
-      // hasAttachment: string,
-      // idServiceRequest: 0,
-      // idProductionRegistration: 0,
-      // aux: string,
-    })
+    const raw = ApiServiceOrderMapper.toApi(data)
+    const response = await api.post('maintenance/service-order', raw)
 
     if (response.status !== 201) return
 
@@ -153,7 +131,13 @@ export function ServiceOrderForm({
             </Button>
 
             <div className="flex gap-3">
-              <Button type="submit" variant="success" form="service-form">
+              <Button
+                type="submit"
+                variant="success"
+                form="service-form"
+                loading={isSubmitting}
+                disabled={isSubmitting}
+              >
                 <Save size={16} />
                 Salvar
               </Button>
