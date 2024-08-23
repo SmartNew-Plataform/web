@@ -31,8 +31,8 @@ type ReactDataParamsType = {
   index: number
   perPage: number
   filterText?: string
-  dateFrom?: Date
-  dateTo?: Date
+  dateFrom?: string
+  dateTo?: string
 }
 
 export interface DataTableProps<TData, TValue> {
@@ -42,8 +42,8 @@ export interface DataTableProps<TData, TValue> {
     pageCount: number
   }>
   filterText?: string
-  dateFrom?: Date
-  dateTo?: Date
+  dateFrom?: string
+  dateTo?: string
   id: string | string[]
   onRowSelection?: (data: TData[]) => void
 }
