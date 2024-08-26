@@ -6,6 +6,7 @@ import { api } from '@/lib/api'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { useState } from 'react'
 import { AlertModal } from './alert-modal'
+import { toast } from './ui/use-toast'
 
 export function TableInfo() {
   const { infoScreen } = useCoreScreensStore()
@@ -40,6 +41,11 @@ export function TableInfo() {
     if (selectedItemId !== null) {
       try {
         await api.delete(`/smart-list/check-list/${selectedItemId}`)
+        toast({
+          title: 'Deletado com sucesso!',
+          description: 'Checklist foi deletado com sucesso.',
+          variant: 'success',
+        })
       } catch (error) {
         console.error('Failed to delete:', error)
       }
