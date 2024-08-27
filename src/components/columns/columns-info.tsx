@@ -15,7 +15,9 @@ export type InfoData = {
   period: string
 }
 
-export const columns: ColumnDef<InfoData>[] = [
+export const columns: (
+  onDeleteClick: (id: number) => void,
+) => ColumnDef<InfoData>[] = (onDeleteClick) => [
   {
     header: () => <span />,
     accessorKey: 'id',
@@ -24,6 +26,7 @@ export const columns: ColumnDef<InfoData>[] = [
       const searchParams = new URLSearchParams(window.location.search)
       const token = searchParams.get('token')
       const id = row.getValue('id')
+
       return (
         <div className="flex gap-2">
           <Button variant="secondary" size="icon-xs" asChild>
@@ -32,7 +35,11 @@ export const columns: ColumnDef<InfoData>[] = [
             </Link>
           </Button>
 
-          <Button variant="destructive" size="icon-xs">
+          <Button
+            variant="destructive"
+            size="icon-xs"
+            onClick={() => onDeleteClick(Number(id))}
+          >
             <Trash2 size={12} />
           </Button>
         </div>
