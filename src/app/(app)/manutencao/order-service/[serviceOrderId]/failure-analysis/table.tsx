@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { ApiFailureAnalysisMapper } from '@/lib/mappers/api-failure-analysis-mapper'
+import { FormFailureAnalysis } from '@/lib/mappers/form-failure-analysis'
 import { useLoading } from '@/store/loading-store'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
@@ -83,7 +84,7 @@ export function Table() {
       header: '',
       cell: ({ row }) => {
         const data = row.original
-        const raw = data
+        const raw = FormFailureAnalysis.toForm(data)
 
         return (
           <div className="flex gap-2">
@@ -109,15 +110,19 @@ export function Table() {
       },
     },
     {
+      accessorKey: 'relatedComponent.component',
       header: 'Componente',
     },
     {
+      accessorKey: 'relatedFailureSymptoms.description',
       header: 'Sintoma',
     },
     {
+      accessorKey: 'relatedFailureCause.description',
       header: 'Causa',
     },
     {
+      accessorKey: 'relatedFailureAction.description',
       header: 'Ação',
     },
   ]
