@@ -1,18 +1,21 @@
 'use client'
 
-import { columns } from '@/components/columns/columns-info'
+import { columns, InfoData } from '@/components/columns/columns-info'
 import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { api } from '@/lib/api'
 import { useCoreScreensStore } from '@/store/core-screens-store'
+import { useGridStore } from '@/store/smartlist/grid'
 import { useState } from 'react'
 import { AlertModal } from './alert-modal'
 import { toast } from './ui/use-toast'
 
 export function TableInfo() {
   const { infoScreen } = useCoreScreensStore()
-  // console.log('columns => ', columns)
 
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null)
+  // const [selectedRows, setSelectedRows] = useState<InfoData[]>([])
+
+  const { setChecklistId } = useGridStore()
 
   async function fetchDataTable(params: {
     index: number
@@ -20,8 +23,6 @@ export function TableInfo() {
     dateFrom?: string
     dateTo?: string
   }) {
-    console.log(infoScreen?.filter)
-
     const data = await api
       .get('/smart-list/check-list', {
         params: {
@@ -32,8 +33,11 @@ export function TableInfo() {
       })
       .then((res) => res.data)
 
-    // console.log(data[0])
     return data
+  }
+
+  function selectRow(data: InfoData[]) {
+    setChecklistId(data.map(({ id }) => id.toString()))
   }
 
   async function handleDelete() {
@@ -65,6 +69,7 @@ export function TableInfo() {
         columns={tableColumns}
         fetchData={fetchDataTable}
         filterText={infoScreen?.filter?.filterText}
+        onRowSelection={selectRow}
       />
 
       <AlertModal

@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { ArrowDownWideNarrow, ExternalLink, Trash2 } from 'lucide-react'
@@ -17,39 +18,54 @@ export type InfoData = {
 
 export const columns: (
   onDeleteClick: (id: number) => void,
-) => ColumnDef<InfoData>[] = (onDeleteClick) => [
-  {
-    header: () => <span />,
-    accessorKey: 'id',
-    cell: ({ row }) => {
-      if (!window) return
-      const searchParams = new URLSearchParams(window.location.search)
-      const token = searchParams.get('token')
-      const id = row.getValue('id')
+  // onRowSelectionChange: (selectedRows: InfoData[]) => void,
+) => ColumnDef<InfoData>[] = (onDeleteClick) => {
+  return [
+    {
+      accessorKey: 'id',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Selecionar todos"
+        />
+      ),
+      cell: ({ row }) => {
+        const infoData = row.original as InfoData
+        return (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label="Selecionar linha"
+            />
+            <Button variant="secondary" size="icon-xs" asChild>
+              <Link
+                href={`/checklist/grid/${infoData.id}?token=${new URLSearchParams(
+                  window.location.search,
+                ).get('token')}`}
+              >
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </Button>
 
-      return (
-        <div className="flex gap-2">
-          <Button variant="secondary" size="icon-xs" asChild>
-            <Link href={`/checklist/grid/${id}?token=${token}`}>
-              <ExternalLink className="h-3 w-3" />
-            </Link>
-          </Button>
-
-          <Button
-            variant="destructive"
-            size="icon-xs"
-            onClick={() => onDeleteClick(Number(id))}
-          >
-            <Trash2 size={12} />
-          </Button>
-        </div>
-      )
+            <Button
+              variant="destructive"
+              size="icon-xs"
+              onClick={() => onDeleteClick(Number(infoData.id))}
+            >
+              <Trash2 size={12} />
+            </Button>
+          </div>
+        )
+      },
     },
-  },
-  {
-    accessorKey: 'id',
-    header: ({ column }) => {
-      return (
+    {
+      accessorKey: 'id',
+      header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
@@ -57,14 +73,11 @@ export const columns: (
           N° Checklist
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
-      )
+      ),
     },
-  },
-
-  {
-    accessorKey: 'model',
-    header: ({ column }) => {
-      return (
+    {
+      accessorKey: 'model',
+      header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
@@ -72,13 +85,11 @@ export const columns: (
           Tipo Checklist
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
-      )
+      ),
     },
-  },
-  {
-    accessorKey: 'startDate',
-    header: ({ column }) => {
-      return (
+    {
+      accessorKey: 'startDate',
+      header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
@@ -86,18 +97,15 @@ export const columns: (
           Data de abertura
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
-      )
+      ),
+      cell: ({ row }) => {
+        const date: string = row.getValue('startDate')
+        return date ? dayjs(date).format('DD/MM/YYYY, HH:mm') : 'Sem registro'
+      },
     },
-    cell: ({ row }) => {
-      const date: string = row.getValue('startDate')
-
-      return date ? dayjs(date).format('DD/MM/YYYY, HH:mm') : 'Sem registro'
-    },
-  },
-  {
-    accessorKey: 'period',
-    header: ({ column }) => {
-      return (
+    {
+      accessorKey: 'period',
+      header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
@@ -105,13 +113,11 @@ export const columns: (
           Turno
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
-      )
+      ),
     },
-  },
-  {
-    accessorKey: 'item',
-    header: ({ column }) => {
-      return (
+    {
+      accessorKey: 'item',
+      header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
@@ -119,37 +125,19 @@ export const columns: (
           Ativo/Diversos
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
-      )
+      ),
     },
-  },
-  {
-    accessorKey: 'user',
-    header: ({ column }) => {
-      return (
+    {
+      accessorKey: 'user',
+      header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Usuario
+          Usuário
           <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
         </Button>
-      )
+      ),
     },
-  },
-  {
-    accessorKey: 'status',
-    cell: ({ row }) =>
-      row.getValue('status') === 'open' ? 'Aberto' : 'Finalizado ',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Status
-          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
-]
+  ]
+}
