@@ -17,9 +17,18 @@ import {
 import { api } from '@/lib/api'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { useLoading } from '@/store/loading-store'
+import { useGridStore } from '@/store/smartlist/grid'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AES } from 'crypto-js'
 import dayjs from 'dayjs'
-import { Eraser, FileBarChart, Info, ListFilter, Search } from 'lucide-react'
+import {
+  Eraser,
+  FileBarChart,
+  FileBarChart2,
+  Info,
+  ListFilter,
+  Search,
+} from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -46,6 +55,8 @@ export function HeaderInfo() {
   const formFilter = useForm<FilterFormData>({
     resolver: zodResolver(filterFormSchema),
   })
+
+  const { checklistId } = useGridStore()
 
   const { changeFilter } = useCoreScreensStore(({ changeFilter }) => ({
     changeFilter,
@@ -126,6 +137,15 @@ export function HeaderInfo() {
     loading.hide()
   }
 
+  async function handleGeneratePDF() {
+    checklistId?.forEach((id) => {
+      const hash = AES.encrypt(String(id), 'ask-checklist')
+      window.open(
+        `https://pdf.smartnewservices.com.br/generator/checklist/asks/?id=${hash}`,
+      )
+    })
+  }
+
   return (
     <Card className="flex items-center justify-between rounded-md p-4">
       <h1 className="text-lg font-semibold text-slate-700">Checklist Grid</h1>
@@ -133,6 +153,10 @@ export function HeaderInfo() {
         <Button variant="outline" onClick={handleGenerateExcel}>
           <FileBarChart className="h-4 w-4" />
           Excel
+        </Button>
+        <Button onClick={handleGeneratePDF}>
+          <FileBarChart2 className="h-4 w-4" />
+          PDF
         </Button>
         <Popover>
           <PopoverTrigger asChild>
