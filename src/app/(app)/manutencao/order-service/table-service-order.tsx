@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Expand } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { z } from 'zod'
 // import { useEffect, useState } from 'react'
 
@@ -30,6 +31,8 @@ const serviceOrderFromSchema = z.object({
 export type ServiceOrderFormData = z.infer<typeof serviceOrderFromSchema>
 
 export function TableServiceOrder() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const { data: serviceOrderFormData, isLoading } = useQuery({
     queryKey: ['maintenance-service-order-table'],
     queryFn: fetchDataTable,
@@ -37,14 +40,10 @@ export function TableServiceOrder() {
 
   async function fetchDataTable(): Promise<ServiceOrderFormData[]> {
     const response: { data: ServiceOrderFormData[] } = await api
-      .get('/maintenance/service-order/list-table', {
-        // params,
-      })
+      .get('/maintenance/service-order/list-table')
       .then((res) => res.data)
 
-    // console.log('response => ', response)
     if (response.data.length) {
-      // console.log('data => ', response)
       return response.data
     }
 
@@ -65,7 +64,9 @@ export function TableServiceOrder() {
               onClick={() => {
                 // setIndexModal(line.row.index)
                 // setChildrenData(children)
-                console.log(id)
+                router.push(
+                  `/manutencao/order-service/${id}/details?token=${searchParams.get('token')}`,
+                )
               }}
             >
               <Expand size={12} />

@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { ArrowDownWideNarrow, ExternalLink } from 'lucide-react'
+import { ArrowDownWideNarrow, ExternalLink, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
 export type InfoData = {
@@ -15,7 +15,9 @@ export type InfoData = {
   period: string
 }
 
-export const columns: ColumnDef<InfoData>[] = [
+export const columns: (
+  onDeleteClick: (id: number) => void,
+) => ColumnDef<InfoData>[] = (onDeleteClick) => [
   {
     header: () => <span />,
     accessorKey: 'id',
@@ -24,12 +26,23 @@ export const columns: ColumnDef<InfoData>[] = [
       const searchParams = new URLSearchParams(window.location.search)
       const token = searchParams.get('token')
       const id = row.getValue('id')
+
       return (
-        <Button variant="secondary" size="icon-xs" asChild>
-          <Link href={`/checklist/grid/${id}?token=${token}`}>
-            <ExternalLink className="h-3 w-3" />
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" size="icon-xs" asChild>
+            <Link href={`/checklist/grid/${id}?token=${token}`}>
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+          </Button>
+
+          <Button
+            variant="destructive"
+            size="icon-xs"
+            onClick={() => onDeleteClick(Number(id))}
+          >
+            <Trash2 size={12} />
+          </Button>
+        </div>
       )
     },
   },

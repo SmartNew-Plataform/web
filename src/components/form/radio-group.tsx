@@ -13,5 +13,11 @@ export function RadioGroup({ name, ...props }: RadioGroupProps) {
     control,
   })
 
-  return <RadioGroupLib {...field} {...props} />
+  return (
+    <RadioGroupLib
+      value={field.value}
+      onValueChange={field.onChange}
+      {...props}
+    />
+  )
 }

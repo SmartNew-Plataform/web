@@ -5,21 +5,12 @@ import { RadioGroupItem } from '@/components/ui/radio-group'
 import { useServiceOrder } from '@/store/maintenance/service-order'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { useFormContext } from 'react-hook-form'
 import { ServiceOrderFormData } from '../table-service-order'
 
 export function StepTwo() {
   const { selects } = useServiceOrder()
-  const { watch, setValue } = useFormContext()
   const queryClient = useQueryClient()
   const [orderBondedData, setOrderBondedData] = useState<SelectData[]>([])
-
-  const equipmentValue = watch('equipment')
-
-  const equipmentData = selects.equipment?.find(
-    (e) => e.value === equipmentValue,
-  )
-  const branchText = equipmentData?.branch.label
 
   useEffect(() => {
     async function fetchServiceOrder() {
@@ -40,21 +31,20 @@ export function StepTwo() {
     fetchServiceOrder()
   }, [])
 
-  useEffect(() => {
-    if (!branchText) return
-    setValue('branch', branchText)
-  }, [branchText])
-
   return (
     <>
-      <Form.Field>
-        <Form.Label htmlFor="maintainers">Mantenedores:</Form.Label>
-        <Form.Select
-          options={orderBondedData}
-          id="maintainers"
-          name="maintainers"
-        />
-      </Form.Field>
+      {!selects.maintainers ? (
+        <Form.SkeletonField />
+      ) : (
+        <Form.Field>
+          <Form.Label htmlFor="maintainers">Mantenedores:</Form.Label>
+          <Form.MultiSelect
+            options={selects.maintainers}
+            id="maintainers"
+            name="maintainers"
+          />
+        </Form.Field>
+      )}
       <Form.Field>
         <Form.Label htmlFor="orderBonded">Ordem vinculada:</Form.Label>
         <Form.Select

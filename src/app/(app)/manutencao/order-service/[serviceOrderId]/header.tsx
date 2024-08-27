@@ -1,0 +1,40 @@
+'use client'
+
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { ReactNode } from 'react'
+
+export function Header({ children }: { children: ReactNode }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
+  function handleChangeTab(tab: string) {
+    router.push(`${tab}?token=${searchParams.get('token')}`)
+  }
+
+  const pathnameList = pathname.split('/')
+  const tabValue = pathnameList[pathnameList.length - 1]
+
+  return (
+    <Tabs
+      defaultValue="details"
+      value={tabValue}
+      className="flex h-full w-full flex-col items-start gap-4 overflow-auto"
+      onValueChange={handleChangeTab}
+    >
+      <TabsList>
+        <TabsTrigger value="details">Detalhes</TabsTrigger>
+        {/* <TabsTrigger value="task">Tarefas (Checklist)</TabsTrigger> */}
+        <TabsTrigger value="timekeeping">Apontamento de horas</TabsTrigger>
+        <TabsTrigger value="stop-recording">Registro de paradas</TabsTrigger>
+        <TabsTrigger value="material">Materiais</TabsTrigger>
+        <TabsTrigger value="diverse">Diversos</TabsTrigger>
+        <TabsTrigger value="failure-analysis">Analise de falhas</TabsTrigger>
+        <TabsTrigger value="attach">Anexos</TabsTrigger>
+      </TabsList>
+
+      <main className="flex h-full w-full flex-col gap-4">{children}</main>
+    </Tabs>
+  )
+}

@@ -21,9 +21,9 @@ export function StepOne() {
   const branchValue = equipmentData?.branch.value
 
   useEffect(() => {
-    if (!branchText) return
+    if (!branchValue) return
     setValue('branch', branchValue)
-  }, [branchText])
+  }, [equipmentValue, branchValue])
 
   return (
     <>
