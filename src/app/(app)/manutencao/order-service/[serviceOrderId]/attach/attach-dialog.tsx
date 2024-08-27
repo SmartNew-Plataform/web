@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { useLoading } from '@/store/loading-store'
 import { useServiceOrderAttach } from '@/store/maintenance/service-order-attach'
 import { useQueryClient } from '@tanstack/react-query'
 import { Save, Trash2 } from 'lucide-react'
@@ -20,6 +21,7 @@ export function AttachDialog({ children, ...props }: AttachDialogProps) {
   const params = useParams()
   const queryClient = useQueryClient()
   const { toast } = useToast()
+  const loading = useLoading()
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     console.log(acceptedFiles)
@@ -33,6 +35,7 @@ export function AttachDialog({ children, ...props }: AttachDialogProps) {
 
   async function handleRegisterAttach() {
     if (files.length === 0) return
+    loading.show()
     await Promise.all(
       files.map((file) => {
         const data = new FormData()
@@ -55,7 +58,7 @@ export function AttachDialog({ children, ...props }: AttachDialogProps) {
             }),
           )
       }),
-    )
+    ).finally(loading.hide)
 
     queryClient.refetchQueries(['maintenance/service-order/attach'])
     setFiles([])
