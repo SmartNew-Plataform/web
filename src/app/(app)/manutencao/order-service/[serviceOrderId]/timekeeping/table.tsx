@@ -131,12 +131,12 @@ export function Table() {
     {
       accessorKey: 'dateEndHour',
       header: 'Termino',
-      cell: ({ row }) => dayjs(row.getValue('dateStartHour')).format('HH:mm'),
+      cell: ({ row }) => dayjs(row.getValue('dateEndHour')).format('HH:mm'),
     },
     {
       accessorKey: 'dateEmission',
       header: 'Tempo real',
-      cell: ({ row }) => dayjs(row.getValue('dateStartHour')).format('HH:mm'),
+      cell: ({ row }) => dayjs(row.getValue('dateEmission')).format('HH:mm'),
     },
     {
       accessorKey: 'relatedStatusServiceOrder.status',
