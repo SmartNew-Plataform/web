@@ -33,7 +33,6 @@ export function TableInfo() {
       .then((res) => res.data)
 
     // console.log(data[0])
-
     return data
   }
 
