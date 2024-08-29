@@ -1,13 +1,11 @@
 'use client'
-import { Button } from '@/components/ui/button'
+import { AttachPreview } from '@/components/attach-preview'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { useLoading } from '@/store/loading-store'
 import { useServiceOrderAttach } from '@/store/maintenance/service-order-attach'
 import { useQuery } from '@tanstack/react-query'
-import { Trash2 } from 'lucide-react'
-import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
@@ -37,9 +35,9 @@ export function AttachList() {
   const { data, refetch } = useQuery({
     queryKey: ['maintenance/service-order/attach'],
     queryFn: async () => {
-      const response = await api.get<{ data: { url: string; id: number }[] }>(
-        `/maintenance/service-order/${params.serviceOrderId}/attachments`,
-      )
+      const response = await api.get<{
+        data: { url: string; id: number; nameAttachment: string }[]
+      }>(`/maintenance/service-order/${params.serviceOrderId}/attachments`)
 
       if (response.status !== 200) return
 
@@ -77,26 +75,19 @@ export function AttachList() {
 
         {data?.length ? (
           <div className="grid max-h-full w-full grid-cols-auto-md items-start gap-4 overflow-auto">
-            {data?.map(({ url, id }) => (
-              <div key={url} className="relative">
-                <Button
-                  variant="destructive"
-                  size="icon-xs"
-                  className="absolute right-1 top-1"
-                  onClick={() => handleDeleteAttach(id)}
-                >
-                  <Trash2 size={14} />
-                </Button>
-                <Image
-                  width={500}
-                  height={500}
-                  alt=""
-                  src={url}
-                  className="aspect-square w-full rounded border object-cover"
-                  draggable={false}
+            {data?.map(({ url, id, nameAttachment }) => {
+              const nameSpliced = nameAttachment.split('.')
+              const type = nameSpliced[nameSpliced.length - 1]
+              return (
+                <AttachPreview
+                  key={url}
+                  file={url}
+                  type={type}
+                  name={nameAttachment}
+                  onDelete={() => handleDeleteAttach(id)}
                 />
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           <span className="text-1xl font-semibold text-slate-600">

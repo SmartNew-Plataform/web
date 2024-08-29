@@ -1,25 +1,49 @@
-name: Build & Deploy app
-
 on:
   push:
     branches:
-      - build
-
+      - dev
+name: Deploy website on push
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
+  web-deploy:
+      name: 🎉 Deploy
+      runs-on: ubuntu-latest
+      steps:
+      - name: 🚚 Get latest code
         uses: actions/checkout@v2
 
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
+      - name: Use Node.js 18
+        uses: actions/setup-node@v2
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          
-      - name: SSH into Droplet and Run Commands
+          node-version: '18'
+        
+      - name: 🔨 Build & Prisma & Combine
         run: |
-          ssh -i /home/davi/.ssh/id_rsa root@64.225.6.102 "touch test-conn.txt"
-        env:
-          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          DROPLET_IP: 64.225.6.102
+          npm ci
+          npm run build
+          mkdir combined
+          mv .next combined
+          mv package.json combined
+          mv package-lock.json combined
+      
+      - name: List output files
+        run: find combined/ -print
+        
+      - name: 📂 Sync files
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+            username: 'root'
+            server: '161.35.123.160'
+            password: ${{ secrets.SSH_PASSWORD }}
+            local_path: './combined/*'
+            remote_path: '/var/www/homolog.smartnewservices.com.br'
+
+      - name: 🚀 Run commands on remote server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+            host: '161.35.123.160'
+            username: 'root'
+            password: ${{ secrets.SSH_PASSWORD }}
+            port: 22
+            script: |
+              cd /var/www/homolog.smartnewservices.com.br
+              npm ci
