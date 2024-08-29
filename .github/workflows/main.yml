@@ -18,7 +18,7 @@ jobs:
         
       - name: 🔨 Build & Prisma & Combine
         run: |
-          npm ci
+          npm i
           npm run build
           mkdir combined
           mv .next combined
@@ -46,4 +46,4 @@ jobs:
             port: 22
             script: |
               cd /var/www/homolog.smartnewservices.com.br
-              npm ci
+              npm i
