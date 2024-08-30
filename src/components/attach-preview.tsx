@@ -1,6 +1,11 @@
-import { FileSpreadsheet, FileText, Trash2 } from 'lucide-react'
+import {
+  Download,
+  FilePieChart,
+  FileSpreadsheet,
+  FileText,
+  Trash2,
+} from 'lucide-react'
 import Image from 'next/image'
-import { PdfFilePreview } from './pdf-file-preview'
 import { Button } from './ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
@@ -21,39 +26,30 @@ export function AttachPreview({
   return (
     <Tooltip>
       <TooltipTrigger>
-        <div className="relative aspect-square overflow-hidden rounded border text-zinc-600">
-          <Button
-            variant="destructive"
-            size="icon-xs"
-            className="absolute right-1 top-1 z-[999999]"
-            onClick={onDelete}
-          >
-            <Trash2 size={14} />
-          </Button>
+        <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded border">
+          <div className="absolute right-1 top-1 z-[999999] flex gap-1">
+            <a href={url} download target="_blank">
+              <Button size="icon-xs">
+                <Download size={14} />
+              </Button>
+            </a>
+            <Button variant="destructive" size="icon-xs" onClick={onDelete}>
+              <Trash2 size={14} />
+            </Button>
+          </div>
           {type === 'pdf' ? (
-            <a
-              href={url}
-              target="_blank"
-              className="flex h-full w-full items-center justify-center"
-            >
-              <PdfFilePreview file={file} pageWidth={500} />
-            </a>
-          ) : type === 'xls' || type === 'xlsx' ? (
-            <a
-              href={url}
-              download
-              className="flex h-full w-full items-center justify-center"
-            >
+            <div className="aspect-square rounded-full bg-orange-200 p-4 text-orange-600">
+              <FilePieChart size={32} />
+            </div>
+          ) : // <PdfFilePreview file={file} pageWidth={500} />
+          type === 'xls' || type === 'xlsx' ? (
+            <div className="aspect-square rounded-full bg-emerald-200 p-4 text-emerald-600">
               <FileSpreadsheet size={32} />
-            </a>
+            </div>
           ) : type === 'doc' || type === 'docx' ? (
-            <a
-              href={url}
-              download
-              className="flex h-full w-full items-center justify-center"
-            >
+            <div className="aspect-square rounded-full bg-blue-200 p-4 text-blue-600">
               <FileText size={32} />
-            </a>
+            </div>
           ) : (
             <Image
               width={500}
