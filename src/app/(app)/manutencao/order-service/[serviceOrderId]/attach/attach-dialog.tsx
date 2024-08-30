@@ -1,4 +1,5 @@
 'use client'
+import { AttachPreview } from '@/components/attach-preview'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
@@ -7,8 +8,7 @@ import { cn } from '@/lib/utils'
 import { useLoading } from '@/store/loading-store'
 import { useServiceOrderAttach } from '@/store/maintenance/service-order-attach'
 import { useQueryClient } from '@tanstack/react-query'
-import { Save, Trash2 } from 'lucide-react'
-import Image from 'next/image'
+import { Save } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { ComponentProps, useCallback, useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
@@ -100,25 +100,17 @@ export function AttachDialog({ children, ...props }: AttachDialogProps) {
             <div className="grid max-h-full w-full grid-cols-auto-md items-start gap-4 overflow-auto">
               {files.map((file) => {
                 const url = URL.createObjectURL(file)
+                const typeSpliced = file.name.split('.')
+                const type = typeSpliced[typeSpliced.length - 1]
+
                 return (
-                  <div key={url} className="relative">
-                    <Button
-                      variant="destructive"
-                      size="icon-xs"
-                      className="absolute right-1 top-1"
-                      onClick={() => handleDeleteAttach(file.name)}
-                    >
-                      <Trash2 size={14} />
-                    </Button>
-                    <Image
-                      width={150}
-                      height={150}
-                      alt=""
-                      src={url}
-                      className="aspect-square w-full rounded border object-cover"
-                      draggable={false}
-                    />
-                  </div>
+                  <AttachPreview
+                    key={file.name}
+                    file={type === 'pdf' ? file : url}
+                    onDelete={() => handleDeleteAttach(file.name)}
+                    type={type}
+                    name={file.name}
+                  />
                 )
               })}
             </div>
