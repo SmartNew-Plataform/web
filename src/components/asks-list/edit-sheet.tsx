@@ -2,12 +2,14 @@
 import { api } from '@/lib/api'
 import { useCoreScreensStore } from '@/store/core-screens-store'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { Trash2 } from 'lucide-react'
-import Image from 'next/image'
+import { useParams } from 'next/navigation'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { AttachPreview } from '../attach-preview'
 import { Form } from '../form'
 import {
   AlertDialog,
@@ -19,7 +21,6 @@ import {
   AlertDialogTitle,
 } from '../ui/alert-dialog'
 import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '../ui/sheet'
 import { Skeleton } from '../ui/skeleton'
 import { useToast } from '../ui/use-toast'
@@ -31,24 +32,22 @@ interface EditSheetProps {
 }
 
 export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
-  const {
-    checklistAsksScreen,
-    loadChecklistAsks,
-    deleteImageFromAsk,
-    checkIfAnswerHasChild,
-  } = useCoreScreensStore(
-    ({
-      checklistAsksScreen,
-      loadChecklistAsks,
-      deleteImageFromAsk,
-      checkIfAnswerHasChild,
-    }) => ({
-      checklistAsksScreen,
-      loadChecklistAsks,
-      deleteImageFromAsk,
-      checkIfAnswerHasChild,
-    }),
-  )
+  const { checklistAsksScreen, deleteImageFromAsk, checkIfAnswerHasChild } =
+    useCoreScreensStore(
+      ({
+        checklistAsksScreen,
+        loadChecklistAsks,
+        deleteImageFromAsk,
+        checkIfAnswerHasChild,
+      }) => ({
+        checklistAsksScreen,
+        loadChecklistAsks,
+        deleteImageFromAsk,
+        checkIfAnswerHasChild,
+      }),
+    )
+  const params = useParams()
+  const queryClient = useQueryClient()
 
   const editFormSchema = z.object({
     answer: z.string(),
@@ -148,14 +147,15 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
       })
       .finally(() => setIsUpdating(false))
 
-    if (response.updated) {
-      toast({
-        title: 'Tarefa atualizada com sucesso!',
-        variant: 'success',
-      })
-      setSheetOpen(false)
-      loadChecklistAsks(String(checklistAsksScreen?.id))
-    }
+    if (!response.updated) return
+
+    toast({
+      title: 'Tarefa atualizada com sucesso!',
+      variant: 'success',
+    })
+    setSheetOpen(false)
+    // loadChecklistAsks(String(checklistAsksScreen?.id))
+    queryClient.refetchQueries(['checklist-asks', params.askId])
   }
 
   async function handleDeleteImage(index: number) {
@@ -188,8 +188,6 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
       })
     }
   }
-
-  console.log(checklistAsksScreen)
 
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -224,47 +222,29 @@ export function EditSheet({ sheetOpen, setSheetOpen }: EditSheetProps) {
 
                 {currentOption?.action && (
                   <>
-                    <Form.ImagePicker name="images" multiple />
+                    <Form.AttachDragDrop name="images" />
 
-                    <div className="flex flex-wrap gap-2">
-                      {checklistAsksScreen.editingAsk.images?.map(
-                        (src, index) => (
-                          <Dialog key={src.url}>
-                            <div className="relative border">
-                              <Button
-                                size="icon-xs"
-                                variant="destructive"
-                                className="absolute right-1 top-1"
-                                type="button"
-                                onClick={() => setConfirmModal(index)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                              <DialogTrigger asChild>
-                                <Image
-                                  className="h-[80px] rounded object-cover"
-                                  objectFit="cover"
-                                  height={80}
-                                  width={80}
-                                  src={src.url}
-                                  alt={src.url}
-                                />
-                              </DialogTrigger>
-                            </div>
-                            <DialogContent className="p-0">
-                              <Image
-                                className="rounded"
-                                objectFit="cover"
-                                width={510}
-                                height={680}
-                                src={src.url}
-                                alt={src.url}
+                    <div className="flex flex-col gap-4 border-t pt-4">
+                      <span className="font-bold uppercase text-slate-700">
+                        Arquivos ja cadastrados:
+                      </span>
+                      <div className="grid grid-cols-auto-sm gap-2">
+                        {checklistAsksScreen.editingAsk.images?.map(
+                          (src, index) => {
+                            const typeSpliced = src.url.split('.')
+                            const type = typeSpliced[typeSpliced.length - 1]
+                            return (
+                              <AttachPreview
+                                file={src.url}
+                                key={src.url}
+                                onDelete={() => setConfirmModal(index)}
+                                type={type}
                               />
-                            </DialogContent>
-                          </Dialog>
-                        ),
-                      )}
-                      <Form.ErrorMessage field="images" />
+                            )
+                          },
+                        )}
+                        <Form.ErrorMessage field="images" />
+                      </div>
                     </div>
                   </>
                 )}

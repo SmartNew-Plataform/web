@@ -67,7 +67,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
 
   async function fetchCompartment() {
     const response = await api
-      .get(`fuelling/input/${tankId}`)
+      .get(`fuelling/report/family-consumption`)
       .then((response) => response.data)
     return response.data || []
   }
@@ -75,7 +75,6 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
 
   const { data, refetch } = useQuery<TankFormProps>({
     queryKey: [`fuelling/input`, tankId],
-
     queryFn: fetchCompartment,
   })
 

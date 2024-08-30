@@ -1,4 +1,5 @@
 import { Label } from '../ui/label'
+import { AttachDragDrop } from './attach-drag-drop'
 import { Checkbox } from './checkbox'
 import { ColorPicker } from './color-picker'
 import { CostCenterPicker } from './cost-center-picker'
@@ -34,4 +35,5 @@ export const Form = {
   PeriodInput,
   CostCenterPicker,
   RadioGroup,
+  AttachDragDrop,
 }
