@@ -127,6 +127,17 @@ export function HeaderFuelling() {
                 Relatório Equipamento
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
+                  pathname: '/abastecimento/consumo',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Análise de consumo
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
