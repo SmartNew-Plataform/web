@@ -67,6 +67,7 @@ export function StepOne() {
   const { data: selects, isLoading: isLoadingSelects } = useQuery({
     queryKey: ['fuelling/list-fuel'],
     queryFn: loadSelects,
+    refetchOnMount: false,
   })
 
   const { watch, setValue, resetField } = useFormContext()

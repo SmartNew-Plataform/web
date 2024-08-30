@@ -127,6 +127,7 @@ export function Table() {
   async function handleEditFuelling(data: SupplyFormData) {
     const fuelStationId = data.post ? String(data.post) : null
     const trainId = data.train ? String(data.train) : null
+    const tankId = data.tank ? String(data.tank) : null
     try {
       const response = await api.put(`fuelling/${fuellingIdToEdit}`, {
         ...data,
@@ -134,7 +135,7 @@ export function Table() {
         type: data.type,
         fuelStationId,
         trainId,
-        tankId: data.tank,
+        tankId,
         fuelId: data.fuel,
         compartmentId: data.compartment,
         numberRequest: data.request,
