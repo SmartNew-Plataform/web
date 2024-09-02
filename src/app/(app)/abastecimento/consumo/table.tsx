@@ -37,6 +37,7 @@ export default function AnaliseConsumoPorFrota() {
   const { data = [] } = useQuery({
     queryKey: ['fuelling/report/family-consumption'],
     queryFn: fetchCompartment,
+    refetchInterval: 1 * 20 * 1000,
   })
 
   const getIconAndColor = (item: FuellingItem) => {
