@@ -21,7 +21,7 @@ jobs:
           npm i -f
           npm run build
           mkdir combined
-          mv .next combined
+          mv build combined
           mv package.json combined
           mv package-lock.json combined
       
@@ -46,4 +46,4 @@ jobs:
             port: 22
             script: |
               cd /var/www/homolog.smartnewservices.com.br
-              npm ci
+              npm i -f

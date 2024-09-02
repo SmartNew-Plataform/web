@@ -12,6 +12,7 @@ package-lock.json
 # next.js
 /.next/
 /out/
+/build/
 
 # production
 /build
