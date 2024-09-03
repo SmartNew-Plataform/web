@@ -91,19 +91,19 @@ export default function AnaliseConsumoPorFrota() {
                       {item.typeConsumption}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.quantity}
+                      {item.quantity.toFixed(2)}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.total}
+                      {item.total.toFixed(2)}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.sumConsumption}
+                      {item.sumConsumption.toFixed(2)}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.expectedConsumption}
+                      {item.expectedConsumption.toFixed(2)}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.consumptionMade}
+                      {item.consumptionMade.toFixed(2)}
                     </TableCell>
                     <TableCell
                       className={`flex items-center gap-2 border px-4 py-2 ${color}`}
