@@ -67,7 +67,7 @@ export function Header() {
 
   function handleResetFilters() {
     reset({ family: '', dateFrom: '', dateTo: '' })
-    queryClient.invalidateQueries(['fuelling/report/family-consumption'])
+    setFilter({})
   }
 
   return (
