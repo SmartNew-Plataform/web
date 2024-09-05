@@ -20,7 +20,14 @@ export interface User {
     value: string
     label: string
   }
-  type: string
+  branch: {
+    value: string
+    label: string
+  }
+  type: {
+    value: string
+    label: string
+  }
   password: string
   train?: {
     value: string
@@ -91,19 +98,27 @@ export function UserList() {
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="max-w-full flex-1 truncate">
-                {user.user.label} - {user.type}
+                {user.user.label} - {user.type.label}
               </span>
             </TooltipTrigger>
             <TooltipContent>{user.user.label}</TooltipContent>
           </Tooltip>
 
-          <div className="text-gray-500">
-            Senha: {user.password.replace(/./g, '*')}
-          </div>
-
           {user.train && (
             <div className="text-gray-500">Comboio: {user.train.label}</div>
           )}
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-gray-500">
+                Família: {user.branch.label}
+              </span>
+            </TooltipTrigger>
+          </Tooltip>
+
+          <div className="text-gray-500">
+            Senha: {user.password.toString().replace(/./g, '*')}
+          </div>
         </Card>
       ))}
 
@@ -113,7 +128,7 @@ export function UserList() {
           open={openModal}
           onOpenChange={setOpenModal}
           defaultValues={selectedUser}
-          productId={selectedUser.id}
+          userId={selectedUser.id}
         />
       )}
 

@@ -5,40 +5,46 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
-import { Product } from './users'
+import { User } from './users'
 
-interface ProductModalProps extends ComponentProps<typeof Dialog> {
+interface UserModalProps extends ComponentProps<typeof Dialog> {
   mode: 'create' | 'edit'
-  defaultValues?: Product
-  productId?: number
+  defaultValues?: User
+  userId?: number
 }
 
-const productFormSchema = z.object({
-  description: z.string().nonempty('Este campo é obrigatório!'),
-  unity: z.string().nonempty('Este campo é obrigatório!'),
+const userFormSchema = z.object({
+  user: z.string(),
+  branch: z.string(),
+  type: z.string().nonempty('Este campo é obrigatório!'),
+  password: z.string(),
+  train: z.coerce.string().optional(),
 })
 
-type ProductFormData = z.infer<typeof productFormSchema>
+type UserFormData = z.infer<typeof userFormSchema>
 
 export function ProductModal({
   mode,
   defaultValues,
-  productId,
+  userId,
   ...props
-}: ProductModalProps) {
+}: UserModalProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
-  const productForm = useForm<ProductFormData>({
-    resolver: zodResolver(productFormSchema),
-    defaultValues: defaultValues || {
-      description: '',
-      unity: '',
+  const productForm = useForm<UserFormData>({
+    resolver: zodResolver(userFormSchema),
+    defaultValues: {
+      user: '',
+      branch: '',
+      type: '',
+      password: '',
+      train: '',
     },
   })
 
@@ -46,48 +52,101 @@ export function ProductModal({
     handleSubmit,
     formState: { isSubmitting },
     reset,
+    control,
   } = productForm
 
-  async function handleCreateProduct(data: ProductFormData) {
+  const selectedType = useWatch({
+    control,
+    name: 'type',
+  })
+
+  async function fetchUserOptions() {
+    const response = await api.get('system/choices/user')
+    return response.data.data
+  }
+
+  async function fetchTrainOptions() {
+    const response = await api.get('fuelling/list-train')
+    return response.data.data
+  }
+
+  async function fechFilialOptions() {
+    const response = await api.get('system/list-branch')
+    return response.data.data
+  }
+
+  const { data: userOptions = [], isLoading: isLoadingUsers } = useQuery({
+    queryKey: ['system/choices/user'],
+    queryFn: fetchUserOptions,
+  })
+
+  const { data: trainOptions = [], isLoading: isLoadingTrain } = useQuery({
+    queryKey: ['fuelling/list-train'],
+    queryFn: fetchTrainOptions,
+  })
+
+  const { data: filialOptions = [], isLoading: isLoadingFilial } = useQuery({
+    queryKey: ['system/list-branch'],
+    queryFn: fechFilialOptions,
+  })
+
+  async function handleCreateUser(data: UserFormData) {
     try {
-      const response = await api.post('fuelling/product', {
-        description: data.description,
-        unity: data.unity,
+      const response = await api.post('fuelling/control-user', {
+        user: data.user,
+        branchId: Number(data.branch),
+        type: data.type,
+        password: data.password,
+        trainId: Number(data.train) || undefined,
       })
 
       if (response.status === 201) {
-        toast({ title: 'Produto criado com sucesso!', variant: 'success' })
+        toast({ title: 'Usuário vinculado com sucesso!', variant: 'success' })
         queryClient.invalidateQueries(['fuelling/product'])
         reset()
       }
     } catch (error) {
-      toast({ title: 'Erro ao criar produto!', variant: 'destructive' })
+      toast({ title: 'Erro ao vincular usuário!', variant: 'destructive' })
     }
   }
 
-  async function handleEditProduct(data: ProductFormData) {
+  async function handleEditUser(data: UserFormData) {
     try {
-      if (!productId) return
-      const response = await api.put(`fuelling/product/${productId}`, {
-        description: data.description,
-        unity: data.unity,
+      if (!userId) return
+      const response = await api.put(`fuelling/control-user/${userId}`, {
+        user: data.user,
+        branchId: Number(data.branch),
+        type: data.type,
+        password: data.password,
+        trainId: Number(data.train) || undefined,
       })
 
       if (response.status === 200) {
-        toast({ title: 'Produto editado com sucesso!', variant: 'success' })
+        toast({ title: 'Vinculo editado com sucesso!', variant: 'success' })
         queryClient.invalidateQueries(['fuelling/product'])
         reset()
       }
     } catch (error) {
-      toast({ title: 'Erro ao editar produto!', variant: 'destructive' })
+      toast({ title: 'Erro ao editar vinculo!', variant: 'destructive' })
     }
   }
 
   useEffect(() => {
     if (mode === 'edit' && defaultValues) {
-      reset(defaultValues)
+      reset({
+        user: defaultValues.user.value,
+        branch: defaultValues.branch.value,
+        type: defaultValues.type.value,
+        password: defaultValues.password,
+        train: defaultValues.train?.value || '',
+      })
     }
   }, [mode, defaultValues, reset])
+
+  const typeOptions = [
+    { value: 'driver', label: 'Motorista' },
+    { value: 'supplier', label: 'Abastecedor' },
+  ]
 
   return (
     <Dialog {...props}>
@@ -96,19 +155,57 @@ export function ProductModal({
           <form
             className="flex w-full flex-col gap-2"
             onSubmit={handleSubmit(
-              mode === 'edit' ? handleEditProduct : handleCreateProduct,
+              mode === 'edit' ? handleEditUser : handleCreateUser,
             )}
           >
             <Form.Field>
-              <Form.Label htmlFor="description">Produto:</Form.Label>
-              <Form.Input name="description" id="description" />
-              <Form.ErrorMessage field="description" />
+              <Form.Label htmlFor="user">Usuário:</Form.Label>
+              {isLoadingUsers ? (
+                <p>Carregando usuários...</p>
+              ) : (
+                <Form.Select name="user" id="user" options={userOptions} />
+              )}
+              <Form.ErrorMessage field="user" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="unity">Unidade:</Form.Label>
-              <Form.Input name="unity" id="unity" />
-              <Form.ErrorMessage field="unity" />
+              <Form.Label htmlFor="branch">Filial:</Form.Label>
+              {isLoadingFilial ? (
+                <p>Carregando filiais...</p>
+              ) : (
+                <Form.Select
+                  name="branch"
+                  id="branch"
+                  options={filialOptions}
+                />
+              )}
+              <Form.ErrorMessage field="branch" />
+            </Form.Field>
+
+            <Form.Field>
+              <Form.Label htmlFor="type">Tipo:</Form.Label>
+              <Form.Select options={typeOptions} name="type" id="type" />
+              <Form.ErrorMessage field="type" />
+            </Form.Field>
+
+            {selectedType === 'supplier' && (
+              <Form.Field>
+                <Form.Label htmlFor="train">
+                  Comboio: <span className="text-xs">(opcional)</span>
+                </Form.Label>
+                {isLoadingTrain ? (
+                  <p>Carregando comboios...</p>
+                ) : (
+                  <Form.Select name="train" id="train" options={trainOptions} />
+                )}
+                <Form.ErrorMessage field="train" />
+              </Form.Field>
+            )}
+
+            <Form.Field>
+              <Form.Label htmlFor="password">Senha:</Form.Label>
+              <Form.Input type="password" name="password" id="password" />
+              <Form.ErrorMessage field="password" />
             </Form.Field>
 
             <Button
