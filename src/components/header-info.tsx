@@ -103,7 +103,7 @@ export function HeaderInfo() {
 
     if (!data?.rows) return
     loading.show()
-    await fetch('https://excel-api.smartnewsistemas.com.br/exportDefault', {
+    await fetch('https://excel-api.smartnewservices.com.br/exportDefault', {
       method: 'POST',
       mode: 'cors',
       body: JSON.stringify({
