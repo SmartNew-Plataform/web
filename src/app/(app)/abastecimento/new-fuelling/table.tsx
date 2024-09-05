@@ -261,10 +261,18 @@ export function Table() {
     {
       accessorKey: 'counter',
       header: 'Contador atual',
+      cell({ getValue }) {
+        const couter = Number(getValue())
+        return isNaN(couter) ? '-' : couter.toFixed(2).replace('.', ',')
+      },
     },
     {
       accessorKey: 'counterLast',
       header: 'Contador anterior',
+      cell({ getValue }) {
+        const couterLast = Number(getValue())
+        return isNaN(couterLast) ? '-' : couterLast.toFixed(2).replace('.', ',')
+      },
     },
     {
       accessorKey: 'compartment',

@@ -96,25 +96,44 @@ export default function AnaliseConsumoPorFrota() {
                       {item.typeConsumption}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.quantity.toFixed(2)}
+                      {item.quantity.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.total.toFixed(2)}
+                      {item.total.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.sumConsumption.toFixed(2)}
+                      {item.sumConsumption.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.expectedConsumption.toFixed(2)}
+                      {item.expectedConsumption.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </TableCell>
                     <TableCell className="border px-4 py-2">
-                      {item.consumptionMade.toFixed(2)}
+                      {item.consumptionMade.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </TableCell>
                     <TableCell
                       className={`flex items-center gap-2 border px-4 py-2 ${color}`}
                     >
                       {icon}
-                      {item.difference?.toFixed(2)}%
+                      {item.difference?.toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      %
                     </TableCell>
                   </TableRow>
                 )
