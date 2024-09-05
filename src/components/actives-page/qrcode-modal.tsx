@@ -56,7 +56,7 @@ export function QRCodeModal({ multiple = false, ...props }: QRCodeModalProps) {
   function handleGenerateQrCode(data: ActiveQrCodeData) {
     const hash = CryptoJS.AES.encrypt(JSON.stringify(data), 'qrcode-equipments')
     window.open(
-      `https://pdf.smartnewsistemas.com.br/generator/manager/qrCodeEquipments?params=${hash}`,
+      `https://pdf.smartnewservices.com.br/generator/manager/qrCodeEquipments?params=${hash}`,
     )
   }
 
