@@ -127,7 +127,7 @@ export function HeaderFuelling() {
                 Posição de Estoque
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            {/* <DropdownMenuItem asChild>
               <Link
                 target="_blank"
                 href={{
@@ -137,7 +137,7 @@ export function HeaderFuelling() {
               >
                 Relatório Equipamento
               </Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuItem asChild>
               <Link
                 target="_blank"
