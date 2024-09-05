@@ -92,13 +92,13 @@ export function Header() {
 
   async function handleGenerateExcel() {
     loading.show()
-    const data: { rows: SupplyFormProps[] } | undefined = await fetchDataTable({
+    const data: { data: SupplyFormProps[] } | undefined = await fetchDataTable({
       index: null,
       perPage: null,
     })
     loading.hide()
 
-    if (!data?.rows) return
+    if (!data?.data) return
     loading.show()
     await fetch('https://excel-api.smartnewsistemas.com.br/exportDefault', {
       method: 'POST',
@@ -106,8 +106,8 @@ export function Header() {
       body: JSON.stringify({
         currencyFormat: [],
         title: 'Abastecimentos',
-        data: data.rows.map((item) => ({
-          id: item.id,
+        data: data.data.map((item) => ({
+          // id: item.id,
           Posto: item.post,
           'data de abertura': item.date,
           Equipamento: item.equipment,
