@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
+import { useFilterConsuption } from '@/store/fuelling/filter-consuption'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Eraser, Info, ListFilter, Search } from 'lucide-react'
@@ -26,9 +27,11 @@ const filterFormSchema = z.object({
   dateTo: z.string().optional(),
 })
 
-type FilterFormData = z.infer<typeof filterFormSchema>
+export type FilterFormData = z.infer<typeof filterFormSchema>
 
 export function Header() {
+  const { setFilter } = useFilterConsuption()
+
   const formFilter = useForm<FilterFormData>({
     resolver: zodResolver(filterFormSchema),
   })
@@ -59,27 +62,12 @@ export function Header() {
   })
 
   async function handleFilter(data: FilterFormData) {
-    try {
-      const response = await api.get('/fuelling/report/family-consumption', {
-        params: {
-          equipmentId: data.equipment,
-          familyId: data.family,
-          dateFrom: data.dateFrom,
-          dateTo: data.dateTo,
-        },
-      })
-      queryClient.setQueryData(
-        ['fuelling/report/family-consumption'],
-        response.data.data,
-      )
-    } catch (error) {
-      console.error('Erro ao buscar os dados filtrados:', error)
-    }
+    setFilter(data)
   }
 
   function handleResetFilters() {
     reset({ family: '', dateFrom: '', dateTo: '' })
-    queryClient.invalidateQueries(['fuelling/report/family-consumption'])
+    setFilter({})
   }
 
   return (

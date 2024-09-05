@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { api } from '@/lib/api'
+import { useFilterConsuption } from '@/store/fuelling/filter-consuption'
 import { useQuery } from '@tanstack/react-query'
 import { TrendingDown, TrendingUp } from 'lucide-react'
 
@@ -28,14 +29,18 @@ interface Grupo {
   fuelling: FuellingItem[]
 }
 
-async function fetchCompartment(): Promise<Grupo[]> {
-  const response = await api.get('fuelling/report/family-consumption')
-  return response.data.data || []
-}
-
 export default function AnaliseConsumoPorFrota() {
+  const { filters } = useFilterConsuption()
+
+  async function fetchCompartment(): Promise<Grupo[]> {
+    const response = await api.get('fuelling/report/family-consumption', {
+      params: filters,
+    })
+    return response.data.data || []
+  }
+
   const { data = [] } = useQuery({
-    queryKey: ['fuelling/report/family-consumption'],
+    queryKey: ['fuelling/report/family-consumption', filters],
     queryFn: fetchCompartment,
     refetchInterval: 1 * 20 * 1000,
   })
