@@ -69,29 +69,30 @@ export function Header() {
     loading.show()
     const dataExcel: ConsuptionData[] | undefined =
       await queryClient.getQueryData(['fuelling/report/family-consumption'])
-    console.log(dataExcel)
 
     loading.hide()
     if (!dataExcel) return
+    console.log(dataExcel)
     loading.show()
+    const body = dataExcel.map(({ family, fuelling }) => {
+      return {
+        currencyFormat: [],
+        title: family.replaceAll('/', '-'),
+        data: fuelling.map((item) => ({
+          Equipamento: item.equipment,
+          'Tipo de consumo': item.typeConsumption,
+          'Quantidade de Litros': item.quantity,
+          'Valor total': item.total,
+          'Consumo previsto': item.expectedConsumption,
+          'Consumo realizado': item.consumptionMade,
+          'Diferença %': item.difference,
+        })),
+      }
+    })
     await fetch('https://excel-api.smartnewservices.com.br/exportTabs', {
       method: 'POST',
       mode: 'cors',
-      body: JSON.stringify(
-        dataExcel?.maṕ(({ family, fuelling }) => ({
-          currencyFormat: [],
-          title: family,
-          data: fuelling.map((item) => ({
-            Equipamento: item.fuelling,
-            'Tipo de consumo': item.typeConsumption,
-            'Quantidade de Litros': item.quantity,
-            'Valor total': item.total,
-            'Consumo previsto': item.expectedConsumption,
-            'Consumo realizado': item.consumptionMade,
-            'Diferença %': item.difference,
-          })),
-        })),
-      ),
+      body: JSON.stringify(body),
       headers: {
         'Content-Type': 'application/json',
       },

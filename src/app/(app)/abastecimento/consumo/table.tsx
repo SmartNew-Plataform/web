@@ -40,7 +40,10 @@ export default function AnaliseConsumoPorFrota() {
   }
 
   const { data = [] } = useQuery({
-    queryKey: ['fuelling/report/family-consumption', filters],
+    queryKey: [
+      'fuelling/report/family-consumption',
+      ...Object.values(filters || {}),
+    ],
     queryFn: fetchCompartment,
     refetchInterval: 1 * 20 * 1000,
   })
