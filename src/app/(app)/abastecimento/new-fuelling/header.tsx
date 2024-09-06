@@ -91,10 +91,10 @@ export function Header() {
 
   async function handleGenerateExcel() {
     loading.show()
-    const data: FuellingResponse[] | undefined = queryClient.getQueryData([
-      'fuelling/data',
-    ])
+    const data: { rows: FuellingResponse[] } | undefined =
+      queryClient.getQueryData(['fuelling/data'])
     loading.hide()
+
     if (!data) return
     loading.show()
     await fetch('https://excel-api.smartnewservices.com.br/exportDefault', {
@@ -103,7 +103,8 @@ export function Header() {
       body: JSON.stringify({
         currencyFormat: [],
         title: 'Abastecimentos',
-        data: data.map((item) => ({
+        data: data.rows.map((item) => ({
+          Id: item.id,
           Posto: item.fuelStation,
           'data de abertura': item.date,
           Equipamento: item.equipment,

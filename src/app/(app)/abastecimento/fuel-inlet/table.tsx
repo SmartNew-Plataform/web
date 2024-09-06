@@ -124,6 +124,10 @@ export function Table() {
     {
       accessorKey: 'total',
       header: 'Valor total',
+      cell({ getValue }) {
+        const total = Number(getValue())
+        return isNaN(total) ? '-' : total.toFixed(2).replace('.', ',')
+      },
     },
   ]
 
