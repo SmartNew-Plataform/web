@@ -147,7 +147,7 @@ export function TableServiceOrder() {
                 // setIndexModal(line.row.index)
                 // setChildrenData(children)
                 router.push(
-                  `/manutencao/order-service/${id}/details?token=${searchParams.get('token')}`,
+                  `/manutencao/order-service/${id}/details?token=${searchParams.get('token')}&h=hidden`,
                 )
               }}
             >
