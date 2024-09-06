@@ -5,6 +5,7 @@ import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useFilterFuelling } from '@/store/fuelling/filter-newfuelling'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
@@ -14,6 +15,7 @@ import { FuelForm, SupplyFormData } from './fuelForm'
 import { ObservationModal } from './observationsModal'
 
 export function Table() {
+  const { filters } = useFilterFuelling()
   const [fuellingIdToDelete, setFuellingIdToDelete] = useState<
     number | undefined
   >()
@@ -23,13 +25,17 @@ export function Table() {
   const [isObservationModalOpen, setIsObservationModalOpen] = useState(false)
 
   const { data: fuelingList, refetch: refetchFuelingList } = useQuery({
-    queryKey: ['fuelling/data'],
+    queryKey: ['fuelling/data', ...Object.values(filters || {})],
     queryFn: fetchFuelingList,
     refetchInterval: 1 * 30 * 1000,
   })
 
   async function fetchFuelingList() {
-    const response = await api.get('fuelling/info').then((res) => res.data)
+    const response = await api
+      .get('fuelling/info', {
+        params: filters,
+      })
+      .then((res) => res.data)
     return response.data
   }
 
