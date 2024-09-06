@@ -5,6 +5,7 @@ import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useFilterCreateTank } from '@/store/fuelling/filter-create'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
@@ -13,16 +14,22 @@ import { FuelModal } from './SheetFuelModal'
 import { TankModal } from './tank-modal'
 
 export function Table() {
-  async function fetchSelects() {
-    const response = await api.get('fuelling/tank').then((res) => res.data)
-    return response.data
-  }
+  const { filters } = useFilterCreateTank()
 
   const { data, refetch } = useQuery({
-    queryKey: ['fuelling/create/data'],
+    queryKey: ['fuelling/create/data', ...Object.values(filters || {})],
     queryFn: fetchSelects,
     refetchInterval: 1 * 30 * 1000,
   })
+
+  async function fetchSelects() {
+    const response = await api
+      .get('fuelling/tank', {
+        params: filters,
+      })
+      .then((res) => res.data)
+    return response.data
+  }
 
   const [editData, setEditData] = useState<TankAndTrainResponse | undefined>()
   const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
@@ -49,7 +56,6 @@ export function Table() {
       cell({ row }) {
         const id = row.getValue('id') as string
         const data = row.original
-        console.log(id)
 
         return (
           <div className="flex gap-2">

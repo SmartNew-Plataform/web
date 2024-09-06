@@ -1,12 +1,11 @@
 'use client'
 import { FuelingData, ListFuelling } from '@/@types/fuelling-fuelling'
 import { AlertModal } from '@/components/alert-modal'
-import { DataTable } from '@/components/data-table'
+import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useFilterFuelling } from '@/store/fuelling/filter-newfuelling'
-import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Info, Pencil, Trash2 } from 'lucide-react'
@@ -24,19 +23,16 @@ export function Table() {
   const [observationData, setObservationData] = useState<string | undefined>()
   const [isObservationModalOpen, setIsObservationModalOpen] = useState(false)
 
-  const { data: fuelingList, refetch: refetchFuelingList } = useQuery({
-    queryKey: ['fuelling/data', ...Object.values(filters || {})],
-    queryFn: fetchFuelingList,
-    refetchInterval: 1 * 30 * 1000,
-  })
-
-  async function fetchFuelingList() {
+  async function fetchFuelingList(params: { index: number; perPage: number }) {
     const response = await api
       .get('fuelling/info', {
-        params: filters,
+        params: {
+          ...filters,
+          ...params,
+        },
       })
       .then((res) => res.data)
-    return response.data
+    return response
   }
 
   async function fetchFueling(id: number) {
@@ -158,7 +154,6 @@ export function Table() {
           title: 'Abastecimento editado com sucesso!',
           variant: 'success',
         })
-        refetchFuelingList()
         setFuellingIdToEdit(undefined)
       } else {
         toast({
@@ -183,7 +178,6 @@ export function Table() {
           title: 'Abastecimento deletado com sucesso!',
           variant: 'success',
         })
-        refetchFuelingList()
         setFuellingIdToDelete(undefined)
       } else {
         toast({
@@ -326,7 +320,11 @@ export function Table() {
 
   return (
     <>
-      <DataTable columns={columns} data={fuelingList || []} />
+      <DataTableServerPagination
+        id={'fuelling/data'}
+        columns={columns}
+        fetchData={fetchFuelingList}
+      />
 
       <AlertModal
         open={!!fuellingIdToDelete}
