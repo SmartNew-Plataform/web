@@ -1,6 +1,5 @@
 'use client'
 import { PageHeader } from '@/components/page-header'
-import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { useServiceOrder } from '@/store/maintenance/service-order'
 import { useQuery } from '@tanstack/react-query'
@@ -23,8 +22,6 @@ export function Header() {
         </h1>
 
         <div className="flex gap-4">
-          <SearchInput />
-
           <ServiceOrderForm data={[]}>
             <Button>
               <Plus size={16} />
