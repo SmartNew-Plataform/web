@@ -15,7 +15,7 @@ import {
 import { api } from '@/lib/api'
 import { useFilterConsuption } from '@/store/fuelling/filter-consuption'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Eraser, Info, ListFilter, Search } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -37,7 +37,7 @@ export function Header() {
   })
 
   const { handleSubmit, reset, register, watch } = formFilter
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   const { data: familyOptions = [] } = useQuery({
     queryKey: ['system/choices/family'],

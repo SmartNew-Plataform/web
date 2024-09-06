@@ -12,17 +12,21 @@ export function StepOne() {
   const { selects } = useServiceOrder()
   const { watch, setValue } = useFormContext()
   const [requesterModalOpen, setRequesterModalOpen] = useState<boolean>(false)
+  const [branchText, setBranchText] = useState<string | undefined>()
   const equipmentValue = watch('equipment')
 
   const equipmentData = selects.equipment?.find(
     (e) => e.value === equipmentValue,
   )
-  const branchText = equipmentData?.branch.label
   const branchValue = equipmentData?.branch.value
 
   useEffect(() => {
-    if (!branchValue) return
+    if (!branchValue) {
+      setBranchText('')
+      return
+    }
     setValue('branch', branchValue)
+    setBranchText(equipmentData?.branch.label)
   }, [equipmentValue, branchValue])
 
   return (

@@ -53,6 +53,7 @@
     "lucide-react": "^0.364.0",
     "next": "14.0.1",
     "node": "^18.14.0",
+    "nuqs": "^1.18.0",
     "postcss": "8.4.28",
     "react": "18.2.0",
     "react-apexcharts": "^1.4.1",

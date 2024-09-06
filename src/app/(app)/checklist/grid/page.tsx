@@ -4,9 +4,11 @@ import { TableInfo } from '@/components/table-info'
 
 export default function Info() {
   return (
-    <PageWrapper>
-      <HeaderInfo />
-      <TableInfo />
-    </PageWrapper>
+    <>
+      <PageWrapper>
+        <HeaderInfo />
+        <TableInfo />
+      </PageWrapper>
+    </>
   )
 }
