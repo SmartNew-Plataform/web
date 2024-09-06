@@ -114,17 +114,17 @@ export function Form() {
   }
 
   return (
-    <Card className="w-full max-w-6xl">
-      <CardContent className="max-h-full w-full">
+    <Card className="flex max-h-full w-full max-w-6xl flex-col overflow-auto">
+      <CardContent className="max-h-full w-full pt-6">
         <FormProvider {...detailForm}>
           <form
-            className="grid grid-cols-auto gap-6 overflow-auto pt-6"
+            className="relative grid h-full grid-cols-auto gap-6 overflow-auto"
             onSubmit={handleSubmit(handleUpdateServiceOrder)}
           >
             <StepOne />
             <StepTwo />
             <Button
-              className="col-span-3"
+              className="sticky bottom-0 col-span-3"
               loading={isSubmitting}
               disabled={isSubmitting}
             >

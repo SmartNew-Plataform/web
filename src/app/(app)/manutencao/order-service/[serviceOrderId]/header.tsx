@@ -20,21 +20,23 @@ export function Header({ children }: { children: ReactNode }) {
     <Tabs
       defaultValue="details"
       value={tabValue}
-      className="flex h-full w-full flex-col items-start gap-4 overflow-auto"
+      className="flex h-full w-full flex-col items-start gap-4"
       onValueChange={handleChangeTab}
     >
       <TabsList>
-        <TabsTrigger value="details">Detalhes</TabsTrigger>
-        {/* <TabsTrigger value="task">Tarefas (Checklist)</TabsTrigger> */}
+        <TabsTrigger value="details">Detalhes O.S.</TabsTrigger>
+        <TabsTrigger value="checklist">Checklist</TabsTrigger>
         <TabsTrigger value="timekeeping">Apontamento de horas</TabsTrigger>
         <TabsTrigger value="stop-recording">Registro de paradas</TabsTrigger>
         <TabsTrigger value="material">Materiais</TabsTrigger>
         <TabsTrigger value="diverse">Diversos</TabsTrigger>
-        <TabsTrigger value="failure-analysis">Analise de falhas</TabsTrigger>
+        <TabsTrigger value="failure-analysis">Análise de falhas</TabsTrigger>
         <TabsTrigger value="attach">Anexos</TabsTrigger>
       </TabsList>
 
-      <main className="flex h-full w-full flex-col gap-4">{children}</main>
+      <main className="flex h-full w-full flex-col gap-4 overflow-auto">
+        {children}
+      </main>
     </Tabs>
   )
 }

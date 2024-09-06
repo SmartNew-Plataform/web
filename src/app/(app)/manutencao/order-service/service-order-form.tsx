@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
-import { ComponentProps } from 'react'
+import { ComponentProps, useCallback, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { StepOne } from './steps/step-one'
@@ -64,7 +64,8 @@ export function ServiceOrderForm({
   })
   const {
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
+    reset,
   } = createServiceForm
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -89,7 +90,33 @@ export function ServiceOrderForm({
       variant: 'success',
     })
     queryClient.refetchQueries(['maintenance-service-order-table'])
+    reset({
+      requester: '',
+      equipment: '',
+      branch: '',
+      typeMaintenance: '',
+      hourMeter: 0,
+      odometer: 0,
+      executantSector: '',
+      status: '',
+      requestDate: '',
+      equipmentFail: '',
+    })
   }
+
+  const showToastFormErros = useCallback(() => {
+    const messages = Object.values(errors).map(({ message }) => message)
+    if (messages.length === 0) return
+    toast({
+      title: 'Preencha todos os  campos obrigatórios!',
+      description: messages,
+      variant: 'destructive',
+    })
+  }, [errors])
+
+  useEffect(() => {
+    showToastFormErros()
+  }, [errors])
 
   return (
     <Sheet {...props}>

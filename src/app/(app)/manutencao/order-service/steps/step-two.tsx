@@ -5,7 +5,7 @@ import { RadioGroupItem } from '@/components/ui/radio-group'
 import { useServiceOrder } from '@/store/maintenance/service-order'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { ServiceOrderFormData } from '../table-service-order'
+import { ServiceOrderData } from '../table-service-order'
 
 export function StepTwo() {
   const { selects } = useServiceOrder()
@@ -16,7 +16,7 @@ export function StepTwo() {
     async function fetchServiceOrder() {
       const allOrders = (await queryClient.getQueryData([
         'maintenance-service-order-table',
-      ])) as ServiceOrderFormData[]
+      ])) as ServiceOrderData[]
 
       const orderBondedData = allOrders.map(
         ({ id, descriptionRequest, codeServiceOrder }) => ({

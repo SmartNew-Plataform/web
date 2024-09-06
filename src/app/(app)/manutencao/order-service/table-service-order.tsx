@@ -1,56 +1,138 @@
 'use client'
-import { DataTable } from '@/components/data-table'
+import { AdvancedFilter } from '@/components/advanced-filter'
+import { DataTableServerPagination } from '@/components/data-table-server-pagination'
 import { Button } from '@/components/ui/button'
+import { useFilters } from '@/hooks/use-filters'
 import { api } from '@/lib/api'
-import { useQuery } from '@tanstack/react-query'
+import { useServiceOrder } from '@/store/maintenance/service-order'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Expand } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { z } from 'zod'
-// import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { StatusFilter } from './status-filter'
 
-const serviceOrderFromSchema = z.object({
-  id: z.number(),
-  codeServiceOrder: z.string().optional(),
-  dateTimeRequest: z.coerce.date().optional(),
-  dateEmission: z.coerce.date().optional(),
-  equipment: z.string().optional(),
-  descriptionRequest: z.string().optional(),
-  closed: z.string().optional(),
-  dateExpectedTerm: z.coerce.date().optional(),
-  dateEnd: z.coerce.date().optional(),
-  request: z.string().optional(),
-  emission: z.string().optional(),
-  openTime: z.string().optional(),
-  datePrev: z.coerce.date().optional(),
-  justification: z.string().optional(),
-  status: z.string().optional(),
-})
+export type ServiceOrderData = {
+  id: number
+  codeServiceOrder: string
+  dateTimeRequest: string
+  dateEmission: string
+  equipment: string
+  descriptionRequest: string
+  closed: string
+  dateExpectedTerm: string
+  dateEnd: string
+  request: string
+  emission: string
+  openTime: string
+  datePrev: string
+  justification: string
+  status: {
+    value: string
+    label: string
+    color: string
+  }
+}
 
-export type ServiceOrderFormData = z.infer<typeof serviceOrderFromSchema>
+export type StatusFilterData = {
+  id: string
+  name: string
+  color: string
+  count: number
+}
 
 export function TableServiceOrder() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: serviceOrderFormData, isLoading } = useQuery({
-    queryKey: ['maintenance-service-order-table'],
-    queryFn: fetchDataTable,
+  const { selects } = useServiceOrder()
+  const [statusFilterValue, setStatusFilterValue] = useState<
+    string | undefined
+  >()
+  const [statusFilterData, setStatusFilterData] = useState<
+    StatusFilterData[] | undefined
+  >()
+  const filterServiceOrder = useFilters({
+    defaultValues: { status: selects.status ? [selects.status[0].value] : [] },
+    options: [
+      {
+        label: 'Ordem',
+        value: 'codeServiceOrder',
+        type: 'text',
+      },
+      {
+        label: 'Equipamento',
+        value: 'equipment',
+        type: 'select',
+        options: selects.equipment,
+      },
+      {
+        label: 'Solicitante',
+        value: 'requester',
+        type: 'select',
+        options: selects.requester,
+      },
+      {
+        label: 'Descrição',
+        value: 'descriptionRequest',
+        type: 'text',
+      },
+      {
+        label: 'Data Emissão',
+        value: 'dateEmission',
+        type: 'date',
+      },
+      {
+        label: 'Data Solicitações',
+        value: 'dateTimeRequest',
+        type: 'date',
+      },
+      {
+        label: 'Data Prevista Termino',
+        value: 'dateExpectedEnd',
+        type: 'date',
+      },
+      {
+        label: 'Justificativa',
+        value: 'justification',
+        type: 'text',
+      },
+      {
+        label: 'Status',
+        value: 'status',
+        type: 'select',
+        options: selects.status,
+      },
+    ],
   })
+  const { filterData } = filterServiceOrder
 
-  async function fetchDataTable(): Promise<ServiceOrderFormData[]> {
-    const response: { data: ServiceOrderFormData[] } = await api
-      .get('/maintenance/service-order/list-table')
+  async function fetchDataTable(data: {
+    index: number
+    perPage: number
+  }): Promise<{ rows: ServiceOrderData[]; pageCount: number }> {
+    const response = await api
+      .get<{
+        rows: ServiceOrderData[]
+        pageCount: number
+        filterStatus: StatusFilterData[]
+      }>('/maintenance/service-order/list-table', {
+        params: {
+          ...data,
+          ...filterData,
+          statusOS: statusFilterValue,
+        },
+      })
       .then((res) => res.data)
 
-    if (response.data.length) {
-      return response.data
+    if (response.rows.length) {
+      setStatusFilterData(response.filterStatus)
+      return response
     }
 
-    return []
+    return { rows: [], pageCount: 0 }
   }
 
-  const columns: ColumnDef<ServiceOrderFormData>[] = [
+  const columns: ColumnDef<ServiceOrderData>[] = [
     {
       accessorKey: 'expand',
       header: '',
@@ -88,7 +170,7 @@ export function TableServiceOrder() {
       header: 'Equipamento',
     },
     {
-      accessorKey: 'request',
+      accessorKey: 'requester',
       header: 'Solicitante',
     },
     {
@@ -120,7 +202,9 @@ export function TableServiceOrder() {
       header: 'Data Prevista Termino',
       cell: (line) => {
         if (line.getValue() !== null) {
-          return dayjs(line.getValue() as Date).format('DD/MM/YYYY HH:mm:ss')
+          return line.getValue()
+            ? dayjs(line.getValue() as Date).format('DD/MM/YYYY HH:mm:ss')
+            : ''
         } else return 'Sem Registro'
       },
     },
@@ -131,14 +215,42 @@ export function TableServiceOrder() {
     {
       accessorKey: 'status',
       header: 'Status',
+      cell: (row) => {
+        const status = row.getValue() as ServiceOrderData['status']
+        return (
+          <span
+            className="whitespace-nowrap rounded-full border px-2 py-1 text-sm font-semibold text-slate-600"
+            style={{
+              borderColor: status.color,
+              background: `${status.color}20`,
+            }}
+          >
+            {status.label}
+          </span>
+        )
+      },
     },
   ]
 
   return (
-    <DataTable
-      columns={columns}
-      data={serviceOrderFormData || []}
-      isLoading={isLoading}
-    />
+    <div className="flex h-full flex-1 flex-col gap-4 overflow-auto">
+      <AdvancedFilter {...filterServiceOrder} />
+
+      <StatusFilter
+        value={statusFilterValue}
+        onChange={setStatusFilterValue}
+        data={statusFilterData || []}
+      />
+
+      <DataTableServerPagination
+        fetchData={fetchDataTable}
+        id={[
+          'maintenance-service-order-table',
+          ...(Object.values(filterData) as string[]),
+          statusFilterValue || '',
+        ]}
+        columns={columns}
+      />
+    </div>
   )
 }
