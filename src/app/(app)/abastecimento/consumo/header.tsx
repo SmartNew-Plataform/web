@@ -1,4 +1,5 @@
 'use client'
+import { ConsuptionData } from '@/@types/fuelling/consuption'
 import { Form } from '@/components/form'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
@@ -14,9 +15,11 @@ import {
 } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
 import { useFilterConsuption } from '@/store/fuelling/filter-consuption'
+import { useLoading } from '@/store/loading-store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
-import { Eraser, Info, ListFilter, Search } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { Eraser, FileBarChart, Info, ListFilter, Search } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -31,13 +34,14 @@ export type FilterFormData = z.infer<typeof filterFormSchema>
 
 export function Header() {
   const { setFilter } = useFilterConsuption()
+  const loading = useLoading()
+  const queryClient = useQueryClient()
 
   const formFilter = useForm<FilterFormData>({
     resolver: zodResolver(filterFormSchema),
   })
 
   const { handleSubmit, reset, register, watch } = formFilter
-  // const queryClient = useQueryClient()
 
   const { data: familyOptions = [] } = useQuery({
     queryKey: ['system/choices/family'],
@@ -60,6 +64,52 @@ export function Header() {
       return response.data.data || []
     },
   })
+
+  async function handleGenerateExcel() {
+    loading.show()
+    const dataExcel: ConsuptionData[] | undefined =
+      await queryClient.getQueryData(['fuelling/report/family-consumption'])
+
+    loading.hide()
+    if (!dataExcel) return
+    console.log(dataExcel)
+    loading.show()
+    const body = dataExcel.map(({ family, fuelling }) => {
+      return {
+        currencyFormat: [],
+        title: family.replaceAll('/', '-'),
+        data: fuelling.map((item) => ({
+          Equipamento: item.equipment,
+          'Tipo de consumo': item.typeConsumption,
+          'Quantidade de Litros': item.quantity,
+          'Valor total': item.total,
+          'Consumo previsto': item.expectedConsumption,
+          'Consumo realizado': item.consumptionMade,
+          'Diferença %': item.difference,
+        })),
+      }
+    })
+    await fetch('https://excel-api.smartnewservices.com.br/exportTabs', {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob]))
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `tanques_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+      })
+      .catch((error) => console.error(error))
+    loading.hide()
+  }
 
   async function handleFilter(data: FilterFormData) {
     setFilter(data)
@@ -151,6 +201,11 @@ export function Header() {
             </FormProvider>
           </PopoverContent>
         </Popover>
+
+        <Button variant="outline" onClick={handleGenerateExcel}>
+          <FileBarChart size={16} />
+          Excel
+        </Button>
       </div>
     </PageHeader>
   )

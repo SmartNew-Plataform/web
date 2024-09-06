@@ -148,7 +148,7 @@ export function FuelModal({ tankId, ...props }: ActiveFormProps) {
               <CardContent className="relative pt-5">
                 <p>{compartmentId}</p>
                 <p>Quantidade: {quantity} L </p>
-                <p>Valor: {value} R$</p>
+                <p>Valor: R$ {value.toString().replace('.', ',')} </p>
                 <div className="absolute right-4 top-4 flex gap-2">
                   <Button
                     onClick={() => setCompartmentIdToDelete(id)}

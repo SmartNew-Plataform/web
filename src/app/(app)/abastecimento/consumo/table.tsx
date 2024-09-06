@@ -13,7 +13,7 @@ import { useFilterConsuption } from '@/store/fuelling/filter-consuption'
 import { useQuery } from '@tanstack/react-query'
 import { TrendingDown, TrendingUp } from 'lucide-react'
 
-interface FuellingItem {
+export interface FuellingItem {
   equipment: string
   typeConsumption: string
   quantity: number
@@ -40,7 +40,10 @@ export default function AnaliseConsumoPorFrota() {
   }
 
   const { data = [] } = useQuery({
-    queryKey: ['fuelling/report/family-consumption', filters],
+    queryKey: [
+      'fuelling/report/family-consumption',
+      ...Object.values(filters || {}),
+    ],
     queryFn: fetchCompartment,
     refetchInterval: 1 * 20 * 1000,
   })
