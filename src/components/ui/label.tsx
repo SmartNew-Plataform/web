@@ -25,7 +25,7 @@ const Label = React.forwardRef<
     className={cn(
       labelVariants(),
       className,
-      `after:content-['${required ? '*' : ''}'] after:ml-0.5 after:text-red-500`,
+      required && `after:ml-0.5 after:text-red-500 after:content-['*']`,
     )}
     {...props}
   />
