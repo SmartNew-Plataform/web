@@ -32,6 +32,7 @@ export function Table() {
         },
       })
       .then((res) => res.data)
+
     return response
   }
 
