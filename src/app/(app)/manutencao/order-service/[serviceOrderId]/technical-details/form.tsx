@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
-import { ApiServiceOrderMapper } from '@/lib/mappers/api-service-order-mapper'
 import { useServiceOrder } from '@/store/maintenance/service-order'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
@@ -56,10 +55,10 @@ export function FormTechnical() {
 
   async function handleUpdateServiceOrder(data: TechnicalDetailsData) {
     console.log(data)
-    const raw = ApiServiceOrderMapper.toApi(data)
+    // const raw = ApiServiceOrderMapper.toApi(data)
     const response = await api.put(
       `/maintenance/service-order/${params.serviceOrderId}`,
-      raw,
+      // raw,
     )
 
     if (response.status !== 200) return
@@ -75,14 +74,14 @@ export function FormTechnical() {
     fetchSelects()
   }, [])
 
-  useEffect(() => {
-    if (!data) return
-    reset({
-      maintenanceDiagnosis: data.comments,
-      solution: data.descriptionServicePerformed,
-      executorObservation: data.observationsExecutor,
-    })
-  }, [data])
+  // useEffect(() => {
+  //   if (!data) return
+  //   reset({
+  //     maintenanceDiagnosis: data.comments,
+  //     solution: data.descriptionServicePerformed,
+  //     executorObservation: data.observationsExecutor,
+  //   })
+  // }, [data])
 
   if (isLoading || !data) {
     return (
