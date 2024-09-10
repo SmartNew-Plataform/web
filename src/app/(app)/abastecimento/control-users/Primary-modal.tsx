@@ -102,7 +102,7 @@ export function ProductModal({
 
       if (response.status === 201) {
         toast({ title: 'Usuário vinculado com sucesso!', variant: 'success' })
-        queryClient.invalidateQueries(['fuelling/product'])
+        queryClient.invalidateQueries(['fuelling/control-user'])
         reset()
       }
     } catch (error) {
@@ -122,12 +122,13 @@ export function ProductModal({
       })
 
       if (response.status === 200) {
-        toast({ title: 'Vinculo editado com sucesso!', variant: 'success' })
-        queryClient.invalidateQueries(['fuelling/product'])
+        toast({ title: 'Vínculo editado com sucesso!', variant: 'success' })
+
+        queryClient.invalidateQueries(['fuelling/control-user'])
         reset()
       }
     } catch (error) {
-      toast({ title: 'Erro ao editar vinculo!', variant: 'destructive' })
+      toast({ title: 'Erro ao editar vínculo!', variant: 'destructive' })
     }
   }
 

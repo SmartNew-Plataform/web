@@ -18,7 +18,7 @@ export function StatusFilter({ value, onChange, data }: StatusFilterProps) {
           <button
             key={id}
             data-active={value === id}
-            className="box-border flex h-min items-center gap-2 whitespace-nowrap rounded border bg-white px-2 text-zinc-700 shadow-sm data-[active=true]:border-2"
+            className="box-border flex h-8 items-center gap-2 whitespace-nowrap rounded border bg-white px-2 text-zinc-700 shadow-sm data-[active=true]:border-2"
             style={{ borderColor: value === id ? color : '#cbd5e1' }}
             onClick={() => toggleStatus(id)}
           >
@@ -27,7 +27,7 @@ export function StatusFilter({ value, onChange, data }: StatusFilterProps) {
               style={{ background: color }}
             />
             {name}
-            <span className="flex aspect-square items-center justify-center border-l  py-1 pl-2">
+            <span className="flex h-full items-center justify-center border-l pl-2">
               {count}
             </span>
           </button>

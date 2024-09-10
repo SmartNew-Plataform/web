@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { ArrowDownWideNarrow, ExternalLink, Trash2 } from 'lucide-react'
+import { ExternalLink, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
 export type InfoData = {
@@ -65,39 +65,15 @@ export const columns: (
     },
     {
       accessorKey: 'id',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          N° Checklist
-          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: 'N° Checklist',
     },
     {
       accessorKey: 'model',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Tipo Checklist
-          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: 'Tipo Checklist',
     },
     {
       accessorKey: 'startDate',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Data de abertura
-          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: 'Data de abertura',
       cell: ({ row }) => {
         const date: string = row.getValue('startDate')
         return date ? dayjs(date).format('DD/MM/YYYY, HH:mm') : 'Sem registro'
@@ -105,39 +81,15 @@ export const columns: (
     },
     {
       accessorKey: 'period',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Turno
-          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: 'Turno',
     },
     {
       accessorKey: 'item',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Ativo/Diversos
-          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: 'Ativo/Diversos',
     },
     {
       accessorKey: 'user',
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Usuário
-          <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: 'Usuário',
     },
   ]
 }
