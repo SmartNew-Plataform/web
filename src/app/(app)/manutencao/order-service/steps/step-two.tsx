@@ -90,28 +90,6 @@ export function StepTwo() {
         <Form.Input type="date" name="dueDate" id="dueDate" />
         <Form.ErrorMessage field="dueDate" />
       </Form.Field>
-
-      <Form.Field>
-        <Form.Label htmlFor="maintenanceDiagnosis">
-          Diagnostico da manutenção:
-        </Form.Label>
-        <Form.Textarea name="maintenanceDiagnosis" id="maintenanceDiagnosis" />
-        <Form.ErrorMessage field="maintenanceDiagnosis" />
-      </Form.Field>
-
-      <Form.Field>
-        <Form.Label htmlFor="solution">Solução:</Form.Label>
-        <Form.Textarea name="solution" id="solution" />
-        <Form.ErrorMessage field="solution" />
-      </Form.Field>
-
-      <Form.Field>
-        <Form.Label htmlFor="executorObservation">
-          Observação do Executor:
-        </Form.Label>
-        <Form.Textarea name="executorObservation" id="executorObservation" />
-        <Form.ErrorMessage field="executorObservation" />
-      </Form.Field>
     </>
   )
 }
