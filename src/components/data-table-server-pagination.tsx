@@ -77,7 +77,7 @@ export function DataTableServerPagination<TData, TValue>({
     typeof id === 'object' ? id : [id],
     () => fetchData(fetchDataOptions),
     {
-      refetchInterval: 1000 * 15, // 15 seconds
+      refetchInterval: 1000 * 15,
       retry: 8,
       retryDelay: 8000,
     },

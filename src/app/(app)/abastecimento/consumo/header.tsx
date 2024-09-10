@@ -166,12 +166,18 @@ export function Header() {
 
                 <Form.Field>
                   <Form.Label>Equipamento</Form.Label>
-                  <Form.Select
-                    className="max-w-sm"
-                    name="equipment"
-                    placeholder="Selecione o equipamento"
-                    options={allEquipmentOptions || []}
-                  />
+                  {allEquipmentOptions.length > 0 ? (
+                    <Form.Select
+                      className="max-w-sm"
+                      name="equipment"
+                      placeholder="Selecione o equipamento"
+                      options={allEquipmentOptions || []}
+                    />
+                  ) : (
+                    <p className="text-sm text-red-500">
+                      Família sem nenhum equipamento.
+                    </p>
+                  )}
                 </Form.Field>
 
                 <Form.Field>

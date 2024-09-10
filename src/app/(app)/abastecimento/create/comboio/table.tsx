@@ -49,7 +49,6 @@ export function Table() {
       cell({ row }) {
         const id = row.getValue('id') as string
         const data = row.original
-        console.log(id)
 
         return (
           <div className="flex gap-2">
