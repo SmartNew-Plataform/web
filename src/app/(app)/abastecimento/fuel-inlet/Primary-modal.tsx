@@ -192,7 +192,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
 
   return (
     <Dialog {...props}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl">
         <FormProvider {...tankForm}>
           <form
             className="flex w-full flex-col gap-2"
