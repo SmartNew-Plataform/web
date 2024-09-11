@@ -60,14 +60,12 @@ export function FuelForm({
 }: SupplyModalProps) {
   const createSupplyForm = useForm<SupplyFormData>({
     resolver: zodResolver(createSupplyFormSchema),
-    defaultValues: defaultValues ?? {},
   })
 
   const {
     handleSubmit,
     reset,
     setError,
-    setValue,
     formState: { isSubmitting, isValid, isDirty },
   } = createSupplyForm
   const createActiveWizardForm = useWizardForm()
@@ -103,11 +101,31 @@ export function FuelForm({
 
   useEffect(() => {
     if (defaultValues) {
-      Object.keys(defaultValues).forEach((key) => {
-        setValue(
-          key as keyof SupplyFormData,
-          defaultValues[key as keyof SupplyFormData],
-        )
+      reset(defaultValues)
+    }
+    if (mode === 'create') {
+      reset({
+        comments: '',
+        compartment: '',
+        consumption: 0,
+        counter: 0,
+        date: '',
+        driver: '',
+        equipment: '',
+        fuel: '',
+        last: 0,
+        odometer: 0,
+        odometerPrevious: 0,
+        post: '',
+        quantity: 0,
+        receipt: '',
+        request: '',
+        supplier: '',
+        tank: '',
+        train: '',
+        type: '',
+        typeSupplier: '',
+        value: 0,
       })
     }
   }, [defaultValues])
@@ -138,10 +156,10 @@ export function FuelForm({
           >
             <WizardForm {...createActiveWizardForm}>
               <WizardFormStep>
-                <StepOne />
+                <StepOne isEdit={mode === 'edit'} />
               </WizardFormStep>
               <WizardFormStep>
-                <StepTwo />
+                <StepTwo isEdit={mode === 'edit'} />
               </WizardFormStep>
               <WizardFormStep>
                 <StepThree />

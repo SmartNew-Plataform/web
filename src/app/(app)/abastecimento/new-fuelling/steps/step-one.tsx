@@ -19,7 +19,11 @@ export type FuelType = {
   unity: string
 }
 
-export function StepOne() {
+interface StepOneProps {
+  isEdit: boolean
+}
+
+export function StepOne({ isEdit }: StepOneProps) {
   async function loadSelects() {
     const [
       tankResponse,
@@ -150,14 +154,16 @@ export function StepOne() {
       resetField('compartment')
       resetField('fuel')
     }
-  }, [supplier, resetField])
+  }, [supplier])
 
   useEffect(() => {
+    if (isEdit) return
     setValue('last', counter)
     setValue('typeEquipment', typeConsumption)
   }, [equipmentValue, counter, typeConsumption])
 
   useEffect(() => {
+    if (isEdit) return
     setValue('odometerPrevious', odometer)
     setValue('odometer', odometerCurrent)
   }, [compartmentValue, quantity, odometer, odometerCurrent])
