@@ -111,7 +111,7 @@ export function Table() {
     },
     {
       accessorKey: 'fiscalNumber',
-      header: 'Nota fiscal',
+      header: 'Nota fiscal / Nº Controle',
     },
     {
       accessorKey: 'bound.text',
