@@ -106,15 +106,22 @@ export function Header() {
         data: data.rows.map((item) => ({
           Id: item.id,
           Posto: item.fuelStation,
-          'data de abertura': item.date,
+          'Data de abertura': dayjs(item.date).format('DD-MM-YYYY-HH-mm-ss'),
           Equipamento: item.equipment,
-          'Tipo de consumo': item.consumption,
-          'Contador atual': item.counter,
-          'Contador anterior': item.counterLast,
+          'Tipo de consumo': Number(item.consumption)
+            .toFixed(2)
+            .replace('.', ','),
+          'Contador atual': Number(item.counter).toFixed(2).replace('.', ','),
+          'Contador anterior': Number(item.counterLast)
+            .toFixed(2)
+            .replace('.', ','),
           Combustível: item.compartment,
-          Quantidade: item.quantidade,
-          'Consumo realizado': item.consumption,
-          'Valor unitário': item.value,
+          Quantidade: Number(item.quantidade).toFixed(2).replace('.', ','),
+          'Consumo realizado': Number(item.consumption)
+            .toFixed(2)
+            .replace('.', ','),
+          'Valor unitário': Number(item.value).toFixed(2).replace('.', ','),
+          'Valor total': Number(item.total).toFixed(2).replace('.', ','),
         })),
       }),
       headers: {
