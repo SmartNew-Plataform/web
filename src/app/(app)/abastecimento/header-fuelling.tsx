@@ -79,6 +79,17 @@ export function HeaderFuelling() {
                 Produtos
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
+                  pathname: '/abastecimento/control-users',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Usuários
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
