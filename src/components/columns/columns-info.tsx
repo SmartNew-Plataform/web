@@ -62,6 +62,7 @@ export const columns: (
           </div>
         )
       },
+      enableHiding: false,
     },
     {
       accessorKey: 'id',

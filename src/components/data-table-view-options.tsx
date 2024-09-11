@@ -33,10 +33,11 @@ export function DataTableViewOptions<TData>({
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
-          .filter(
-            (column) =>
-              column.columnDef.header?.length !== 0 && column.getCanHide(),
-          )
+          .filter((column) => {
+            console.log(typeof column.columnDef.header !== 'string')
+
+            return column.columnDef.header?.length !== 0 && column.getCanHide()
+          })
           .map((column) => {
             return (
               <DropdownMenuCheckboxItem
