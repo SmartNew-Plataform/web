@@ -27,8 +27,8 @@ export function Table() {
     const response = await api
       .get('fuelling/info', {
         params: {
-          ...filters,
           ...params,
+          ...filters,
         },
       })
       .then((res) => res.data)
@@ -322,7 +322,7 @@ export function Table() {
   return (
     <>
       <DataTableServerPagination
-        id={'fuelling/data'}
+        id={['fuelling/data', ...Object.values(filters || {})]}
         columns={columns}
         fetchData={fetchFuelingList}
       />
