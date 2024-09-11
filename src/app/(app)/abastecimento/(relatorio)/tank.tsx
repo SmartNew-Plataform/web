@@ -37,7 +37,7 @@ export function Tank({ type, fuel, fuelLevel, fuelCapacity }: TankProps) {
       <p className="text-xl text-slate-800">
         Capacidade máxima: {fuelCapacity} L
       </p>
-      <p className="text-xl text-slate-800">Quantidade: {fuelLevel} L</p>
+      <p className="text-xl text-slate-800">Posição estoque: {fuelLevel} L</p>
     </div>
   )
 }
