@@ -22,7 +22,7 @@ export const columns: (
 ) => ColumnDef<InfoData>[] = (onDeleteClick) => {
   return [
     {
-      accessorKey: 'id',
+      accessorKey: 'btn',
       header: ({ table }) => (
         <Checkbox
           checked={

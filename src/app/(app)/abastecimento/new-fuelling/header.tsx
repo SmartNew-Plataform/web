@@ -143,6 +143,8 @@ export function Header() {
   }
 
   async function handleFilter(data: FuellingFilteFormData) {
+    console.log(data)
+
     setFilter(data)
   }
 

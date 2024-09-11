@@ -43,6 +43,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   })
   const {
     reset,
+    setValue,
     handleSubmit,
     watch,
     formState: { isSubmitting },
@@ -190,6 +191,25 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     }
   }, [mode, defaultValues, reset, type])
 
+  useEffect(() => {
+    if (type === 'train' && mode === 'create') {
+      api
+        .get('/fuelling/input')
+        .then((response) => {
+          const comboioEntry = response.data.lastControl
+          if (comboioEntry) {
+            setValue('fiscalNumber', comboioEntry)
+          }
+        })
+        .catch((error) => {
+          console.error('Erro ao buscar dados:', error)
+        })
+    }
+    if (type === 'tank') {
+      setValue('fiscalNumber', '')
+    }
+  }, [type, setValue])
+
   return (
     <Dialog {...props}>
       <DialogContent className="max-w-2xl">
@@ -237,7 +257,9 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
             )}
 
             <Form.Field>
-              <Form.Label htmlFor="fiscalNumber">Nota fiscal:</Form.Label>
+              <Form.Label htmlFor="fiscalNumber">
+                {type === 'tank' ? 'Nota fiscal' : 'Nº Controle'}:
+              </Form.Label>
               <Form.Input name="fiscalNumber" id="fiscalNumber" />
               <Form.ErrorMessage field="fiscalNumber" />
             </Form.Field>
