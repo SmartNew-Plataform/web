@@ -110,8 +110,19 @@ export function Table() {
       },
     },
     {
-      accessorKey: 'typeDocument',
+      accessorKey: 'type',
       header: 'Tipo',
+      cell({ row }) {
+        const typeValue = row.original.type.value
+
+        if (typeValue === 'tank') {
+          return 'INTERNO'
+        } else if (typeValue === 'train') {
+          return 'NF'
+        } else {
+          return '-'
+        }
+      },
     },
     {
       accessorKey: 'fiscalNumber',
