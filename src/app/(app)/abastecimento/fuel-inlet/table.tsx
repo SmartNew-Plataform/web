@@ -35,7 +35,7 @@ export function Table() {
   >(undefined)
 
   async function handleDeleteTank() {
-    const response = await api.delete(`fuelling/${tankIdToDelete}`)
+    const response = await api.delete(`fuelling/input/${tankIdToDelete}`)
 
     if (response.status !== 200) return
 
