@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+
 import { InputInlet } from '@/store/fuelling/input-inlet'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -35,7 +36,6 @@ type TankFormData = z.infer<typeof tankFormSchema>
 
 export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
   const { setTank, setTrain } = InputInlet()
-
   const tankForm = useForm<TankFormData>({
     resolver: zodResolver(tankFormSchema),
   })
