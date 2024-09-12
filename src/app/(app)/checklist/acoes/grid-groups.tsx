@@ -22,7 +22,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import CryptoJS from 'crypto-js'
 import dayjs from 'dayjs'
-import { ArrowDownWideNarrow, FileBarChart2, Image, Timer } from 'lucide-react'
+import { FileBarChart2, Image, Timer } from 'lucide-react'
 import { useState } from 'react'
 import { DialogAction } from './dialog-action'
 
@@ -149,7 +149,8 @@ export function GridGroups() {
 
   const columns: ColumnDef<ActionItem>[] = [
     {
-      accessorKey: 'id',
+      accessorKey: 'btn',
+      enableHiding: false,
       header: ({ table }) => (
         <Checkbox
           checked={
@@ -255,17 +256,7 @@ export function GridGroups() {
     },
     {
       accessorKey: 'status',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Status
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Status',
     },
   ]
 

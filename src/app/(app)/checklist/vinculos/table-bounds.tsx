@@ -18,13 +18,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import {
-  ArrowDownWideNarrow,
-  CornerDownLeft,
-  ExternalLink,
-  Pencil,
-  Trash2,
-} from 'lucide-react'
+import { CornerDownLeft, ExternalLink, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { SheetEditBound } from './sheet-edit-bound'
@@ -92,32 +86,11 @@ export function TableBounds() {
     },
     {
       accessorKey: 'name',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Familia/locação
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Familia/locação',
     },
-
     {
       accessorKey: 'description',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Descrição
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Descrição',
     },
   ]
 
