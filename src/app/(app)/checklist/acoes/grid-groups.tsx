@@ -22,7 +22,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import CryptoJS from 'crypto-js'
 import dayjs from 'dayjs'
-import { ArrowDownWideNarrow, FileBarChart2, Image, Timer } from 'lucide-react'
+import { FileBarChart2, Image, Timer } from 'lucide-react'
 import { useState } from 'react'
 import { DialogAction } from './dialog-action'
 
@@ -149,7 +149,8 @@ export function GridGroups() {
 
   const columns: ColumnDef<ActionItem>[] = [
     {
-      accessorKey: 'id',
+      accessorKey: 'btn',
+      enableHiding: false,
       header: ({ table }) => (
         <Checkbox
           checked={
@@ -209,51 +210,20 @@ export function GridGroups() {
     },
     {
       accessorKey: 'code',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Código
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Código',
       cell: ({ row }) => {
         const code = row.getValue('code') as number
-
         return code || 'Sem registro'
       },
     },
     {
       accessorKey: 'task',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Verificação
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Verificação',
     },
     {
       accessorKey: 'startDate',
       sortingFn: 'datetime',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Criado em
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Criado em',
       cell: ({ row }) => {
         const createdAt = row.getValue('startDate') as string
 
@@ -264,60 +234,20 @@ export function GridGroups() {
     },
     {
       accessorKey: 'item',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Ativo/Diverso
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Ativo/Diverso',
     },
     {
       accessorKey: 'branch',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Local
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Local',
     },
     {
       accessorKey: 'responsible.name',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Responsável
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Responsável',
     },
     {
       accessorKey: 'endDate',
       sortingFn: 'datetime',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Prazo
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Prazo',
       cell: ({ row }) => {
         const deadline = row.getValue('endDate') as string
 
@@ -326,17 +256,7 @@ export function GridGroups() {
     },
     {
       accessorKey: 'status',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Status
-            <ArrowDownWideNarrow className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: 'Status',
     },
   ]
 
