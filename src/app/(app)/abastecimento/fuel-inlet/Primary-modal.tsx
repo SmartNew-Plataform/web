@@ -23,12 +23,10 @@ interface TankModalProps extends ComponentProps<typeof Dialog> {
 
 const tankFormSchema = z.object({
   type: z.coerce.string({ required_error: 'Este campo e obrigatório!' }),
-  typeSupplier: z
-    .string({ required_error: 'Este campo e obrigatório!' })
-    .min(1),
-  fiscalNumber: z.coerce.string().min(0),
-  provider: z.coerce.string({ required_error: 'Escolha uma filial!' }),
-  date: z.coerce.string({ required_error: 'Informe a data' }),
+  typeSupplier: z.string().min(1, 'Este campo e obrigatório!'),
+  fiscalNumber: z.coerce.string().min(1, 'Este campo é obrigatório!'),
+  provider: z.string({ required_error: 'Escolha uma filial!' }),
+  date: z.string({ required_error: 'Informe a data' }),
   tank: z.string().optional(),
   train: z.string().optional(),
 })
@@ -158,6 +156,7 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
     toast({ title: 'Tanque criado com sucesso', variant: 'success' })
 
     queryClient.refetchQueries(['fuelling/create/data'])
+    reset()
     refetch()
   }
 
