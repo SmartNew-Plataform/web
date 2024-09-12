@@ -110,8 +110,12 @@ export function Table() {
       },
     },
     {
+      accessorKey: 'typeDocument',
+      header: 'Tipo',
+    },
+    {
       accessorKey: 'fiscalNumber',
-      header: 'Nota fiscal / Nº Controle',
+      header: 'Nº DCTO',
     },
     {
       accessorKey: 'bound.text',
