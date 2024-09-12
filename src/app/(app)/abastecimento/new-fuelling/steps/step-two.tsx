@@ -2,7 +2,11 @@ import { Form } from '@/components/form'
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-export function StepTwo() {
+interface StepTwoData {
+  isEdit: boolean
+}
+
+export function StepTwo({ isEdit }: StepTwoData) {
   const { watch, setValue } = useFormContext()
 
   const handleCalculateConsumption = () => {
@@ -26,6 +30,9 @@ export function StepTwo() {
   }
 
   useEffect(() => {
+    console.log(isEdit)
+
+    if (isEdit) return
     handleCalculateConsumption()
   }, [watch('quantity'), watch('last'), watch('counter')])
 
