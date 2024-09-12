@@ -42,9 +42,7 @@ export function Table() {
 
       if (response.status === 200) {
         const data = response.data
-        console.log('Dados recebidos do abastecimento:', data)
         const mappedData = mapFuelingDataToSupplyFormData(data)
-        console.log('Dados mapeados:', mappedData)
         setEditingFuelData(mappedData)
         setFuellingIdToEdit(id)
       } else {
