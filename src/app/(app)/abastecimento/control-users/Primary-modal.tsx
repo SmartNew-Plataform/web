@@ -128,7 +128,10 @@ export function ProductModal({
         reset()
       }
     } catch (error) {
-      toast({ title: 'Erro ao editar vínculo!', variant: 'destructive' })
+      toast({
+        title: 'Erro ao editar, Usuario lançou um abastecimento!',
+        variant: 'destructive',
+      })
     }
   }
 

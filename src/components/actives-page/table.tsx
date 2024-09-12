@@ -220,7 +220,7 @@ export function Table() {
 
   const columns: ColumnDef<Active>[] = [
     {
-      accessorKey: 'id',
+      accessorKey: 'btn',
       header: '',
       cell: ({ row }) => {
         return (
