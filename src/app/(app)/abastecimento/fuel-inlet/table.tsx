@@ -105,8 +105,8 @@ export function Table() {
       accessorKey: 'date',
       header: 'Data',
       cell({ getValue }) {
-        const date = getValue() as string
-        return dayjs(date).format('DD/MM/YYYY')
+        const date = new Date(getValue() as string).toUTCString()
+        return dayjs(date).add(3, 'hour').format('DD/MM/YYYY')
       },
     },
     {
