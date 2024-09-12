@@ -4,7 +4,7 @@ export default function IframePage() {
   return (
     <PageWrapper>
       <iframe
-        src="https://scriptcase.smartnewservices.com.br/sistemas/blank_IntegraReact?tokenUser=a2be186c45cd4c9be5cb847767053dee&blank=blank_compras_grid"
+        src="https://sistemas.smartnewsystem.com.br/blank_fornecedor_tela/?usr_login=bruno.matias&id_cliente=2&usr_modulo=11"
         className="h-full w-full"
         frameBorder="0"
       ></iframe>
