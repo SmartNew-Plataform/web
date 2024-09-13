@@ -74,7 +74,7 @@ export function StepOne({ isEdit }: StepOneProps) {
     refetchOnMount: false,
   })
 
-  const { watch, setValue, resetField } = useFormContext()
+  const { watch, setValue } = useFormContext()
   const mode = watch('type')
   const supplier = watch('typeSupplier') as 'tank' | 'train' | 'post'
 
@@ -146,15 +146,15 @@ export function StepOne({ isEdit }: StepOneProps) {
     ({ value }) => value === equipmentValue,
   )?.type
 
-  useEffect(() => {
-    if (supplier) {
-      resetField('tank')
-      resetField('train')
-      resetField('post')
-      resetField('compartment')
-      resetField('fuel')
-    }
-  }, [supplier])
+  // useEffect(() => {
+  //   if (supplier) {
+  //     resetField('tank')
+  //     resetField('train')
+  //     resetField('post')
+  //     resetField('compartment')
+  //     resetField('fuel')
+  //   }
+  // }, [supplier])
 
   useEffect(() => {
     if (isEdit) return
@@ -167,6 +167,11 @@ export function StepOne({ isEdit }: StepOneProps) {
     setValue('odometerPrevious', odometer)
     setValue('odometer', odometerCurrent)
   }, [compartmentValue, quantity, odometer, odometerCurrent])
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0]
+    setValue('date', today)
+  }, [setValue])
 
   return (
     <>

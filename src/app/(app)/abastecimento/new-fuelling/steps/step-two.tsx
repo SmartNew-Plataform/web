@@ -86,7 +86,7 @@ export function StepTwo({ isEdit }: StepTwoData) {
           <Form.ErrorMessage field="consumption" />
         </Form.Field>
         <Form.Label htmlFor="value">Valor Unitário:</Form.Label>
-        <Form.Input placeholder="5,96" type="number" name="value" id="value" />
+        <Form.Input type="number" name="value" id="value" />
         <Form.ErrorMessage field="value" />
       </Form.Field>
     </>
