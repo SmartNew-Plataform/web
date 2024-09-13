@@ -247,9 +247,8 @@ export function StepOne({ isEdit }: StepOneProps) {
           <Form.ErrorMessage field="typeSupplier" />
         </Form.Field>
       )}
-      {isLoadingSelects || !supplier ? (
-        <Form.SkeletonField />
-      ) : (
+
+      {supplier && (
         <Form.Field>
           <Form.Label>{typeSupplierOptions[supplier].label}:</Form.Label>
           <Form.Select
@@ -260,6 +259,7 @@ export function StepOne({ isEdit }: StepOneProps) {
           <Form.ErrorMessage field="typeSupplier" />
         </Form.Field>
       )}
+
       {compartmentOptions && supplier !== 'post' ? (
         <Form.Field>
           <Form.Label>Compartimento:</Form.Label>
