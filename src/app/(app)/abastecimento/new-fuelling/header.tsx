@@ -62,12 +62,14 @@ export function Header() {
       odometerLast: data.odometerPrevious,
     })
 
-    if (response.status !== 201) return
+    if (response.status !== 201) return response
 
     toast({
       title: 'Abastecimento criado com sucesso!',
       variant: 'success',
     })
+
+    return response
   }
 
   const { data: allEquipmentOptions = [] } = useQuery({
