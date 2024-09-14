@@ -129,44 +129,40 @@ export function Table() {
     const fuelStationId = data.post ? String(data.post) : null
     const trainId = data.train ? String(data.train) : null
     const tankId = data.tank ? String(data.tank) : null
-    try {
-      const response = await api.put(`fuelling/${fuellingIdToEdit}`, {
-        ...data,
-        equipmentId: data.equipment,
-        type: data.type,
-        fuelStationId,
-        trainId,
-        tankId,
-        fuelId: data.fuel,
-        compartmentId: data.compartment,
-        numberRequest: data.request,
-        fiscalNumber: data.receipt,
-        value: data.value,
-        currentCounter: data.last,
-        observation: data.comments,
-        counterLast: data.last,
-        odometerLast: data.odometerPrevious,
-      })
+    const response = await api.put(`fuelling/${fuellingIdToEdit}`, {
+      ...data,
+      equipmentId: data.equipment,
+      type: data.type,
+      fuelStationId,
+      trainId,
+      tankId,
+      fuelId: data.fuel,
+      compartmentId: data.compartment,
+      numberRequest: data.request,
+      fiscalNumber: data.receipt,
+      value: data.value,
+      currentCounter: data.last,
+      observation: data.comments,
+      counterLast: data.last,
+      odometerLast: data.odometerPrevious,
+    })
 
-      if (response.status === 200) {
-        toast({
-          title: 'Abastecimento editado com sucesso!',
-          variant: 'success',
-        })
-        setFuellingIdToEdit(undefined)
-      } else {
-        toast({
-          title: 'Erro ao editar abastecimento',
-          description: 'Não foi possível editar o abastecimento.',
-        })
-      }
-    } catch (error) {
-      console.error('Erro ao editar abastecimento:', error)
-      toast({
-        title: 'Erro ao editar abastecimento',
-        description: 'Você só pode editar o ultimo abastecimento feito.',
-      })
-    }
+    if (response.status !== 200) return response
+
+    toast({
+      title: 'Abastecimento editado com sucesso!',
+      variant: 'success',
+    })
+    setFuellingIdToEdit(undefined)
+    return response
+    // try {
+    // } catch (error) {
+    //   console.error('Erro ao editar abastecimento:', error)
+    //   toast({
+    //     title: 'Erro ao editar abastecimento',
+    //     description: 'Você só pode editar o ultimo abastecimento feito.',
+    //   })
+    // }
   }
 
   async function handleDeleteFuelling() {
