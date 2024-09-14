@@ -35,7 +35,6 @@ export function FormTechnical() {
   })
   const {
     handleSubmit,
-    reset,
     formState: { isSubmitting },
   } = detailForm
   const { fetchSelects } = useServiceOrder()
