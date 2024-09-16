@@ -164,7 +164,7 @@ export function Table() {
       console.error('Erro ao editar abastecimento:', error)
       toast({
         title: 'Erro ao editar abastecimento',
-        description: 'Você só pode editar o ultimo abastecimento feito.',
+        description: 'Quantidade inserida maior do que possui!',
       })
     }
   }
