@@ -116,9 +116,9 @@ export function Table() {
         const typeValue = row.original.type.value
 
         if (typeValue === 'tank') {
-          return 'INTERNO'
-        } else if (typeValue === 'train') {
           return 'NF'
+        } else if (typeValue === 'train') {
+          return 'INTERNO'
         } else {
           return '-'
         }
