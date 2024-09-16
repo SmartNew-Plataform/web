@@ -25,7 +25,8 @@ export function StepTwo({ isEdit }: StepTwoData) {
         type === 'KM/L' &&
         !isNaN(quantity) &&
         !isNaN(last) &&
-        !isNaN(counter)
+        !isNaN(counter) &&
+        last > 0
       ) {
         const consumption = quantity / (counter - last)
         setValue('consumption', consumption.toFixed(2))
@@ -33,10 +34,13 @@ export function StepTwo({ isEdit }: StepTwoData) {
         type === 'L/HR' &&
         !isNaN(quantity) &&
         !isNaN(last) &&
-        !isNaN(counter)
+        !isNaN(counter) &&
+        last > 0
       ) {
         const consumption = (counter - last) / quantity
         setValue('consumption', consumption.toFixed(2))
+      } else {
+        setValue('consumption', 0)
       }
     }
   }

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useFilterFuelling } from '@/store/fuelling/filter-newfuelling'
+import { useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Info, Pencil, Trash2 } from 'lucide-react'
@@ -14,6 +15,7 @@ import { FuelForm, SupplyFormData } from './fuelForm'
 import { ObservationModal } from './observationsModal'
 
 export function Table() {
+  const queryClient = useQueryClient()
   const { filters } = useFilterFuelling()
   const [fuellingIdToDelete, setFuellingIdToDelete] = useState<
     number | undefined
@@ -147,26 +149,31 @@ export function Table() {
       odometerLast: data.odometerPrevious,
     })
 
-      if (response.status === 200) {
-        toast({
-          title: 'Abastecimento editado com sucesso!',
-          variant: 'success',
-        })
-        setFuellingIdToEdit(undefined)
-      } else {
-        toast({
-          title: 'Erro ao editar abastecimento',
-          description: 'Não foi possível editar o abastecimento.',
-        })
-      }
-    } catch (error) {
-      console.error('Erro ao editar abastecimento:', error)
+    if (response.status === 200) {
+      toast({
+        title: 'Abastecimento editado com sucesso!',
+        variant: 'success',
+      })
+      queryClient.refetchQueries(['fuelling/data'])
+      queryClient.refetchQueries(['fuelling/list-fuel'])
+      setFuellingIdToEdit(undefined)
+      return response
+    } else {
       toast({
         title: 'Erro ao editar abastecimento',
-        description: 'Você só pode editar o ultimo abastecimento feito.',
+        description: 'Não foi possível editar o abastecimento.',
       })
+      return response
     }
   }
+
+  // catch (error) {
+  //   console.error('Erro ao editar abastecimento:', error)
+  //   toast({
+  //     title: 'Erro ao editar abastecimento',
+  //     description: 'Você só pode editar o ultimo abastecimento feito.',
+  //   })
+  // }
 
   async function handleDeleteFuelling() {
     try {
@@ -176,6 +183,8 @@ export function Table() {
           title: 'Abastecimento deletado com sucesso!',
           variant: 'success',
         })
+        queryClient.refetchQueries(['fuelling/data'])
+        queryClient.refetchQueries(['fuelling/list-fuel'])
         setFuellingIdToDelete(undefined)
       } else {
         toast({
