@@ -1,4 +1,5 @@
 import { Form } from '@/components/form'
+import { toast } from '@/components/ui/use-toast'
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
@@ -8,33 +9,42 @@ interface StepTwoData {
 
 export function StepTwo({ isEdit }: StepTwoData) {
   const { watch, setValue } = useFormContext()
+  const quantity = parseFloat(watch('quantity'))
+  const last = parseFloat(watch('last'))
+  const counter = parseFloat(watch('counter'))
+  const type = watch('typeEquipment')
 
   const handleCalculateConsumption = () => {
-    const quantity = parseFloat(watch('quantity'))
-    const last = parseFloat(watch('last'))
-    const counter = parseFloat(watch('counter'))
-    const type = watch('typeEquipment')
-
-    if (
-      type === 'KM/L' &&
-      !isNaN(quantity) &&
-      !isNaN(last) &&
-      !isNaN(counter)
-    ) {
-      const consumption = quantity / (counter - last)
-      setValue('consumption', consumption.toFixed(2))
-    } else if (type === 'L/HR') {
-      const consumption = (counter - last) / quantity
-      setValue('consumption', consumption.toFixed(2))
+    if (type === null) {
+      toast({
+        title: 'Equipamento selecionado sem tipo de consumo informado!',
+        variant: 'destructive',
+      })
+    } else {
+      if (
+        type === 'KM/L' &&
+        !isNaN(quantity) &&
+        !isNaN(last) &&
+        !isNaN(counter)
+      ) {
+        const consumption = quantity / (counter - last)
+        setValue('consumption', consumption.toFixed(2))
+      } else if (
+        type === 'L/HR' &&
+        !isNaN(quantity) &&
+        !isNaN(last) &&
+        !isNaN(counter)
+      ) {
+        const consumption = (counter - last) / quantity
+        setValue('consumption', consumption.toFixed(2))
+      }
     }
   }
 
   useEffect(() => {
-    console.log(isEdit)
-
     if (isEdit) return
     handleCalculateConsumption()
-  }, [watch('quantity'), watch('last'), watch('counter')])
+  }, [quantity, type, last, counter])
 
   return (
     <>
@@ -76,7 +86,7 @@ export function StepTwo({ isEdit }: StepTwoData) {
           <Form.ErrorMessage field="consumption" />
         </Form.Field>
         <Form.Label htmlFor="value">Valor Unitário:</Form.Label>
-        <Form.Input placeholder="5,96" type="number" name="value" id="value" />
+        <Form.Input type="number" name="value" id="value" />
         <Form.ErrorMessage field="value" />
       </Form.Field>
     </>

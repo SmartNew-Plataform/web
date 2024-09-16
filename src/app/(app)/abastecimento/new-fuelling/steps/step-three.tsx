@@ -1,16 +1,10 @@
 import { Form } from '@/components/form'
-import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 export function StepThree() {
-  const { setValue, watch } = useFormContext()
+  const { watch } = useFormContext()
 
   const mode = watch('type')
-
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0]
-    setValue('date', today)
-  }, [setValue])
 
   return (
     <>
