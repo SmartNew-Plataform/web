@@ -129,24 +129,23 @@ export function Table() {
     const fuelStationId = data.post ? String(data.post) : null
     const trainId = data.train ? String(data.train) : null
     const tankId = data.tank ? String(data.tank) : null
-    try {
-      const response = await api.put(`fuelling/${fuellingIdToEdit}`, {
-        ...data,
-        equipmentId: data.equipment,
-        type: data.type,
-        fuelStationId,
-        trainId,
-        tankId,
-        fuelId: data.fuel,
-        compartmentId: data.compartment,
-        numberRequest: data.request,
-        fiscalNumber: data.receipt,
-        value: data.value,
-        currentCounter: data.last,
-        observation: data.comments,
-        counterLast: data.last,
-        odometerLast: data.odometerPrevious,
-      })
+    const response = await api.put(`fuelling/${fuellingIdToEdit}`, {
+      ...data,
+      equipmentId: data.equipment,
+      type: data.type,
+      fuelStationId,
+      trainId,
+      tankId,
+      fuelId: data.fuel,
+      compartmentId: data.compartment,
+      numberRequest: data.request,
+      fiscalNumber: data.receipt,
+      value: data.value,
+      currentCounter: data.last,
+      observation: data.comments,
+      counterLast: data.last,
+      odometerLast: data.odometerPrevious,
+    })
 
       if (response.status === 200) {
         toast({
@@ -164,7 +163,7 @@ export function Table() {
       console.error('Erro ao editar abastecimento:', error)
       toast({
         title: 'Erro ao editar abastecimento',
-        description: 'Quantidade inserida maior do que possui!',
+        description: 'Você só pode editar o ultimo abastecimento feito.',
       })
     }
   }

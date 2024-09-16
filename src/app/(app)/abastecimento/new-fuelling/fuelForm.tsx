@@ -5,6 +5,7 @@ import { WizardForm } from '@/components/wizard-form'
 import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
 import { useWizardForm } from '@/hooks/use-wizard-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AxiosResponse } from 'axios'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
@@ -47,7 +48,7 @@ const createSupplyFormSchema = z.object({
 export type SupplyFormData = z.infer<typeof createSupplyFormSchema>
 
 export interface SupplyModalProps extends ComponentProps<typeof Sheet> {
-  onSubmit: (data: SupplyFormData) => Promise<void>
+  onSubmit: (data: SupplyFormData) => Promise<AxiosResponse>
   defaultValues?: SupplyFormData
   mode: 'create' | 'edit'
 }
@@ -92,8 +93,13 @@ export function FuelForm({
     }
 
     try {
-      await onSubmit(data)
-      reset({ date: data.date })
+      const response = await onSubmit(data)
+
+      if (response.status === 201) {
+        reset()
+        paginate({ newDirection: -1 })
+        paginate({ newDirection: -1 })
+      }
     } catch (error) {
       console.log(error)
     }
@@ -102,31 +108,6 @@ export function FuelForm({
   useEffect(() => {
     if (defaultValues) {
       reset(defaultValues)
-    }
-    if (mode === 'create') {
-      reset({
-        comments: undefined,
-        compartment: undefined,
-        consumption: undefined,
-        counter: undefined,
-        date: undefined,
-        driver: undefined,
-        equipment: undefined,
-        fuel: undefined,
-        last: 0,
-        odometer: undefined,
-        odometerPrevious: undefined,
-        post: undefined,
-        quantity: undefined,
-        receipt: undefined,
-        request: undefined,
-        supplier: undefined,
-        tank: undefined,
-        train: undefined,
-        type: undefined,
-        typeSupplier: undefined,
-        value: undefined,
-      })
     }
   }, [defaultValues])
 

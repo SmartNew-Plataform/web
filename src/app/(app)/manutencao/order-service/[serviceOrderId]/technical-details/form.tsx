@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { ApiTechnicalDetailsMapper } from '@/lib/mappers/api-technical-details-mapper'
 import { useServiceOrder } from '@/store/maintenance/service-order'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
@@ -27,22 +28,21 @@ const technicalDetailsSchema = z.object({
   statusFail: z.string().optional(),
 })
 
-type TechnicalDetailsData = z.infer<typeof technicalDetailsSchema>
+export type TechnicalDetailsFormData = z.infer<typeof technicalDetailsSchema>
 
 export function FormTechnical() {
-  const detailForm = useForm<TechnicalDetailsData>({
+  const detailForm = useForm<TechnicalDetailsFormData>({
     resolver: zodResolver(technicalDetailsSchema),
   })
   const {
     handleSubmit,
-    reset,
     formState: { isSubmitting },
   } = detailForm
   const { fetchSelects } = useServiceOrder()
   const params = useParams()
   const { toast } = useToast()
 
-  const { data, isLoading, refetch } = useQuery<TechnicalDetailsData>({
+  const { data, isLoading, refetch } = useQuery<TechnicalDetailsFormData>({
     queryKey: ['maintenance/order-service/details', params.serviceOrderId],
     queryFn: async () => {
       const response = await api
@@ -53,12 +53,11 @@ export function FormTechnical() {
     },
   })
 
-  async function handleUpdateServiceOrder(data: TechnicalDetailsData) {
-    console.log(data)
-    // const raw = ApiServiceOrderMapper.toApi(data)
+  async function handleUpdateServiceOrder(data: TechnicalDetailsFormData) {
+    const raw = ApiTechnicalDetailsMapper.toApi(data)
     const response = await api.put(
       `/maintenance/service-order/${params.serviceOrderId}`,
-      // raw,
+      raw,
     )
 
     if (response.status !== 200) return
@@ -74,14 +73,10 @@ export function FormTechnical() {
     fetchSelects()
   }, [])
 
-  // useEffect(() => {
-  //   if (!data) return
-  //   reset({
-  //     maintenanceDiagnosis: data.comments,
-  //     solution: data.descriptionServicePerformed,
-  //     executorObservation: data.observationsExecutor,
-  //   })
-  // }, [data])
+  useEffect(() => {
+    if (!data) return
+    reset()
+  }, [data])
 
   if (isLoading || !data) {
     return (
@@ -156,18 +151,6 @@ export function FormTechnical() {
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="serviceEvaluationNote">
-                Nota de avaliação do serviço:
-              </Form.Label>
-              <Form.Select
-                name="serviceEvaluationNote"
-                id="serviceEvaluationNote"
-                options={[]}
-              />
-              <Form.ErrorMessage field="serviceEvaluationNote" />
-            </Form.Field>
-
-            <Form.Field>
               <Form.Label htmlFor="priority">Prioridade:</Form.Label>
               <Form.Select name="priority" id="priority" options={[]} />
               <Form.ErrorMessage field="priority" />
@@ -193,6 +176,14 @@ export function FormTechnical() {
               <Form.Label htmlFor="statusFail">Status falha:</Form.Label>
               <Form.Select name="statusFail" id="statusFail" options={[]} />
               <Form.ErrorMessage field="statusFail" />
+            </Form.Field>
+
+            <Form.Field>
+              <Form.Label htmlFor="serviceEvaluationNote">
+                Nota de avaliação do serviço:
+              </Form.Label>
+              <Form.Rater name="serviceEvaluationNote" withRatingLabel />
+              <Form.ErrorMessage field="serviceEvaluationNote" />
             </Form.Field>
 
             <Button
