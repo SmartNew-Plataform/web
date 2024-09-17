@@ -204,9 +204,9 @@ export function TankModal({ mode, defaultValues, ...props }: TankModalProps) {
           console.error('Erro ao buscar dados:', error)
         })
     }
-    if (type === 'tank') {
-      setValue('fiscalNumber', '')
-    }
+    // if (type === 'tank') {
+    //   setValue('fiscalNumber', '')
+    // }
   }, [type, setValue])
 
   return (

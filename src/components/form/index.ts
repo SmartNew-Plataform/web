@@ -13,6 +13,7 @@ import { InputDateRange } from './input-date-range'
 import { MultiSelect } from './multi-select'
 import { PeriodInput } from './period-input'
 import { RadioGroup } from './radio-group'
+import { Rater } from './rater'
 import { Select } from './select'
 import { SkeletonField } from './skeleton-field'
 import { Textarea } from './textarea'
@@ -36,4 +37,5 @@ export const Form = {
   CostCenterPicker,
   RadioGroup,
   AttachDragDrop,
+  Rater,
 }

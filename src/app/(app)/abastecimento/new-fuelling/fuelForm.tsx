@@ -5,6 +5,7 @@ import { WizardForm } from '@/components/wizard-form'
 import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
 import { useWizardForm } from '@/hooks/use-wizard-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { AxiosResponse } from 'axios'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react'
@@ -63,6 +64,7 @@ export function FuelForm({
     resolver: zodResolver(createSupplyFormSchema),
   })
 
+  const queryClient = useQueryClient()
   const {
     handleSubmit,
     reset,
@@ -94,7 +96,8 @@ export function FuelForm({
 
     try {
       const response = await onSubmit(data)
-
+      queryClient.refetchQueries(['fuelling/data'])
+      queryClient.refetchQueries(['fuelling/list-fuel'])
       if (response.status === 201) {
         reset()
         paginate({ newDirection: -1 })

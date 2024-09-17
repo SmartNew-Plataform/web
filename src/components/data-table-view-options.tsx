@@ -34,8 +34,6 @@ export function DataTableViewOptions<TData>({
         {table
           .getAllColumns()
           .filter((column) => {
-            console.log(typeof column.columnDef.header !== 'string')
-
             return column.columnDef.header?.length !== 0 && column.getCanHide()
           })
           .map((column) => {

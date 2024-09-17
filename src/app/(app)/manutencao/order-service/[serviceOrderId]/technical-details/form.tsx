@@ -1,13 +1,15 @@
 'use client'
 
+import { SelectData } from '@/@types/select-data'
 import { Form } from '@/components/form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
-import { useServiceOrder } from '@/store/maintenance/service-order'
+import { ApiTechnicalDetailsMapper } from '@/lib/mappers/api-technical-details-mapper'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { Save } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useEffect } from 'react'
@@ -20,44 +22,43 @@ const technicalDetailsSchema = z.object({
   executorObservation: z.string().optional(),
   technicalDrive: z.string().optional(),
   technicalArrival: z.string().optional(),
-  serviceEvaluationNote: z.string().optional(),
-  priority: z.string().optional(),
-  classification: z.string().optional(),
-  cause: z.string().optional(),
-  statusFail: z.string().optional(),
+  serviceEvaluationNote: z.number().optional(),
+  priority: z.string().optional().nullable(),
+  classification: z.string().optional().nullable(),
 })
 
-type TechnicalDetailsData = z.infer<typeof technicalDetailsSchema>
+export type TechnicalDetailsFormData = z.infer<typeof technicalDetailsSchema>
 
 export function FormTechnical() {
-  const detailForm = useForm<TechnicalDetailsData>({
+  const detailForm = useForm<TechnicalDetailsFormData>({
     resolver: zodResolver(technicalDetailsSchema),
   })
   const {
     handleSubmit,
     formState: { isSubmitting },
+    reset,
   } = detailForm
-  const { fetchSelects } = useServiceOrder()
   const params = useParams()
   const { toast } = useToast()
 
-  const { data, isLoading, refetch } = useQuery<TechnicalDetailsData>({
+  const { data, isLoading, refetch } = useQuery<TechnicalDetailsFormData>({
     queryKey: ['maintenance/order-service/details', params.serviceOrderId],
     queryFn: async () => {
       const response = await api
-        .get(`/maintenance/service-order/${params.serviceOrderId}`)
+        .get(
+          `/maintenance/service-order/${params.serviceOrderId}/technical-details`,
+        )
         .then((res) => res.data)
 
       return response.data
     },
   })
 
-  async function handleUpdateServiceOrder(data: TechnicalDetailsData) {
-    console.log(data)
-    // const raw = ApiServiceOrderMapper.toApi(data)
+  async function handleUpdateServiceOrder(data: TechnicalDetailsFormData) {
+    const raw = ApiTechnicalDetailsMapper.toApi(data)
     const response = await api.put(
-      `/maintenance/service-order/${params.serviceOrderId}`,
-      // raw,
+      `/maintenance/service-order/${params.serviceOrderId}/technical-details`,
+      raw,
     )
 
     if (response.status !== 200) return
@@ -69,18 +70,35 @@ export function FormTechnical() {
     refetch()
   }
 
-  useEffect(() => {
-    fetchSelects()
-  }, [])
+  const { data: selects, isLoading: isLoadingSelects } = useQuery({
+    queryKey: ['technical-details/selects'],
+    queryFn: async () => {
+      const [classification, priority] = await Promise.all([
+        api
+          .get<{
+            data: SelectData[]
+          }>('/system/choices/list-classification-service-order')
+          .then((res) => res.data.data),
+        api
+          .get<{
+            data: SelectData[]
+          }>('/system/choices/list-priority-service-order')
+          .then((res) => res.data.data),
+      ])
 
-  // useEffect(() => {
-  //   if (!data) return
-  //   reset({
-  //     maintenanceDiagnosis: data.comments,
-  //     solution: data.descriptionServicePerformed,
-  //     executorObservation: data.observationsExecutor,
-  //   })
-  // }, [data])
+      return { classification, priority }
+    },
+  })
+
+  useEffect(() => {
+    if (!data) return
+    reset({
+      ...data,
+      technicalDrive: dayjs(data.technicalDrive).format('YYYY-MM-DD'),
+      technicalArrival: dayjs(data.technicalArrival).format('YYYY-MM-DD'),
+    })
+    console.log(dayjs(data.technicalArrival).format('YYYY-MM-DD'))
+  }, [data])
 
   if (isLoading || !data) {
     return (
@@ -93,6 +111,8 @@ export function FormTechnical() {
       </Card>
     )
   }
+
+  console.log(data)
 
   return (
     <Card className="flex max-h-full w-full max-w-6xl flex-col overflow-auto">
@@ -154,44 +174,40 @@ export function FormTechnical() {
               <Form.ErrorMessage field="technicalArrival" />
             </Form.Field>
 
+            {isLoadingSelects ? (
+              <Form.SkeletonField />
+            ) : (
+              <Form.Field>
+                <Form.Label htmlFor="priority">Prioridade:</Form.Label>
+                <Form.Select
+                  name="priority"
+                  id="priority"
+                  options={selects?.priority || []}
+                />
+                <Form.ErrorMessage field="priority" />
+              </Form.Field>
+            )}
+
+            {isLoadingSelects ? (
+              <Form.SkeletonField />
+            ) : (
+              <Form.Field>
+                <Form.Label htmlFor="classification">Classificação:</Form.Label>
+                <Form.Select
+                  name="classification"
+                  id="classification"
+                  options={selects?.classification || []}
+                />
+                <Form.ErrorMessage field="classification" />
+              </Form.Field>
+            )}
+
             <Form.Field>
               <Form.Label htmlFor="serviceEvaluationNote">
                 Nota de avaliação do serviço:
               </Form.Label>
-              <Form.Select
-                name="serviceEvaluationNote"
-                id="serviceEvaluationNote"
-                options={[]}
-              />
+              <Form.Rater name="serviceEvaluationNote" withRatingLabel />
               <Form.ErrorMessage field="serviceEvaluationNote" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="priority">Prioridade:</Form.Label>
-              <Form.Select name="priority" id="priority" options={[]} />
-              <Form.ErrorMessage field="priority" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="classification">Classificação:</Form.Label>
-              <Form.Select
-                name="classification"
-                id="classification"
-                options={[]}
-              />
-              <Form.ErrorMessage field="classification" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="cause">Causa motivo:</Form.Label>
-              <Form.Select name="cause" id="cause" options={[]} />
-              <Form.ErrorMessage field="cause" />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label htmlFor="statusFail">Status falha:</Form.Label>
-              <Form.Select name="statusFail" id="statusFail" options={[]} />
-              <Form.ErrorMessage field="statusFail" />
             </Form.Field>
 
             <Button
