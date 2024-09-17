@@ -12,7 +12,7 @@ export function Header() {
   return (
     <PageHeader>
       <h1 className="text-xl font-semibold text-slate-600">
-        Cadastro de usuário
+        Vínculo De Usuários
       </h1>
       <div className="flex gap-4">
         <SearchInput />
