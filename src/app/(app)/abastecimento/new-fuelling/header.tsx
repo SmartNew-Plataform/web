@@ -68,8 +68,7 @@ export function Header() {
       title: 'Abastecimento criado com sucesso!',
       variant: 'success',
     })
-    queryClient.refetchQueries(['fuelling/data'])
-
+    queryClient.refetchQueries(['fuelling/list-fuel', 'fuelling/data'])
     return response
   }
 
