@@ -22,6 +22,7 @@ export function useWizardForm() {
 
   return {
     step,
+    setStep,
     direction,
     paginate,
     setSteps,

@@ -145,21 +145,11 @@ export function StepOne({ isEdit }: StepOneProps) {
     ({ value }) => value === equipmentValue,
   )?.type
 
-  // useEffect(() => {
-  //   if (supplier) {
-  //     resetField('tank')
-  //     resetField('train')
-  //     resetField('post')
-  //     resetField('compartment')
-  //     resetField('fuel')
-  //   }
-  // }, [supplier])
-
   useEffect(() => {
     if (isEdit) return
-    setValue('last', counter)
     setValue('typeEquipment', typeConsumption)
-  }, [equipmentValue, counter, typeConsumption])
+    setValue('last', counter)
+  }, [equipmentValue, counter, selects])
 
   useEffect(() => {
     if (isEdit) return
