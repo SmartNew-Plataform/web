@@ -39,14 +39,15 @@ export const useTasksBoundedStore = create<StoreData>((set) => {
     async loadTasksBounded({ boundId, filterText }) {
       set({ tasksBounded: undefined })
       const response = await api
-        .get(`/smart-list/bound/${boundId}`, {
+        .get(`/smart-list/bound/${boundId}/item`, {
           params: { filterText },
         })
         .then((res) => res.data)
 
       set({
-        tasksBounded: response.list,
+        tasksBounded: response.data,
       })
+      console.log(response)
 
       return response.list
     },

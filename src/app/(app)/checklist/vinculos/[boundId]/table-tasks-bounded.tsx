@@ -131,8 +131,6 @@ export function TableTasksBounded({ boundId }: TableTasksBounded) {
     },
   ]
 
-  console.log(data)
-
   return (
     <>
       <AlertDialog
