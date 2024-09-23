@@ -75,7 +75,6 @@ export function SheetEditBound({
       variant: 'success',
     })
     queryClient.refetchQueries(['checklist/bounds'])
-    onOpenChange(null)
   }
 
   // const { data } = useQuery({
