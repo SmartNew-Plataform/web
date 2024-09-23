@@ -12,13 +12,11 @@ import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { validateMultipleOptions } from '@/lib/validate-multiple-options'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
-import { useTasksBoundedStore } from '@/store/smartlist/smartlist-tasks-bounded'
 import { useUserStore } from '@/store/user-store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -42,38 +40,34 @@ const newBoundSchema = z
     description: z
       .string({ required_error: 'A descrição é obrigatória!' })
       .nonempty({ message: 'Preencha a descrição' }),
+    task: z.array(
+      z.string({
+        required_error: 'Escolha uma tarefa!',
+        invalid_type_error: 'Você não selecionou nada!',
+      }),
+    ),
+    control: z.string({
+      required_error: 'Escolha um tipo de controle!',
+      invalid_type_error: 'Você não selecionou nada!',
+    }),
   })
   .superRefine((data, ctx) =>
     validateMultipleOptions<typeof data>(data, ctx, data.type),
   )
 
-const newTaskSchema = z.object({
-  task: z.array(
-    z.string({
-      required_error: 'Escolha uma tarefa!',
-      invalid_type_error: 'Você não selecionou nada!',
-    }),
-  ),
-  control: z.string({
-    required_error: 'Escolha um tipo de controle!',
-    invalid_type_error: 'Você não selecionou nada!',
-  }),
-})
-
 type NewBoundData = z.infer<typeof newBoundSchema>
-type NewTaskData = z.infer<typeof newTaskSchema>
+
+type SelectResponse = {
+  id: number
+  description: string
+}
 
 export function SheetNewBound() {
-  const [boundId, setBoundId] = useState<string | null>(null) // Armazena o ID do vínculo criado
   const newBoundForm = useForm<NewBoundData>({
     resolver: zodResolver(newBoundSchema),
     defaultValues: {
       type: 'family',
     },
-  })
-
-  const newTaskForm = useForm<NewTaskData>({
-    resolver: zodResolver(newTaskSchema),
   })
 
   const {
@@ -83,8 +77,6 @@ export function SheetNewBound() {
     formState: { isSubmitting },
   } = newBoundForm
 
-  const { handleSubmit: handleSubmitTask, reset: resetTask } = newTaskForm
-
   const { user } = useUserStore()
   const { loadFamily, loadDiverse } = useBoundStore()
   const { toast } = useToast()
@@ -92,56 +84,71 @@ export function SheetNewBound() {
   const searchParams = useSearchParams()
   const filterText = searchParams.get('s') || ''
 
-  // Criação do vínculo
   async function handleCreateNewBound(data: NewBoundData) {
     try {
       const response = await api.post('/smart-list/bound', {
         ...data,
+        control: Number(data.control),
+        task: data.task.map(Number),
         familyId: data.family,
         diverseId: data.diverse,
       })
       console.log(response.data)
-      // const createdBoundId = response.data.id
-      setBoundId('200')
 
       toast({
         title: 'Vínculo criado com sucesso!',
         variant: 'success',
       })
 
-      reset({ description: '', family: [], diverse: [], type: 'family' })
+      reset({
+        description: '',
+        family: [],
+        diverse: [],
+        type: 'family',
+        control: '',
+        task: [],
+      })
       queryClient.refetchQueries(['checklist/bounds', filterText])
     } catch (error) {
       console.log(error)
     }
   }
 
-  async function handleNewTask(data: NewTaskData) {
-    if (!boundId) return
+  // async function handleNewTask(data: NewTaskData) {
+  //   if (!boundId) return
 
-    try {
-      await api.post(`/smart-list/bound/${boundId}/item`, {
-        controlId: Number(data.control),
-        task: data.task,
-        filterText,
-      })
+  //   try {
+  //     await api.post(`/smart-list/bound/${boundId}/item`, {
+  //       controlId: Number(data.control),
+  //       task: data.task,
+  //       filterText,
+  //     })
 
-      toast({
-        title: 'Tarefa vinculada com sucesso!',
-        variant: 'success',
-      })
+  //     toast({
+  //       title: 'Tarefa vinculada com sucesso!',
+  //       variant: 'success',
+  //     })
 
-      resetTask({ control: '', task: [] })
-      queryClient.refetchQueries(['checklist/bound/task', boundId])
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  //     resetTask({ control: '', task: [] })
+  //     queryClient.refetchQueries(['checklist/bound/task', boundId])
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   const { data } = useQuery({
     queryKey: ['checklist/bounds/selects', user?.login],
     queryFn: async () => {
-      const [family, diverse] = await Promise.all([loadFamily(), loadDiverse()])
+      const [family, diverse, task, control] = await Promise.all([
+        loadFamily(),
+        loadDiverse(),
+        api
+          .get<{ task: SelectResponse[] }>('/smart-list/task')
+          .then((res) => res.data.task),
+        api
+          .get<{ control: SelectResponse[] }>('/smart-list/bound/list-control')
+          .then((res) => res.data.control),
+      ])
 
       return {
         family: family?.map(({ id, family }) => ({
@@ -149,36 +156,18 @@ export function SheetNewBound() {
           value: id.toString(),
         })),
         diverse,
+        task: task.map(({ id, description }) => ({
+          label: description,
+          value: id.toString(),
+        })),
+        control: control.map(({ id, description }) => ({
+          label: description,
+          value: id.toString(),
+        })),
       }
     },
     retry: true,
   })
-
-  const { task, control } = useTasksBoundedStore(
-    ({ task, loadTasksBounded, control }) => {
-      const taskFormatted = task
-        ? task.map(({ id, description }) => ({
-            label: description,
-            value: id.toString(),
-          }))
-        : []
-
-      const controlFormatted = control
-        ? control.map(({ id, description }) => ({
-            label: description,
-            value: id.toString(),
-          }))
-        : []
-
-      return {
-        task: taskFormatted,
-        loadTasksBounded,
-        control: controlFormatted,
-      }
-    },
-  )
-
-  console.log('Bound ID:', boundId)
 
   const type = watch('type')
 
@@ -228,36 +217,22 @@ export function SheetNewBound() {
               <Form.Input name="description" />
             </Form.Field>
 
+            <Form.Field>
+              <Form.Label>Tarefas:</Form.Label>
+              <Form.MultiSelect name="task" options={data?.task || []} />
+            </Form.Field>
+
+            <Form.Field>
+              <Form.Label>Controle:</Form.Label>
+              <Form.Select name="control" options={data?.control || []} />
+            </Form.Field>
+
             <Button disabled={isSubmitting} loading={isSubmitting}>
               <Plus className="h-4 w-4" />
               Cadastrar vínculo
             </Button>
           </form>
         </FormProvider>
-        {/* Exibe o formulário de vinculação de tarefa após criar o vínculo */}
-        {boundId && (
-          <FormProvider {...newTaskForm}>
-            <form
-              className="mt-6 flex w-full flex-col gap-3"
-              onSubmit={handleSubmitTask(handleNewTask)}
-            >
-              <Form.Field>
-                <Form.Label>Tarefas:</Form.Label>
-                <Form.MultiSelect name="task" options={task} />
-              </Form.Field>
-
-              <Form.Field>
-                <Form.Label>Controle:</Form.Label>
-                <Form.Select name="control" options={control} />
-              </Form.Field>
-
-              <Button disabled={isSubmitting} loading={isSubmitting}>
-                <Plus className="h-4 w-4" />
-                Vincular tarefa
-              </Button>
-            </form>
-          </FormProvider>
-        )}
       </SheetContent>
     </Sheet>
   )

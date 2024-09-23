@@ -34,7 +34,7 @@ export function TableBounds() {
     loadBounds,
   }))
   const [deleteId, setDeleteId] = useState<number | null>(null)
-  const [editId, setEditId] = useState<number | null>(null)
+  const [editData, setEditData] = useState<BoundData | undefined>(undefined)
   const { toast } = useToast()
   const searchParams = useSearchParams()
 
@@ -51,6 +51,7 @@ export function TableBounds() {
       header: '',
       cell({ row }) {
         const id = row.getValue('id') as number
+        const data = row.original
 
         return (
           <div className="flex gap-2">
@@ -64,7 +65,7 @@ export function TableBounds() {
             <Button
               variant="secondary"
               size="icon-xs"
-              onClick={() => setEditId(id)}
+              onClick={() => setEditData(data)}
             >
               <Pencil className="h-3 w-3" />
             </Button>
@@ -118,7 +119,11 @@ export function TableBounds() {
 
   return (
     <>
-      <SheetEditBound onOpenChange={setEditId} boundId={editId} />
+      <SheetEditBound
+        defaultValues={editData}
+        open={!!editData}
+        onOpenChange={(open) => setEditData(open ? editData : undefined)}
+      />
       <AlertDialog
         open={!!deleteId}
         onOpenChange={(open) => setDeleteId(open ? deleteId : null)}
