@@ -112,7 +112,7 @@ export function Table() {
       consumption: data.data.consumption ?? 0,
       value: data.data.value,
       comments: data.data.observation ?? '',
-      odometerPrevious: data.data.odometerPrevious ?? 0,
+      odometerPrevious: data.data.odometerLast ?? 0,
       odometer: data.data.odometer ?? 0,
       counter: data.data.counter ?? 0,
       last: data.data.counterLast ?? 0,

@@ -60,7 +60,7 @@ export interface FuelingData {
     consumption: number
     value: number
     observation?: string
-    odometerPrevious?: number
+    odometerLast?: number
     odometer?: number
     counter?: number
     counterLast?: number
