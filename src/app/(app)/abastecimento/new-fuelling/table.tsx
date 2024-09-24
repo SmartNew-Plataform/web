@@ -121,7 +121,8 @@ export function Table() {
       compartment: data.tankFuelling
         ? data.tankFuelling.value.toString()
         : data.trainFuelling?.value.toString()
-          ? data.trainFuelling.value.toString(),
+          ? data.trainFuelling.value.toString()
+          : '',
       tank: data.tank?.value.toString() ?? '',
       train: data.train?.value.toString() ?? '',
       post: data.post?.value.toString() ?? '',
