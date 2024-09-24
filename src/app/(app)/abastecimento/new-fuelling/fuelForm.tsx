@@ -19,6 +19,7 @@ import { StepTwo } from './steps/step-two'
 const createSupplyFormSchema = z.object({
   type: z.string({ required_error: 'Este campo é obrigatório!' }),
   typeSupplier: z.string({ required_error: 'Este campo é obrigatório!' }),
+  typeEquipment: z.string().optional(),
   driver: z.string({ required_error: 'Este campo é obrigatório!' }),
   odometerPrevious: z.coerce.number().optional(),
   odometer: z.coerce
@@ -72,7 +73,8 @@ export function FuelForm({
     formState: { isSubmitting, isValid, isDirty },
   } = createSupplyForm
   const createActiveWizardForm = useWizardForm()
-  const { paginate, percentSteps, lastStep, firstStep } = createActiveWizardForm
+  const { paginate, percentSteps, lastStep, firstStep, setStep } =
+    createActiveWizardForm
 
   function handleNextStep() {
     paginate({ newDirection: 1 })
@@ -110,6 +112,7 @@ export function FuelForm({
 
   useEffect(() => {
     if (defaultValues) {
+      setStep(['step-1', 0])
       reset(defaultValues)
     }
   }, [defaultValues])
@@ -117,7 +120,7 @@ export function FuelForm({
   return (
     <Sheet {...props}>
       <SheetContent className="flex max-h-screen w-1/4 flex-col overflow-x-hidden">
-        <div className="mt-4 flex items-end justify-between border-b border-zinc-200 pb-4">
+        <div className="flex items-end justify-between border-b border-zinc-200 pb-4">
           <SheetTitle>
             {mode === 'edit'
               ? 'Editar abastecimento'
@@ -139,13 +142,13 @@ export function FuelForm({
             className="mt-4 flex h-full w-full flex-col gap-3 overflow-auto overflow-x-hidden"
           >
             <WizardForm {...createActiveWizardForm}>
-              <WizardFormStep>
+              <WizardFormStep className="w-full">
                 <StepOne isEdit={mode === 'edit'} />
               </WizardFormStep>
-              <WizardFormStep>
-                <StepTwo isEdit={mode === 'edit'} />
+              <WizardFormStep className="w-full">
+                <StepTwo />
               </WizardFormStep>
-              <WizardFormStep>
+              <WizardFormStep className="w-full">
                 <StepThree />
               </WizardFormStep>
             </WizardForm>

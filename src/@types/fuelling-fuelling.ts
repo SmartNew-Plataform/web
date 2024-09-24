@@ -55,7 +55,10 @@ export interface FuelingData {
     requestNumber: string
     fiscalNumber: string
     date: string
-    equipment: { value: string }
+    equipment: {
+      value: string
+      type: string
+    }
     quantidade: number
     consumption: number
     value: number
