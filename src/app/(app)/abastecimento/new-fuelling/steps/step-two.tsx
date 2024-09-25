@@ -30,10 +30,10 @@ export function StepTwo({ isEdit }: StepTwoData) {
         if (counter === last) {
           setValue('consumption', 0)
         } else {
-          if (type === 'KM/L' && last > 0) {
+          if (type === 'L/HR' && last > 0) {
             const consumption = quantity / (counter - last)
             setValue('consumption', consumption.toFixed(2))
-          } else if (type === 'L/HR' && last > 0) {
+          } else if (type === 'KM/L' && last > 0) {
             const consumption = (counter - last) / quantity
             setValue('consumption', consumption.toFixed(2))
           } else {
