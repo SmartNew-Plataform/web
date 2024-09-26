@@ -254,7 +254,10 @@ export function Table() {
       header: 'Data abastecimento',
       cell({ getValue }) {
         const date = getValue() as string
-        return dayjs(date).format('DD/MM/YYYY')
+
+        const cleanedDate = date.endsWith('Z') ? date.slice(0, -1) : date
+
+        return dayjs(cleanedDate).format('DD/MM/YYYY')
       },
     },
     {
