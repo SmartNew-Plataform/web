@@ -159,6 +159,10 @@ export function Header() {
         Registrar abastecimento
       </h2>
       <div className="flex gap-4">
+        <Button variant="outline" onClick={handleGenerateExcel}>
+          <FileBarChart size={16} />
+          Excel
+        </Button>
         <Popover>
           <PopoverTrigger asChild>
             <Button>
@@ -233,10 +237,6 @@ export function Header() {
           </PopoverContent>
         </Popover>
 
-        <Button variant="outline" onClick={handleGenerateExcel}>
-          <FileBarChart size={16} />
-          Excel
-        </Button>
         <Button onClick={() => setIsOpen(true)}>
           <Plus size={16} />
           Novo abastecimento
