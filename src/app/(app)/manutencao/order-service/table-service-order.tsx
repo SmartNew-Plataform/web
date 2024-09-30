@@ -4,13 +4,14 @@ import { DataTableServerPagination } from '@/components/data-table-server-pagina
 import { Button } from '@/components/ui/button'
 import { useFilters } from '@/hooks/use-filters'
 import { api } from '@/lib/api'
-import { useServiceOrder } from '@/store/maintenance/service-order'
+import {
+  StatusFilterData,
+  useServiceOrder,
+} from '@/store/maintenance/service-order'
 import { ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Expand } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
-import { StatusFilter } from './status-filter'
 
 export type ServiceOrderData = {
   id: number
@@ -34,23 +35,10 @@ export type ServiceOrderData = {
   }
 }
 
-export type StatusFilterData = {
-  id: string
-  name: string
-  color: string
-  count: number
-}
-
 export function TableServiceOrder() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { selects } = useServiceOrder()
-  const [statusFilterValue, setStatusFilterValue] = useState<
-    string | undefined
-  >()
-  const [statusFilterData, setStatusFilterData] = useState<
-    StatusFilterData[] | undefined
-  >()
+  const { selects, statusFilterValue, setStatusFilterData } = useServiceOrder()
   const filterServiceOrder = useFilters({
     defaultValues: { status: selects.status ? [selects.status[0].value] : [] },
     options: [
@@ -235,13 +223,6 @@ export function TableServiceOrder() {
   return (
     <div className="flex h-full flex-1 flex-col gap-4 overflow-auto">
       <AdvancedFilter {...filterServiceOrder} />
-
-      <StatusFilter
-        value={statusFilterValue}
-        onChange={setStatusFilterValue}
-        data={statusFilterData || []}
-      />
-
       <DataTableServerPagination
         fetchData={fetchDataTable}
         id={[
