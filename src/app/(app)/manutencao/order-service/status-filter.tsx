@@ -1,4 +1,5 @@
-import { StatusFilterData } from './table-service-order'
+'use client'
+import { StatusFilterData } from '@/store/maintenance/service-order'
 
 interface StatusFilterProps {
   data: Array<StatusFilterData>
