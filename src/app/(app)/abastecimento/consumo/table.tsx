@@ -51,23 +51,32 @@ export default function AnaliseConsumoPorFrota() {
   const getIconAndColor = (item: FuellingItem) => {
     const { expectedConsumption, consumptionMade } = item
 
+    let difference = 0
     let isEficiente = false
-    if (expectedConsumption > 0 && consumptionMade > 0) {
-      const resultado = consumptionMade / expectedConsumption
-      isEficiente = resultado >= 1
+
+    if (expectedConsumption > 0) {
+      difference = (consumptionMade / expectedConsumption - 1) * 100
+      isEficiente = consumptionMade >= expectedConsumption
+    } else if (expectedConsumption === 0 && consumptionMade > 0) {
+      difference = 100
+      isEficiente = false
+    } else if (expectedConsumption === 0 && consumptionMade === 0) {
+      difference = 0
+      isEficiente = true
     }
 
     return isEficiente
       ? {
           icon: <TrendingUp className="text-green-500" />,
           color: 'text-green-500',
+          difference,
         }
       : {
           icon: <TrendingDown className="text-red-500" />,
           color: 'text-red-500',
+          difference,
         }
   }
-
   return (
     <div className="container mx-auto p-4">
       {data.map((grupo: Grupo, index: number) => (

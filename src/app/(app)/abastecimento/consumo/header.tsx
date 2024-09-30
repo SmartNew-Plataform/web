@@ -24,8 +24,8 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const filterFormSchema = z.object({
-  equipment: z.string().optional(),
-  family: z.string().optional(),
+  equipmentId: z.string().optional(),
+  familyId: z.string().optional(),
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
 })
@@ -51,7 +51,7 @@ export function Header() {
     },
   })
 
-  const selectedFamily = watch('family')
+  const selectedFamily = watch('familyId')
 
   const { data: allEquipmentOptions = [] } = useQuery({
     queryKey: ['system/choices/equipment', selectedFamily],
@@ -116,7 +116,7 @@ export function Header() {
   }
 
   function handleResetFilters() {
-    reset({ family: '', dateFrom: '', dateTo: '' })
+    reset({ familyId: '', dateFrom: '', dateTo: '' })
     setFilter({})
   }
 
@@ -158,7 +158,7 @@ export function Header() {
                   </div>
                   <Form.Select
                     className="max-w-sm"
-                    name="family"
+                    name="familyId"
                     placeholder="Selecione a Família"
                     options={familyOptions || []}
                   />
@@ -169,7 +169,7 @@ export function Header() {
                   {allEquipmentOptions.length > 0 ? (
                     <Form.Select
                       className="max-w-sm"
-                      name="equipment"
+                      name="equipmentId"
                       placeholder="Selecione o equipamento"
                       options={allEquipmentOptions || []}
                     />
