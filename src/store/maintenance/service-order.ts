@@ -6,6 +6,13 @@ type EquipmentData = {
   branch: SelectData
 } & SelectData
 
+export type StatusFilterData = {
+  id: string
+  name: string
+  color: string
+  count: number
+}
+
 interface ServiceOrderStoreData {
   selects: {
     equipment?: EquipmentData[] | undefined
@@ -16,6 +23,11 @@ interface ServiceOrderStoreData {
     status: SelectData[] | undefined
     maintainers: SelectData[] | undefined
   }
+  statusFilterValue: string | undefined
+  setStatusFilterValue: (data: string | undefined) => void
+
+  statusFilterData: StatusFilterData[] | undefined
+  setStatusFilterData: (data: StatusFilterData[] | undefined) => void
 
   setSelects: (data: ServiceOrderStoreData['selects']) => void
   fetchSelects: () => Promise<ServiceOrderStoreData['selects']>
@@ -31,6 +43,16 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
       requester: undefined,
       status: undefined,
       maintainers: undefined,
+    },
+    statusFilterValue: undefined,
+    statusFilterData: undefined,
+
+    setStatusFilterValue(data) {
+      set({ statusFilterValue: data })
+    },
+
+    setStatusFilterData(data) {
+      set({ statusFilterData: data })
     },
 
     setSelects(data) {

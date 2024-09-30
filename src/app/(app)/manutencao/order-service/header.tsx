@@ -5,9 +5,15 @@ import { useServiceOrder } from '@/store/maintenance/service-order'
 import { useQuery } from '@tanstack/react-query'
 import { Plus } from 'lucide-react'
 import { ServiceOrderForm } from './service-order-form'
+import { StatusFilter } from './status-filter'
 
 export function Header() {
-  const { fetchSelects } = useServiceOrder()
+  const {
+    fetchSelects,
+    statusFilterValue,
+    setStatusFilterValue,
+    statusFilterData,
+  } = useServiceOrder()
 
   useQuery({
     queryKey: ['maintenance-service-order-selects'],
@@ -20,6 +26,12 @@ export function Header() {
         <h1 className="text-xl font-semibold text-slate-600">
           Ordem de Serviço
         </h1>
+
+        <StatusFilter
+          value={statusFilterValue}
+          onChange={setStatusFilterValue}
+          data={statusFilterData || []}
+        />
 
         <div className="flex gap-4">
           <ServiceOrderForm data={[]}>
