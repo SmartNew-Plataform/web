@@ -49,34 +49,40 @@ export default function AnaliseConsumoPorFrota() {
   })
 
   const getIconAndColor = (item: FuellingItem) => {
-    const { expectedConsumption, consumptionMade } = item
+    const { expectedConsumption, consumptionMade, typeConsumption } = item
 
-    let difference = 0
-    let isEficiente = false
-
-    if (expectedConsumption > 0) {
-      difference = (consumptionMade / expectedConsumption - 1) * 100
-      isEficiente = consumptionMade >= expectedConsumption
-    } else if (expectedConsumption === 0 && consumptionMade > 0) {
-      difference = 100
-      isEficiente = false
-    } else if (expectedConsumption === 0 && consumptionMade === 0) {
-      difference = 0
-      isEficiente = true
+    if (expectedConsumption <= 0 || consumptionMade <= 0) {
+      return {
+        icon: null,
+        color: '',
+        percentage: null,
+      }
     }
 
-    return isEficiente
-      ? {
-          icon: <TrendingUp className="text-green-500" />,
-          color: 'text-green-500',
-          difference,
-        }
-      : {
-          icon: <TrendingDown className="text-red-500" />,
-          color: 'text-red-500',
-          difference,
-        }
+    // Cálculo da diferença em porcentagem
+    const difference = (consumptionMade / expectedConsumption - 1) * 100
+    let isEficiente = false
+
+    if (typeConsumption === 'L/HR') {
+      isEficiente = consumptionMade <= expectedConsumption
+    } else if (typeConsumption === 'KM/L') {
+      isEficiente = consumptionMade >= expectedConsumption
+    }
+
+    return {
+      icon: isEficiente ? (
+        <TrendingUp className="text-green-500" />
+      ) : (
+        <TrendingDown className="text-red-500" />
+      ),
+      color: isEficiente ? 'text-green-500' : 'text-red-500',
+      percentage: difference.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }), // Armazenar o valor da diferença formatado
+    }
   }
+
   return (
     <div className="container mx-auto p-4">
       {data.map((grupo: Grupo, index: number) => (
@@ -98,7 +104,8 @@ export default function AnaliseConsumoPorFrota() {
             </TableHeader>
             <TableBody>
               {grupo.fuelling.map((item: FuellingItem, idx: number) => {
-                const { icon, color } = getIconAndColor(item)
+                // Chamar a função getIconAndColor e extrair o ícone, cor e porcentagem calculada
+                const { icon, color, percentage } = getIconAndColor(item)
                 return (
                   <TableRow key={idx} className="hover:bg-gray-100">
                     <TableCell className="border px-4 py-2">
@@ -141,11 +148,7 @@ export default function AnaliseConsumoPorFrota() {
                       className={`flex items-center gap-2 border px-4 py-2 ${color}`}
                     >
                       {icon}
-                      {item.difference?.toLocaleString('pt-BR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                      %
+                      {percentage}%
                     </TableCell>
                   </TableRow>
                 )
