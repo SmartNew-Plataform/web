@@ -146,7 +146,7 @@ export function FuelForm({
                 <StepOne isEdit={mode === 'edit'} />
               </WizardFormStep>
               <WizardFormStep className="w-full">
-                <StepTwo />
+                <StepTwo isEdit={mode === 'edit'} />
               </WizardFormStep>
               <WizardFormStep className="w-full">
                 <StepThree />
