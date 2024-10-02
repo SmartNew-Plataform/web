@@ -1,175 +1,129 @@
 'use client'
-import { FuelInlet } from '@/@types/fuelling-tank'
-import { AlertModal } from '@/components/alert-modal'
-import { DataTable } from '@/components/data-table'
-import { Button } from '@/components/ui/button'
-import { toast } from '@/components/ui/use-toast'
-import { api } from '@/lib/api'
-import { InputInlet } from '@/store/fuelling/input-inlet'
-import { useQuery } from '@tanstack/react-query'
-import { ColumnDef } from '@tanstack/react-table'
-import dayjs from 'dayjs'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+
 import { useState } from 'react'
-import { TankModal } from './Primary-modal'
-import { FuelModal } from './SheetFuelModal'
+
+type FuelConfig = {
+  fuelType: string
+  selectedOption: string
+}
+
+const initialData: FuelConfig[] = [
+  {
+    fuelType: 'Configuração de cálculo abastecimento',
+    selectedOption: 'lastInvoice',
+  },
+  {
+    fuelType: 'Visualização de abastecimentos APP',
+    selectedOption: 'today',
+  },
+]
 
 export function Table() {
-  async function fetchSelects() {
-    const response = await api.get('fuelling/input').then((res) => res.data)
-    return response.data
+  const [configData, setConfigData] = useState<FuelConfig[]>(initialData)
+
+  const handleOptionChange = (index: number, newOption: string) => {
+    const updatedData = configData.map((config, i) =>
+      i === index ? { ...config, selectedOption: newOption } : config,
+    )
+    setConfigData(updatedData)
   }
-
-  const { data, refetch } = useQuery({
-    queryKey: ['fuelling/create/data'],
-    queryFn: fetchSelects,
-    refetchInterval: 1 * 30 * 1000,
-  })
-
-  const { tank, train, setCompartment } = InputInlet()
-
-  const [editData, setEditData] = useState<FuelInlet | undefined>()
-  const [tankIdToDelete, setTankIdToDelete] = useState<number | undefined>()
-  const [tankIdToCompartment, setTankIdToCompartment] = useState<
-    string | undefined
-  >(undefined)
-
-  async function handleDeleteTank() {
-    const response = await api.delete(`fuelling/input/${tankIdToDelete}`)
-
-    if (response.status !== 200) return
-
-    toast({
-      title: 'Entrada deletado com sucesso!',
-      variant: 'success',
-    })
-    refetch()
-  }
-
-  const columns: ColumnDef<FuelInlet>[] = [
-    {
-      accessorKey: 'id',
-      header: '',
-      cell({ row }) {
-        const id = row.getValue('id') as string
-        const data = row.original
-
-        return (
-          <div className="flex gap-2">
-            <Button onClick={() => setEditData(data)} size="icon-xs">
-              <Pencil size={12} />
-            </Button>
-            <Button
-              onClick={() => setTankIdToDelete(data.id)}
-              variant="destructive"
-              size="icon-xs"
-            >
-              <Trash2 size={12} />
-            </Button>
-            <Button
-              onClick={() => {
-                if (data.type.value === 'tank') {
-                  const findTank = tank.find(
-                    (value) => value.value === data.bound.value,
-                  )
-
-                  if (!findTank) {
-                    console.log(data.bound.value, tank)
-                    return false
-                  }
-
-                  setCompartment(findTank.comparment.map((value) => value))
-                } else if (data.type.value === 'train') {
-                  const findTrain = train.find(
-                    (value) => value.value === data.bound.value,
-                  )
-
-                  if (!findTrain) {
-                    return false
-                  }
-
-                  setCompartment(findTrain.comparment.map((value) => value))
-                }
-                setTankIdToCompartment(id)
-              }}
-              variant="outline"
-              size="icon-xs"
-            >
-              <Plus size={12} />
-            </Button>
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: 'date',
-      header: 'Data',
-      cell({ getValue }) {
-        const date = new Date(getValue() as string).toUTCString()
-        return dayjs(date).add(3, 'hour').format('DD/MM/YYYY')
-      },
-    },
-    {
-      accessorKey: 'type',
-      header: 'Tipo',
-      cell({ row }) {
-        const typeValue = row.original.type.value
-
-        if (typeValue === 'tank') {
-          return 'NF'
-        } else if (typeValue === 'train') {
-          return 'INTERNO'
-        } else {
-          return '-'
-        }
-      },
-    },
-    {
-      accessorKey: 'fiscalNumber',
-      header: 'Nº DCTO',
-    },
-    {
-      accessorKey: 'bound.text',
-      header: 'Equipamento abastecido',
-    },
-    {
-      accessorKey: 'provider.text',
-      header: 'Fornecedor',
-    },
-    {
-      accessorKey: 'total',
-      header: 'Valor total',
-      cell({ getValue }) {
-        const total = Number(getValue())
-        return isNaN(total) ? '-' : total.toFixed(2).replace('.', ',')
-      },
-    },
-  ]
 
   return (
-    <>
-      <DataTable columns={columns} data={data || []} />
-      <TankModal
-        mode="edit"
-        open={!!editData}
-        defaultValues={editData}
-        onOpenChange={(open) => setEditData(open ? editData : undefined)}
-      />
-      <FuelModal
-        tankId={tankIdToCompartment || ''}
-        open={!!tankIdToCompartment}
-        onOpenChange={(open) => {
-          setTankIdToCompartment(open ? tankIdToCompartment : undefined)
-        }}
-      />
+    <div className="container mx-auto p-6">
+      <div className="rounded-lg bg-white p-6 shadow-md">
+        <h1 className="mb-4 text-2xl font-semibold">
+          Configurações de Combustível
+        </h1>
 
-      <AlertModal
-        open={!!tankIdToDelete}
-        onOpenChange={(open) =>
-          setTankIdToDelete(open ? tankIdToDelete : undefined)
-        }
-        onConfirm={handleDeleteTank}
-      />
-    </>
+        {configData.map((config, index) => (
+          <div key={index} className="mb-6">
+            <h2 className="mb-3 text-lg font-medium">{config.fuelType}</h2>
+
+            {/* Condicional para diferenciar entre os dois grupos de opções */}
+            {config.fuelType === 'Configuração de cálculo abastecimento' ? (
+              <div className="space-y-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="lastInvoice"
+                    checked={config.selectedOption === 'lastInvoice'}
+                    onChange={() => handleOptionChange(index, 'lastInvoice')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Calcular P.U da última NF registrada</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="averageTwoInvoices"
+                    checked={config.selectedOption === 'averageTwoInvoices'}
+                    onChange={() =>
+                      handleOptionChange(index, 'averageTwoInvoices')
+                    }
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>
+                    Calcular média do P.U das últimas duas NFs registradas
+                  </span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="ignorePU"
+                    checked={config.selectedOption === 'ignorePU'}
+                    onChange={() => handleOptionChange(index, 'ignorePU')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Não considerar P.U</span>
+                </label>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="today"
+                    checked={config.selectedOption === 'today'}
+                    onChange={() => handleOptionChange(index, 'today')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Abastecimentos realizados hoje</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="week"
+                    checked={config.selectedOption === 'week'}
+                    onChange={() => handleOptionChange(index, 'week')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Abastecimentos realizados durante a semana</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="month"
+                    checked={config.selectedOption === 'month'}
+                    onChange={() => handleOptionChange(index, 'month')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Abastecimentos realizados no mês</span>
+                </label>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

@@ -6,8 +6,9 @@ import { useLoading } from '@/store/loading-store'
 import { useUserStore } from '@/store/user-store'
 import { AxiosError } from 'axios'
 import Image from 'next/image'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ReactNode, useEffect } from 'react'
+import { useCookies } from 'react-cookie'
 
 interface HeaderAppProps {
   children: ReactNode
@@ -17,26 +18,29 @@ export function HeaderApp({ children }: HeaderAppProps) {
   const { toast } = useToast()
   const { hide } = useLoading()
   const searchParams = useSearchParams()
-  const { fetchUserData } = useUserStore(({ fetchUserData }) => ({
-    fetchUserData,
-  }))
+  const { fetchUserData } = useUserStore()
+  const [cookies, setCookies] = useCookies()
+  const router = useRouter()
 
   useEffect(() => {
-    if (searchParams.has('token')) {
-      const urlToken = searchParams.get('token')
-      api.defaults.headers.common.Authorization = `Bearer ${urlToken}`
-    }
+    const urlToken = searchParams.get('token')
+    setCookies('token', cookies.token || urlToken)
+    api.defaults.headers.common.Authorization = `Bearer ${cookies.token}`
+    // router.replace(window.location.origin)
 
-    fetchUserData().catch((err: AxiosError<{ message: string }>) => {
-      console.log(err)
-
-      toast({
-        title: err.message,
-        description: err.response?.data.message,
-        variant: 'destructive',
-        duration: 1000 * 120,
+    fetchUserData()
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast({
+          title: err.message,
+          description: err.response?.data.message,
+          variant: 'destructive',
+          duration: 1000 * 120,
+        })
       })
-    })
+      .finally(() => {
+        if (urlToken)
+          router.replace(window.location.origin + window.location.pathname)
+      })
 
     api.interceptors.response.use(
       (response) => response,
