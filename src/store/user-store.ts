@@ -25,6 +25,10 @@ export const useUserStore = create<UserStoreData>((set) => {
         return a.order > b.order ? 1 : -1
       })
 
+      // await api.post('login/with-login', {
+      //   login: data.user.login,
+      // })
+
       set({ modules, user: data.user, isLoading: false })
 
       return data
