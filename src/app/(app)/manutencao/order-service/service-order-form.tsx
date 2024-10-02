@@ -24,22 +24,38 @@ interface ServiceOrderFormProps extends ComponentProps<typeof Sheet> {
 }
 
 export const createServiceFormSchema = z.object({
-  requester: z.string({ required_error: 'O solicitante e obrigatório!' }),
-  equipment: z.string({ required_error: 'O equipamento e obrigatório!' }),
-  hourMeter: z.coerce.number({ required_error: 'O horímetro é obrigatório!' }),
-  odometer: z.coerce.number({ required_error: 'O odômetro é obrigatório!' }),
-  branch: z.string({ required_error: 'A filial e obrigatória!' }),
-  typeMaintenance: z.string({
-    required_error: 'O tipo de manutenção e obrigatório!',
-  }),
-  executantSector: z.string({
-    required_error: 'O setor de manutenção e obrigatório!',
-  }),
-  status: z.string({ required_error: 'O status é obrigatório!' }),
-  requestDate: z.string({
-    required_error: 'A data de solicitação é obrigatório!',
-  }),
-  equipmentFail: z.string({ required_error: 'A observação e obrigatória!' }),
+  requester: z
+    .string({ required_error: 'O solicitante e obrigatório!' })
+    .min(1),
+  equipment: z
+    .string({ required_error: 'O equipamento e obrigatório!' })
+    .min(1),
+  hourMeter: z.coerce
+    .number({ required_error: 'O horímetro é obrigatório!' })
+    .min(0),
+  odometer: z.coerce
+    .number({ required_error: 'O odômetro é obrigatório!' })
+    .min(0),
+  branch: z.string({ required_error: 'A filial e obrigatória!' }).min(1),
+  typeMaintenance: z
+    .string({
+      required_error: 'O tipo de manutenção e obrigatório!',
+    })
+    .min(1),
+  executantSector: z
+    .string({
+      required_error: 'O setor de manutenção e obrigatório!',
+    })
+    .min(1),
+  status: z.string({ required_error: 'O status é obrigatório!' }).min(1),
+  requestDate: z
+    .string({
+      required_error: 'A data de solicitação é obrigatório!',
+    })
+    .min(1),
+  equipmentFail: z
+    .string({ required_error: 'A observação e obrigatória!' })
+    .min(1),
 
   orderBonded: z.string().optional(),
   maintainers: z.array(z.string()).optional(),
