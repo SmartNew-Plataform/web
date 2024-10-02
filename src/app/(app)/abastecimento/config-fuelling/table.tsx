@@ -4,23 +4,24 @@ import { useState } from 'react'
 
 type FuelConfig = {
   fuelType: string
-  selectedOption: 'lastInvoice' | 'averageTwoInvoices' | 'ignorePU'
+  selectedOption: string
 }
 
 const initialData: FuelConfig[] = [
   {
-    fuelType: 'Configuração de abastecimento',
+    fuelType: 'Configuração de cálculo abastecimento',
     selectedOption: 'lastInvoice',
+  },
+  {
+    fuelType: 'Visualização de abastecimentos APP',
+    selectedOption: 'today',
   },
 ]
 
 export function Table() {
   const [configData, setConfigData] = useState<FuelConfig[]>(initialData)
 
-  const handleOptionChange = (
-    index: number,
-    newOption: 'lastInvoice' | 'averageTwoInvoices' | 'ignorePU',
-  ) => {
+  const handleOptionChange = (index: number, newOption: string) => {
     const updatedData = configData.map((config, i) =>
       i === index ? { ...config, selectedOption: newOption } : config,
     )
@@ -28,48 +29,98 @@ export function Table() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="container mx-auto p-6">
+      <div className="rounded-lg bg-white p-6 shadow-md">
+        <h1 className="mb-4 text-2xl font-semibold">
+          Configurações de Combustível
+        </h1>
+
         {configData.map((config, index) => (
-          <div key={index} className="rounded-lg border p-4 shadow">
-            <h2 className="mb-2 text-lg font-semibold">{config.fuelType}</h2>
-            <div>
-              <div className="mb-2">
-                <input
-                  type="radio"
-                  name={`option-${index}`}
-                  value="lastInvoice"
-                  checked={config.selectedOption === 'lastInvoice'}
-                  onChange={() => handleOptionChange(index, 'lastInvoice')}
-                  className="mr-2"
-                />
-                Calcular P.U da última NF registrada
+          <div key={index} className="mb-6">
+            <h2 className="mb-3 text-lg font-medium">{config.fuelType}</h2>
+
+            {/* Condicional para diferenciar entre os dois grupos de opções */}
+            {config.fuelType === 'Configuração de cálculo abastecimento' ? (
+              <div className="space-y-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="lastInvoice"
+                    checked={config.selectedOption === 'lastInvoice'}
+                    onChange={() => handleOptionChange(index, 'lastInvoice')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Calcular P.U da última NF registrada</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="averageTwoInvoices"
+                    checked={config.selectedOption === 'averageTwoInvoices'}
+                    onChange={() =>
+                      handleOptionChange(index, 'averageTwoInvoices')
+                    }
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>
+                    Calcular média do P.U das últimas duas NFs registradas
+                  </span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="ignorePU"
+                    checked={config.selectedOption === 'ignorePU'}
+                    onChange={() => handleOptionChange(index, 'ignorePU')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Não considerar P.U</span>
+                </label>
               </div>
-              <div className="mb-2">
-                <input
-                  type="radio"
-                  name={`option-${index}`}
-                  value="averageTwoInvoices"
-                  checked={config.selectedOption === 'averageTwoInvoices'}
-                  onChange={() =>
-                    handleOptionChange(index, 'averageTwoInvoices')
-                  }
-                  className="mr-2"
-                />
-                Calcular média do P.U das últimas duas NFs registradas
+            ) : (
+              <div className="space-y-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="today"
+                    checked={config.selectedOption === 'today'}
+                    onChange={() => handleOptionChange(index, 'today')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Abastecimentos realizados hoje</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="week"
+                    checked={config.selectedOption === 'week'}
+                    onChange={() => handleOptionChange(index, 'week')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Abastecimentos realizados durante a semana</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`option-${index}`}
+                    value="month"
+                    checked={config.selectedOption === 'month'}
+                    onChange={() => handleOptionChange(index, 'month')}
+                    className="mr-3 accent-blue-500"
+                  />
+                  <span>Abastecimentos realizados no mês</span>
+                </label>
               </div>
-              <div>
-                <input
-                  type="radio"
-                  name={`option-${index}`}
-                  value="ignorePU"
-                  checked={config.selectedOption === 'ignorePU'}
-                  onChange={() => handleOptionChange(index, 'ignorePU')}
-                  className="mr-2"
-                />
-                Não considerar P.U
-              </div>
-            </div>
+            )}
           </div>
         ))}
       </div>
