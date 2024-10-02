@@ -49,10 +49,12 @@ export function Form() {
   async function handleUpdateServiceOrder(data: ServiceFormData) {
     console.log(data)
     const raw = ApiServiceOrderMapper.toApi(data)
-    const response = await api.put(
-      `/maintenance/service-order/${params.serviceOrderId}`,
-      raw,
-    )
+    const response = await api
+      .put(`/maintenance/service-order/${params.serviceOrderId}`, raw)
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return
 
