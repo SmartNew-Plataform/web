@@ -15,13 +15,13 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const timeKeepingSchema = z.object({
-  collaborator: z.string(),
-  description: z.string(),
-  date: z.string(),
-  start: z.string(),
-  end: z.string(),
-  realTime: z.string(),
-  status: z.string(),
+  collaborator: z.string().min(1, 'Este campo e obrigatório!'),
+  description: z.string().min(1, 'Este campo e obrigatório!'),
+  date: z.string().min(1, 'Este campo e obrigatório!'),
+  start: z.string().min(1, 'Este campo e obrigatório!'),
+  end: z.string().min(1, 'Este campo e obrigatório!'),
+  realTime: z.string().min(1, 'Este campo e obrigatório!'),
+  status: z.string().min(1, 'Este campo e obrigatório!'),
 })
 
 export type TimeKeepingFormData = z.infer<typeof timeKeepingSchema>
@@ -121,7 +121,9 @@ export function FormSheet({
               <Form.SkeletonField />
             ) : (
               <Form.Field>
-                <Form.Label htmlFor="collaborator">Colaboradores:</Form.Label>
+                <Form.Label required htmlFor="collaborator">
+                  Colaboradores:
+                </Form.Label>
                 <Form.Select
                   name="collaborator"
                   id="collaborator"
@@ -132,31 +134,41 @@ export function FormSheet({
             )}
 
             <Form.Field>
-              <Form.Label htmlFor="description">Descrição:</Form.Label>
+              <Form.Label required htmlFor="description">
+                Descrição:
+              </Form.Label>
               <Form.Textarea name="description" id="description" />
               <Form.ErrorMessage field="description" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="date">Data:</Form.Label>
+              <Form.Label required htmlFor="date">
+                Data:
+              </Form.Label>
               <Form.Input type="date" name="date" id="date" />
               <Form.ErrorMessage field="date" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="start">Inicio:</Form.Label>
+              <Form.Label required htmlFor="start">
+                Inicio:
+              </Form.Label>
               <Form.Input type="time" name="start" id="start" />
               <Form.ErrorMessage field="start" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="end">Termino:</Form.Label>
+              <Form.Label required htmlFor="end">
+                Termino:
+              </Form.Label>
               <Form.Input type="time" name="end" id="end" />
               <Form.ErrorMessage field="end" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="realTime">Tempo real:</Form.Label>
+              <Form.Label required htmlFor="realTime">
+                Tempo real:
+              </Form.Label>
               <Form.Input type="text" readOnly name="realTime" id="realTime" />
               <Form.ErrorMessage field="realTime" />
             </Form.Field>
@@ -165,7 +177,9 @@ export function FormSheet({
               <Form.SkeletonField />
             ) : (
               <Form.Field>
-                <Form.Label htmlFor="status">Status da O.S.:</Form.Label>
+                <Form.Label required htmlFor="status">
+                  Status da O.S.:
+                </Form.Label>
                 <Form.Select
                   options={selects.status}
                   name="status"

@@ -14,7 +14,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const diverseSchema = z.object({
-  description: z.string({ required_error: 'Este campo e obrigatório!' }),
+  description: z.string({ required_error: 'Este campo e obrigatório!' }).min(1),
   quantity: z.coerce.number({ required_error: 'Este campo e obrigatório!' }),
   unitaryValue: z.coerce.number({
     required_error: 'Este campo e obrigatório!',
@@ -115,7 +115,9 @@ export function FormSheet({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label htmlFor="unitaryValue">Custo unitário:</Form.Label>
+              <Form.Label htmlFor="unitaryValue" required>
+                Custo unitário:
+              </Form.Label>
               <Form.Input
                 type="number"
                 step="any"
