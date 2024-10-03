@@ -38,8 +38,14 @@ export function HeaderApp({ children }: HeaderAppProps) {
         })
       })
       .finally(() => {
-        if (urlToken)
-          router.replace(window.location.origin + window.location.pathname)
+        if (urlToken) {
+          const url = new URLSearchParams(searchParams.toString())
+          url.delete('token')
+          console.log(url.toString())
+          router.replace(
+            `${window.location.origin}${window.location.pathname}?${url.toString()}`,
+          )
+        }
       })
 
     api.interceptors.response.use(
