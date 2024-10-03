@@ -49,7 +49,7 @@ export function Grid() {
                   start: from || undefined,
                   end: to || undefined,
                 }
-              : value ?? '',
+              : (value ?? ''),
           status,
           paymentMethod,
         },
@@ -90,7 +90,7 @@ export function Grid() {
             <Link
               href={{
                 pathname: `${routeParams.type}/${id}`,
-                query: { token: searchParams.get('token'), h: 'hidden' },
+                query: { h: 'hidden' },
               }}
             >
               <Button size="icon-xs">
