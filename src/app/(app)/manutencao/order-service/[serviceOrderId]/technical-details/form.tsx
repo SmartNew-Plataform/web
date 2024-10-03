@@ -17,9 +17,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const technicalDetailsSchema = z.object({
-  maintenanceDiagnosis: z.string().optional(),
-  solution: z.string().optional(),
-  executorObservation: z.string().optional(),
+  maintenanceDiagnosis: z.string().optional().nullable(),
+  solution: z.string().optional().nullable(),
+  executorObservation: z.string().optional().nullable(),
   technicalDrive: z.string().optional(),
   technicalArrival: z.string().optional(),
   serviceEvaluationNote: z.number().optional(),

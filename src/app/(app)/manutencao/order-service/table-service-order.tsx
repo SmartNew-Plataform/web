@@ -134,9 +134,7 @@ export function TableServiceOrder() {
               onClick={() => {
                 // setIndexModal(line.row.index)
                 // setChildrenData(children)
-                router.push(
-                  `/manutencao/order-service/${id}/details?token=${searchParams.get('token')}&h=hidden`,
-                )
+                router.push(`/manutencao/order-service/${id}/details?h=hidden`)
               }}
             >
               <Expand size={12} />
