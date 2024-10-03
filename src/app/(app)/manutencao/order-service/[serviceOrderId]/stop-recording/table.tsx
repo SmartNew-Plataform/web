@@ -103,17 +103,17 @@ export function Table() {
       },
     },
     {
-      accessorKey: 'dateStartHour',
+      accessorKey: 'dateEndHour',
       header: 'Data hora parou',
       cell: ({ row }) => {
-        return dayjs(row.getValue('dateStartHour')).format('DD/MM/YYYY HH:mm')
+        return dayjs(row.getValue('dateEndHour')).format('DD/MM/YYYY HH:mm')
       },
     },
     {
-      accessorKey: 'dateEndHour',
+      accessorKey: 'dateStartHour',
       header: 'Data hora funcionou',
       cell: ({ row }) => {
-        return dayjs(row.getValue('dateEndHour')).format('DD/MM/YYYY HH:mm')
+        return dayjs(row.getValue('dateStartHour')).format('DD/MM/YYYY HH:mm')
       },
     },
     {

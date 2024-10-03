@@ -12,7 +12,7 @@ export function Header({ children }: { children: ReactNode }) {
   const pathname = usePathname()
 
   function handleChangeTab(tab: string) {
-    router.push(`${tab}?token=${searchParams.get('token')}`)
+    router.push(`${tab}?${searchParams.toString()}`)
   }
 
   const pathnameList = pathname.split('/')
@@ -29,11 +29,7 @@ export function Header({ children }: { children: ReactNode }) {
         <Button
           variant="outline"
           size="icon"
-          onClick={() =>
-            router.push(
-              `/manutencao/order-service?token=${searchParams.get('token')}&h=hidden`,
-            )
-          }
+          onClick={() => router.push(`/manutencao/order-service?h=hidden`)}
         >
           <ChevronLeft size={16} />
         </Button>

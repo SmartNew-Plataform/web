@@ -134,9 +134,7 @@ export function TableServiceOrder() {
               onClick={() => {
                 // setIndexModal(line.row.index)
                 // setChildrenData(children)
-                router.push(
-                  `/manutencao/order-service/${id}/details?token=${searchParams.get('token')}&h=hidden`,
-                )
+                router.push(`/manutencao/order-service/${id}/details?h=hidden`)
               }}
             >
               <Expand size={12} />
@@ -177,7 +175,9 @@ export function TableServiceOrder() {
       header: 'Data solicitação',
       cell: (line) => {
         if (line.getValue() !== null) {
-          return dayjs(line.getValue() as Date).format('DD/MM/YYYY HH:mm:ss')
+          const date = line.getValue() as string
+
+          return dayjs(date).locale('pt-br').format('DD/MM/YYYY')
         } else return 'Sem Registro'
       },
     },

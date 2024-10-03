@@ -14,7 +14,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const materialSchema = z.object({
-  description: z.string({ required_error: 'Este campo e obrigatório!' }),
+  description: z.string({ required_error: 'Este campo e obrigatório!' }).min(1),
   quantity: z.coerce.number({ required_error: 'Este campo e obrigatório!' }),
   unitaryValue: z.string().optional(),
   dateUse: z.string({ required_error: 'Este campo e obrigatório!' }),
