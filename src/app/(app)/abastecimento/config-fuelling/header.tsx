@@ -1,6 +1,5 @@
 'use client'
 import { PageHeader } from '@/components/page-header'
-import { SearchInput } from '@/components/search-input'
 
 export function Header() {
   return (
@@ -8,9 +7,6 @@ export function Header() {
       <h1 className="text-xl font-semibold text-slate-600">
         Configurações gerais
       </h1>
-      <div className="flex gap-4">
-        <SearchInput />
-      </div>
     </PageHeader>
   )
 }
