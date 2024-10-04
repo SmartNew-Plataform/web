@@ -15,22 +15,20 @@ export function Table() {
 
   async function fetchControlData() {
     try {
-      const response = await api.get(
-        'https://api-homolog.smartnewservices.com.br/fuelling/control',
-      )
+      const response = await api.get('fuelling/control')
 
       if (response.status !== 200) return
 
-      const { filterDay, modelPU } = response.data
+      const { filterDay, modelPU } = response.data.data
 
       setConfigData([
         {
           fuelType: 'Configuração de cálculo abastecimento',
-          selectedOption: modelPU || 'ignorePU',
+          selectedOption: modelPU || '',
         },
         {
           fuelType: 'Visualização de abastecimentos APP',
-          selectedOption: filterDay || 1,
+          selectedOption: filterDay || 0,
         },
       ])
     } catch (error) {
@@ -68,12 +66,9 @@ export function Table() {
     }
 
     try {
-      const response = await api.post(
-        'https://api-homolog.smartnewservices.com.br/fuelling/control',
-        payload,
-      )
+      const response = await api.post('fuelling/control', payload)
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         toast({
           title: 'Configuração salva com sucesso',
           variant: 'success',
