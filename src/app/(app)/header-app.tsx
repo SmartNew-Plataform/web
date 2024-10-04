@@ -54,6 +54,8 @@ export function HeaderApp({ children }: HeaderAppProps) {
         }
       })
 
+    console.log(window.location.origin, window.location.pathname)
+
     api.interceptors.response.use(
       (response) => response,
       (error) => {
