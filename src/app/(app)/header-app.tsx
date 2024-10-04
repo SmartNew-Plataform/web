@@ -27,7 +27,7 @@ export function HeaderApp({ children }: HeaderAppProps) {
     const token = cookies.token ? cookies.token : urlToken
     setCookies('token', token)
     api.defaults.headers.common.Authorization = `Bearer ${token}`
-    // console.log({ cookie: cookies.token, urlToken, token })
+    console.log({ cookie: cookies.token, urlToken, token })
 
     // router.replace(window.location.origin)
 
