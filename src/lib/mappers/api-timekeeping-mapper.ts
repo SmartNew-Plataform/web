@@ -11,15 +11,17 @@ export class ApiTimeKeepingMapper {
       description: data.description,
       // comments: data.,
       // tasks: data.,
-      date: new Date(data.date).toISOString(),
+      date: new Date(data.date).toUTCString(),
       dateStartHour: dayjs()
         .hour(Number(data.start.split(':')[0]))
         .minute(Number(data.start.split(':')[1]))
-        .toISOString(),
+        .toDate()
+        .toUTCString(),
       dateEndHour: dayjs()
         .hour(Number(data.end.split(':')[0]))
         .minute(Number(data.end.split(':')[1]))
-        .toISOString(),
+        .toDate()
+        .toUTCString(),
       // finished: dayjs().get('hours'),
       // typeMaintenance: data.,
       // idProject: data.,

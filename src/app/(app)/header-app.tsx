@@ -45,7 +45,7 @@ export function HeaderApp({ children }: HeaderAppProps) {
         })
       })
       .finally(() => {
-        if (urlToken) {
+        if (cookies.token || urlToken) {
           const url = new URLSearchParams(searchParams.toString())
           url.delete('token')
           router.replace(

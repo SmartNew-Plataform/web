@@ -15,9 +15,7 @@ export function Header() {
   const queryClient = useQueryClient()
 
   async function handleCreateTimeKeeping(data: TimeKeepingFormData) {
-    console.log(data)
     const raw = ApiTimeKeepingMapper.toApi(data)
-    console.log(raw)
 
     const response = await api
       .post(`/maintenance/service-order/${params.serviceOrderId}/note`, raw)
