@@ -29,7 +29,11 @@ export function Header({ children }: { children: ReactNode }) {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => router.push(`/manutencao/order-service?h=hidden`)}
+          onClick={() =>
+            router.push(
+              `/manutencao/order-service?token=${searchParams.get('token')}&h=hidden`,
+            )
+          }
         >
           <ChevronLeft size={16} />
         </Button>
