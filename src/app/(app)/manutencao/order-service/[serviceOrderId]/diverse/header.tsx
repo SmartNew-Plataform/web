@@ -17,10 +17,12 @@ export function Header() {
 
   async function handleCreateDiverse(data: DiverseFormData) {
     const raw = ApiDiverseMapper.toApi(data)
-    const response = await api.post(
-      `/maintenance/service-order/${params.serviceOrderId}/cost`,
-      raw,
-    )
+    const response = await api
+      .post(`/maintenance/service-order/${params.serviceOrderId}/cost`, raw)
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 201) return response
 

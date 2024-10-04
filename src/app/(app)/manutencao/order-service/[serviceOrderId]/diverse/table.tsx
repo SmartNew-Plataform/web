@@ -40,10 +40,15 @@ export function Table() {
 
   async function handleUpdateDiverse(data: DiverseFormData) {
     const raw = ApiDiverseMapper.toApi(data)
-    const response = await api.put(
-      `/maintenance/service-order/${params.serviceOrderId}/cost/${diverseId}`,
-      raw,
-    )
+    const response = await api
+      .put(
+        `/maintenance/service-order/${params.serviceOrderId}/cost/${diverseId}`,
+        raw,
+      )
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return response
 
@@ -63,6 +68,10 @@ export function Table() {
         `/maintenance/service-order/${params.serviceOrderId}/cost/${diverseDeleteId}`,
       )
       .finally(loading.hide)
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return response
 

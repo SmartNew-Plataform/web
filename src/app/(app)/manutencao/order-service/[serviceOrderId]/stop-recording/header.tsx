@@ -18,10 +18,15 @@ export function Header() {
   async function handleCreateStopRecording(data: StopRecordingFormData) {
     console.log(data)
     const raw = ApiStopRecordingMapper.toApi(data)
-    const response = await api.post(
-      `/maintenance/service-order/${params.serviceOrderId}/note-stop`,
-      raw,
-    )
+    const response = await api
+      .post(
+        `/maintenance/service-order/${params.serviceOrderId}/note-stop`,
+        raw,
+      )
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 201) return response
 

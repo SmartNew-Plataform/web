@@ -19,10 +19,12 @@ export function Header() {
     const raw = ApiTimeKeepingMapper.toApi(data)
     console.log(raw)
 
-    const response = await api.post(
-      `/maintenance/service-order/${params.serviceOrderId}/note`,
-      raw,
-    )
+    const response = await api
+      .post(`/maintenance/service-order/${params.serviceOrderId}/note`, raw)
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     console.log(response)
 
