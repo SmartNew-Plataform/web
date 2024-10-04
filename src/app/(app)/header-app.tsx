@@ -24,8 +24,11 @@ export function HeaderApp({ children }: HeaderAppProps) {
 
   useEffect(() => {
     const urlToken = searchParams.get('token')
-    setCookies('token', cookies.token || urlToken)
-    api.defaults.headers.common.Authorization = `Bearer ${cookies.token}`
+    const token = cookies.token ? cookies.token : urlToken
+    setCookies('token', token)
+    api.defaults.headers.common.Authorization = `Bearer ${token}`
+    console.log({ cookie: cookies.token, urlToken, token })
+
     // router.replace(window.location.origin)
 
     fetchUserData()
@@ -41,7 +44,6 @@ export function HeaderApp({ children }: HeaderAppProps) {
         if (urlToken) {
           const url = new URLSearchParams(searchParams.toString())
           url.delete('token')
-          console.log(url.toString())
           router.replace(
             `${window.location.origin}${window.location.pathname}?${url.toString()}`,
           )
