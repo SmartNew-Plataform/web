@@ -24,34 +24,35 @@ export function HeaderApp({ children }: HeaderAppProps) {
 
   useEffect(() => {
     const urlToken = searchParams.get('token')
-    const token = urlToken
-    // setCookies('token', token, {
-    //   sameSite: 'none',
-    //   secure: true,
-    // })
+    const token = cookies.token ? cookies.token : urlToken
+    setCookies('token', token, {
+      sameSite: 'none',
+      secure: true,
+    })
     api.defaults.headers.common.Authorization = `Bearer ${token}`
 
     console.log({ cookie: cookies.token, urlToken, token })
 
     // router.replace(window.location.origin)
 
-    fetchUserData().catch((err: AxiosError<{ message: string }>) => {
-      toast({
-        title: err.message,
-        description: err.response?.data.message,
-        variant: 'destructive',
-        duration: 1000 * 120,
+    fetchUserData()
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast({
+          title: err.message,
+          description: err.response?.data.message,
+          variant: 'destructive',
+          duration: 1000 * 120,
+        })
       })
-    })
-    // .finally(() => {
-    //   if (urlToken) {
-    //     const url = new URLSearchParams(searchParams.toString())
-    //     // url.delete('token')
-    //     router.replace(
-    //       `${window.location.origin}${window.location.pathname}?${url.toString()}`,
-    //     )
-    //   }
-    // })
+      .finally(() => {
+        if (urlToken) {
+          const url = new URLSearchParams(searchParams.toString())
+          url.delete('token')
+          router.replace(
+            `${window.location.origin}${window.location.pathname}?${url.toString()}`,
+          )
+        }
+      })
 
     api.interceptors.response.use(
       (response) => response,
