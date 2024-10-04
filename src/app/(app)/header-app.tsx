@@ -47,7 +47,7 @@ export function HeaderApp({ children }: HeaderAppProps) {
       .finally(() => {
         if (urlToken) {
           const url = new URLSearchParams(searchParams.toString())
-          url.delete('token')
+          // url.delete('token')
           router.replace(
             `${window.location.origin}${window.location.pathname}?${url.toString()}`,
           )
