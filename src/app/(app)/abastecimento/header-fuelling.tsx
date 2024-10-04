@@ -39,6 +39,17 @@ export function HeaderFuelling() {
               <Link
                 target="_blank"
                 href={{
+                  pathname: '/abastecimento/config-fuelling',
+                  query: { token: searchParams.get('token') },
+                }}
+              >
+                Configurações
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                target="_blank"
+                href={{
                   pathname: '/abastecimento/create/tank',
                   query: { token: searchParams.get('token') },
                 }}
