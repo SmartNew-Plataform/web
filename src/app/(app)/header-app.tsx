@@ -24,11 +24,11 @@ export function HeaderApp({ children }: HeaderAppProps) {
 
   useEffect(() => {
     const urlToken = searchParams.get('token')
-    const token = cookies.token ? cookies.token : urlToken
-    setCookies('token', token, {
-      sameSite: 'none',
-      secure: true,
-    })
+    const token = urlToken
+    // setCookies('token', token, {
+    //   sameSite: 'none',
+    //   secure: true,
+    // })
     api.defaults.headers.common.Authorization = `Bearer ${token}`
 
     console.log({ cookie: cookies.token, urlToken, token })
