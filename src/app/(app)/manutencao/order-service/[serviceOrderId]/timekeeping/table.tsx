@@ -46,10 +46,15 @@ export function Table() {
 
   async function handleUpdateTimekeeping(data: TimeKeepingFormData) {
     const raw = ApiTimeKeepingMapper.toApi(data)
-    const response = await api.put(
-      `/maintenance/service-order/${params.serviceOrderId}/note/${timekeepingId}`,
-      raw,
-    )
+    const response = await api
+      .put(
+        `/maintenance/service-order/${params.serviceOrderId}/note/${timekeepingId}`,
+        raw,
+      )
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return response
 

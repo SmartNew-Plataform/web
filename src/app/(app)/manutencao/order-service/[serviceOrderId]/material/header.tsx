@@ -17,10 +17,12 @@ export function Header() {
 
   async function handleCreateMaterial(data: MaterialFormData) {
     const raw = ApiMaterialMapper.toApi(data)
-    const response = await api.post(
-      `/maintenance/service-order/${params.serviceOrderId}/material`,
-      raw,
-    )
+    const response = await api
+      .post(`/maintenance/service-order/${params.serviceOrderId}/material`, raw)
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 201) return response
 

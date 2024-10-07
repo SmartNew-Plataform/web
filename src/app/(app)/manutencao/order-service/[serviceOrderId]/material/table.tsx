@@ -43,10 +43,15 @@ export function Table() {
 
   async function handleUpdateMaterial(data: MaterialFormData) {
     const raw = ApiMaterialMapper.toApi(data)
-    const response = await api.put(
-      `/maintenance/service-order/${params.serviceOrderId}/material/${materialId}`,
-      raw,
-    )
+    const response = await api
+      .put(
+        `/maintenance/service-order/${params.serviceOrderId}/material/${materialId}`,
+        raw,
+      )
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return response
 
@@ -66,6 +71,10 @@ export function Table() {
         `/maintenance/service-order/${params.serviceOrderId}/material/${materialDeleteId}`,
       )
       .finally(loading.hide)
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return response
 

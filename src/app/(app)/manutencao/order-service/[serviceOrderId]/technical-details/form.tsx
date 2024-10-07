@@ -56,10 +56,15 @@ export function FormTechnical() {
 
   async function handleUpdateServiceOrder(data: TechnicalDetailsFormData) {
     const raw = ApiTechnicalDetailsMapper.toApi(data)
-    const response = await api.put(
-      `/maintenance/service-order/${params.serviceOrderId}/technical-details`,
-      raw,
-    )
+    const response = await api
+      .put(
+        `/maintenance/service-order/${params.serviceOrderId}/technical-details`,
+        raw,
+      )
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return
 
@@ -111,8 +116,6 @@ export function FormTechnical() {
       </Card>
     )
   }
-
-  console.log(data)
 
   return (
     <Card className="flex max-h-full w-full max-w-6xl flex-col overflow-auto">

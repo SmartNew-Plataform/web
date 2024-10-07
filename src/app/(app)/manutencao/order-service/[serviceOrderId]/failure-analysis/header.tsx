@@ -16,10 +16,15 @@ export function Header() {
 
   async function handleCreateFailureAnalysis(data: FailureAnalysisFormData) {
     const raw = ApiFailureAnalysisMapper.toApi(data)
-    const response = await api.post(
-      `/maintenance/service-order/${params.serviceOrderId}/failure-analysis`,
-      raw,
-    )
+    const response = await api
+      .post(
+        `/maintenance/service-order/${params.serviceOrderId}/failure-analysis`,
+        raw,
+      )
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 201) return response
 

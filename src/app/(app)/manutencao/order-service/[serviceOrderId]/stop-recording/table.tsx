@@ -41,10 +41,15 @@ export function Table() {
 
   async function handleUpdateStopRecording(data: StopRecordingFormData) {
     const raw = ApiStopRecordingMapper.toApi(data)
-    const response = await api.put(
-      `/maintenance/service-order/${params.serviceOrderId}/note-stop/${stopRecordingId}`,
-      raw,
-    )
+    const response = await api
+      .put(
+        `/maintenance/service-order/${params.serviceOrderId}/note-stop/${stopRecordingId}`,
+        raw,
+      )
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return response
 
@@ -58,9 +63,14 @@ export function Table() {
   }
 
   async function handleDeleteStopRecording() {
-    const response = await api.delete(
-      `/maintenance/service-order/${params.serviceOrderId}/note-stop/${stopRecordingDeleteId}`,
-    )
+    const response = await api
+      .delete(
+        `/maintenance/service-order/${params.serviceOrderId}/note-stop/${stopRecordingDeleteId}`,
+      )
+      .catch((err) => {
+        console.error(err)
+        return err
+      })
 
     if (response.status !== 200) return
 

@@ -35,23 +35,26 @@ export function HeaderApp({ children }: HeaderAppProps) {
 
     // router.replace(window.location.origin)
 
-    fetchUserData().catch((err: AxiosError<{ message: string }>) => {
-      toast({
-        title: err.message,
-        description: err.response?.data.message,
-        variant: 'destructive',
-        duration: 1000 * 120,
+    fetchUserData()
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast({
+          title: err.message,
+          description: err.response?.data.message,
+          variant: 'destructive',
+          duration: 1000 * 120,
+        })
       })
-    })
-    // .finally(() => {
-    //   if (urlToken) {
-    //     const url = new URLSearchParams(searchParams.toString())
-    //     // url.delete('token')
-    //     router.replace(
-    //       `${window.location.origin}${window.location.pathname}?${url.toString()}`,
-    //     )
-    //   }
-    // })
+      .finally(() => {
+        // if (cookies.token || urlToken) {
+        //   const url = new URLSearchParams(searchParams.toString())
+        //   url.delete('token')
+        //   router.replace(
+        //     `${window.location.origin}${window.location.pathname}?${url.toString()}`,
+        //   )
+        // }
+      })
+
+    console.log(window.location.origin, window.location.pathname)
 
     api.interceptors.response.use(
       (response) => response,

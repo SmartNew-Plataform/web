@@ -1,5 +1,5 @@
 import { TimekeepingResponse } from '@/@types/maintenance/timekeeping'
-import { TimeKeepingFormData } from '@/app/(app)/manutencao/order-service/[serviceOrderId]/timekeeping/form-sheet'
+import { TimeKeepingFormData } from '@/app/(app)/manutencao/order-service/[serviceOrderId]/plan-task/form-sheet'
 import dayjs from 'dayjs'
 
 export class FormTimeKeepingMapper {
@@ -10,7 +10,7 @@ export class FormTimeKeepingMapper {
       date: dayjs(data.date).format('YYYY-MM-DD'),
       start: dayjs(data.dateStartHour).format('HH:mm'),
       end: dayjs(data.dateEndHour).format('HH:mm'),
-      realTime: dayjs(data.realTime).format('HH:mm'),
+      realTime: dayjs(data.realTime.toString()).format('HH:mm'),
       status: data.idStatusServiceOrder?.toString(),
     }
   }
