@@ -18,8 +18,8 @@ const timeKeepingSchema = z.object({
   collaborator: z.string().min(1, 'Este campo e obrigatório!'),
   description: z.string().min(1, 'Este campo e obrigatório!'),
   date: z.string().min(1, 'Este campo e obrigatório!'),
-  start: z.string().min(1, 'Este campo e obrigatório!'),
-  end: z.string().min(1, 'Este campo e obrigatório!'),
+  start: z.string().optional(),
+  end: z.string().optional(),
   realTime: z.string().min(1, 'Este campo e obrigatório!'),
   status: z.string().min(1, 'Este campo e obrigatório!'),
 })
@@ -150,17 +150,13 @@ export function FormSheet({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label required htmlFor="start">
-                Inicio:
-              </Form.Label>
+              <Form.Label htmlFor="start">Inicio:</Form.Label>
               <Form.Input type="time" name="start" id="start" />
               <Form.ErrorMessage field="start" />
             </Form.Field>
 
             <Form.Field>
-              <Form.Label required htmlFor="end">
-                Termino:
-              </Form.Label>
+              <Form.Label htmlFor="end">Termino:</Form.Label>
               <Form.Input type="time" name="end" id="end" />
               <Form.ErrorMessage field="end" />
             </Form.Field>

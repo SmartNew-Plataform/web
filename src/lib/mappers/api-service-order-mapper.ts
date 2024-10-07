@@ -13,18 +13,18 @@ export class ApiServiceOrderMapper {
       comments: serviceOrder.maintenanceDiagnosis,
       observationsExecutor: serviceOrder.executorObservation,
       idStatusServiceOrder: Number(serviceOrder.status),
-      dateTimeRequest: new Date(serviceOrder.requestDate).toISOString(),
+      dateTimeRequest: new Date(serviceOrder.requestDate).toUTCString(),
       dateEquipamentoStop: serviceOrder.stoppedDate
-        ? new Date(serviceOrder.stoppedDate).toISOString()
+        ? new Date(serviceOrder.stoppedDate).toUTCString()
         : undefined,
       dateExpectedEnd: serviceOrder.deadlineDate
-        ? new Date(serviceOrder.deadlineDate).toISOString()
+        ? new Date(serviceOrder.deadlineDate).toUTCString()
         : undefined,
       dateEnd: serviceOrder.closingDate
-        ? new Date(serviceOrder.closingDate).toISOString()
+        ? new Date(serviceOrder.closingDate).toUTCString()
         : undefined,
       dueDate: serviceOrder.dueDate
-        ? new Date(serviceOrder.dueDate).toISOString()
+        ? new Date(serviceOrder.dueDate).toUTCString()
         : undefined,
       machineStop: serviceOrder.stoppedMachine,
       idRequester: Number(serviceOrder.requester),
