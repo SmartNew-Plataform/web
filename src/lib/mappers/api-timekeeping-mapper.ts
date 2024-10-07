@@ -13,13 +13,13 @@ export class ApiTimeKeepingMapper {
       // tasks: data.,
       date: new Date(data.date).toUTCString(),
       dateStartHour: dayjs()
-        .hour(Number(data.start.split(':')[0]))
-        .minute(Number(data.start.split(':')[1]))
+        .hour(Number(data.start?.split(':')[0]))
+        .minute(Number(data.start?.split(':')[1]))
         .toDate()
         .toUTCString(),
       dateEndHour: dayjs()
-        .hour(Number(data.end.split(':')[0]))
-        .minute(Number(data.end.split(':')[1]))
+        .hour(Number(data.end?.split(':')[0]))
+        .minute(Number(data.end?.split(':')[1]))
         .toDate()
         .toUTCString(),
       // finished: dayjs().get('hours'),

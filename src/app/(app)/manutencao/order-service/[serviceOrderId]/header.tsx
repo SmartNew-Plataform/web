@@ -40,7 +40,9 @@ export function Header({ children }: { children: ReactNode }) {
         <TabsList>
           <TabsTrigger value="details">Detalhes O.S.</TabsTrigger>
           <TabsTrigger value="technical-details">Parecer Técnico</TabsTrigger>
-          <TabsTrigger value="plan-task">Tarefas Planos</TabsTrigger>
+          <TabsTrigger value="plan-task" disabled>
+            Tarefas Planos
+          </TabsTrigger>
           <TabsTrigger value="checklist" disabled>
             Checklist
           </TabsTrigger>
