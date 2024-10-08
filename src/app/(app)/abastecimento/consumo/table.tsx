@@ -51,6 +51,26 @@ export default function AnaliseConsumoPorFrota() {
   const getIconAndColor = (item: FuellingItem) => {
     const { expectedConsumption, consumptionMade, typeConsumption } = item
 
+    // Caso especial: consumo previsto é 0, mas o consumo realizado é maior que 0
+    if (expectedConsumption === 0 && consumptionMade > 0) {
+      if (typeConsumption === 'L/HR') {
+        // Para L/HR, um consumo maior que 0 é ruim quando o esperado é 0
+        return {
+          icon: <TrendingDown className="text-red-500" />,
+          color: 'text-red-500',
+          percentage: '100.00', // Indica que excedeu totalmente o esperado (que era zero)
+        }
+      } else if (typeConsumption === 'KM/L') {
+        // Para KM/L, um consumo maior que 0 é bom quando o esperado é 0
+        return {
+          icon: <TrendingUp className="text-green-500" />,
+          color: 'text-green-500',
+          percentage: '100.00', // Indica que está muito acima do esperado (que era zero)
+        }
+      }
+    }
+
+    // Se ambos os valores são <= 0, retorna sem valores
     if (expectedConsumption <= 0 || consumptionMade <= 0) {
       return {
         icon: null,
@@ -59,27 +79,38 @@ export default function AnaliseConsumoPorFrota() {
       }
     }
 
-    // Cálculo da diferença em porcentagem
-    const difference = (consumptionMade / expectedConsumption - 1) * 100
+    // Cálculo da diferença padrão
+    const difference =
+      ((consumptionMade - expectedConsumption) / expectedConsumption) * 100
     let isEficiente = false
+    let icon = null
+    let color = ''
 
     if (typeConsumption === 'L/HR') {
       isEficiente = consumptionMade <= expectedConsumption
-    } else if (typeConsumption === 'KM/L') {
-      isEficiente = consumptionMade >= expectedConsumption
-    }
-
-    return {
-      icon: isEficiente ? (
+      icon = isEficiente ? (
         <TrendingUp className="text-green-500" />
       ) : (
         <TrendingDown className="text-red-500" />
-      ),
-      color: isEficiente ? 'text-green-500' : 'text-red-500',
+      )
+      color = isEficiente ? 'text-green-500' : 'text-red-500'
+    } else if (typeConsumption === 'KM/L') {
+      isEficiente = consumptionMade >= expectedConsumption
+      icon = isEficiente ? (
+        <TrendingUp className="text-green-500" />
+      ) : (
+        <TrendingDown className="text-red-500" />
+      )
+      color = isEficiente ? 'text-green-500' : 'text-red-500'
+    }
+
+    return {
+      icon,
+      color,
       percentage: difference.toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      }), // Armazenar o valor da diferença formatado
+      }),
     }
   }
 
@@ -104,7 +135,6 @@ export default function AnaliseConsumoPorFrota() {
             </TableHeader>
             <TableBody>
               {grupo.fuelling.map((item: FuellingItem, idx: number) => {
-                // Chamar a função getIconAndColor e extrair o ícone, cor e porcentagem calculada
                 const { icon, color, percentage } = getIconAndColor(item)
                 return (
                   <TableRow key={idx} className="hover:bg-gray-100">
