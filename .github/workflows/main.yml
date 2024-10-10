@@ -25,6 +25,7 @@ jobs:
           mv next.config.js combined
           mv package.json combined
           mv package-lock.json combined
+          mv ecosystem.config.js combined
       
       - name: List output files
         run: find combined/ -print
