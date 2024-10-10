@@ -51,26 +51,22 @@ export default function AnaliseConsumoPorFrota() {
   const getIconAndColor = (item: FuellingItem) => {
     const { expectedConsumption, consumptionMade, typeConsumption } = item
 
-    // Caso especial: consumo previsto é 0, mas o consumo realizado é maior que 0
     if (expectedConsumption === 0 && consumptionMade > 0) {
       if (typeConsumption === 'L/HR') {
-        // Para L/HR, um consumo maior que 0 é ruim quando o esperado é 0
         return {
           icon: <TrendingDown className="text-red-500" />,
           color: 'text-red-500',
-          percentage: '100.00', // Indica que excedeu totalmente o esperado (que era zero)
+          percentage: '100.00',
         }
       } else if (typeConsumption === 'KM/L') {
-        // Para KM/L, um consumo maior que 0 é bom quando o esperado é 0
         return {
           icon: <TrendingUp className="text-green-500" />,
           color: 'text-green-500',
-          percentage: '100.00', // Indica que está muito acima do esperado (que era zero)
+          percentage: '100.00',
         }
       }
     }
 
-    // Se ambos os valores são <= 0, retorna sem valores
     if (expectedConsumption <= 0 || consumptionMade <= 0) {
       return {
         icon: null,
@@ -79,7 +75,6 @@ export default function AnaliseConsumoPorFrota() {
       }
     }
 
-    // Cálculo da diferença padrão
     const difference =
       ((consumptionMade - expectedConsumption) / expectedConsumption) * 100
     let isEficiente = false

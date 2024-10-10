@@ -21,6 +21,9 @@ const editBoundSchema = z.object({
   description: z
     .string({ required_error: 'A descrição e obrigatória!' })
     .nonempty({ message: 'Preencha a descrição' }),
+  automatic: z.enum(['ATIVADO', 'DESATIVADO']),
+  periodic: z.string().optional(),
+  timer: z.string().optional(),
 
   // task: z.array(
   //   z.string({
@@ -59,6 +62,7 @@ export function SheetEditBound({
 
   useEffect(() => {
     setValue('description', defaultValues?.description || '')
+    // setValue('automatic', defaultValues.automatic || '')
     // setValue('task', defaultValues.|| '')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultValues])

@@ -93,6 +93,14 @@ export function TableBounds() {
       accessorKey: 'description',
       header: 'Descrição',
     },
+    {
+      accessorKey: 'automatic',
+      header: 'Lançamento',
+      cell({ row }) {
+        const value = row.getValue('automatic') as boolean
+        return value ? 'ATIVADO' : 'DESATIVADO'
+      },
+    },
   ]
 
   async function handleDeleteBound() {
