@@ -40,7 +40,7 @@ export function Header() {
 
   const { handleSubmit, reset } = formFilter
 
-  async function handleGenerateExcel2() {
+  async function handleGenerateExcel() {
     loading.show()
     const data: TankResponse[] | undefined = queryClient.getQueryData([
       'fuelling/create/data',
@@ -68,47 +68,6 @@ export function Header() {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(new Blob([blob]))
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `tanques_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-      })
-      .catch((error) => console.error(error))
-    loading.hide()
-  }
-
-  async function handleGenerateExcel() {
-    loading.show()
-    const data: TankResponse[] | undefined = queryClient.getQueryData([
-      'fuelling/create/data',
-    ])
-    console.log(data)
-    loading.hide()
-    if (!data) return
-    loading.show()
-    await fetch('https://excel-api.smartnewservices.com.br/exportDefault', {
-      method: 'POST',
-      mode: 'cors',
-      body: JSON.stringify({
-        currencyFormat: [],
-        title: 'Tanques',
-        data: data.map((item) => ({
-          TAG: item.model,
-          Descrição: item.tank,
-          'Capacidade máxima': item.capacity,
-          Filial: item.branch.label,
-          Combustível: item.compartment,
-        })),
-      }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -194,12 +153,6 @@ export function Header() {
         <Button variant="outline" onClick={handleGenerateExcel}>
           <FileBarChart size={16} />
           Excel
-        </Button>
-
-
-        <Button variant="outline" onClick={handleGenerateExcel2}>
-          <FileBarChart size={16} />
-          Excel2
         </Button>
 
         <Button onClick={() => setOpen(true)}>
