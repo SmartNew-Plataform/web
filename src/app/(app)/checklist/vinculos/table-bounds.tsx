@@ -27,6 +27,11 @@ export type BoundData = {
   id: number
   family: string
   description: string
+  automatic: boolean
+  periodic: string
+  periodicDate: string
+  interval: number
+  timer: string
 }
 
 export function TableBounds() {
@@ -95,7 +100,7 @@ export function TableBounds() {
     },
     {
       accessorKey: 'automatic',
-      header: 'Lançamento',
+      header: 'Lançamento Automático',
       cell({ row }) {
         const value = row.getValue('automatic') as boolean
         return value ? 'ATIVADO' : 'DESATIVADO'

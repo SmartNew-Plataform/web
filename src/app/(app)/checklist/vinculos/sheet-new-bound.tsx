@@ -28,6 +28,8 @@ const newBoundSchema = z.object({
   control: z.string().nonempty('Escolha um tipo de controle!'),
   automatic: z.enum(['ATIVADO', 'DESATIVADO']),
   periodic: z.string().optional(),
+  periodicDate: z.string().optional(),
+  interval: z.number().optional(),
   timer: z.string().optional(),
 })
 
@@ -219,7 +221,7 @@ export function SheetNewBound() {
               <Form.Field>
                 <Form.Label>Intervalo em horas:</Form.Label>
                 <Form.Input
-                  name="timer"
+                  name="interval"
                   type="number"
                   placeholder="Informe o intervalo em horas"
                 />
@@ -231,7 +233,7 @@ export function SheetNewBound() {
                 <Form.Field>
                   <Form.Label>Dia da semana:</Form.Label>
                   <Form.Select
-                    name="timer"
+                    name="periodicDate"
                     options={[
                       { label: 'Segunda-feira', value: 'MONDAY' },
                       { label: 'Terça-feira', value: 'TUESDAY' },
