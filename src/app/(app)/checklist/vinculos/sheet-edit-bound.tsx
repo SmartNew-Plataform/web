@@ -79,8 +79,6 @@ export function SheetEditBound({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultValues])
 
-  console.log(defaultValues)
-
   const { data } = useQuery({
     queryKey: ['checklist/bounds/selects', user?.login],
     queryFn: async () => {

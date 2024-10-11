@@ -77,27 +77,19 @@ export default function AnaliseConsumoPorFrota() {
 
     const difference =
       ((consumptionMade - expectedConsumption) / expectedConsumption) * 100
-    let isEficiente = false
-    let icon = null
-    let color = ''
 
-    if (typeConsumption === 'L/HR') {
-      isEficiente = consumptionMade <= expectedConsumption
-      icon = isEficiente ? (
-        <TrendingUp className="text-green-500" />
-      ) : (
-        <TrendingDown className="text-red-500" />
-      )
-      color = isEficiente ? 'text-green-500' : 'text-red-500'
-    } else if (typeConsumption === 'KM/L') {
-      isEficiente = consumptionMade >= expectedConsumption
-      icon = isEficiente ? (
-        <TrendingUp className="text-green-500" />
-      ) : (
-        <TrendingDown className="text-red-500" />
-      )
-      color = isEficiente ? 'text-green-500' : 'text-red-500'
-    }
+    const isEficiente =
+      typeConsumption === 'L/HR'
+        ? consumptionMade <= expectedConsumption
+        : consumptionMade >= expectedConsumption
+
+    const icon = isEficiente ? (
+      <TrendingUp className="text-green-500" />
+    ) : (
+      <TrendingDown className="text-red-500" />
+    )
+
+    const color = isEficiente ? 'text-green-500' : 'text-red-500'
 
     return {
       icon,
@@ -173,7 +165,7 @@ export default function AnaliseConsumoPorFrota() {
                       className={`flex items-center gap-2 border px-4 py-2 ${color}`}
                     >
                       {icon}
-                      {percentage}%
+                      {percentage ? `${percentage}%` : '-'}
                     </TableCell>
                   </TableRow>
                 )
