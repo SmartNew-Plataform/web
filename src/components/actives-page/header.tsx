@@ -102,6 +102,7 @@ export function Header() {
     
     const sheets = {
       sheetName: 'Equipamentos Ativos',
+      headers: '###headers###',
       recordHeader: "###recordHeader###",
       recordsFormat: "###recordsFormat###",
       records
@@ -138,6 +139,10 @@ export function Header() {
         </h1>
 
         <div className="flex gap-4">
+          <Button variant="outline" onClick={handleGenerateExcel}>
+            <FileBarChart size={16} />
+            Excel
+          </Button>
           <SearchInput />
           <Button onClick={() => setIsOpen(true)}>
             <Plus size={16} />
@@ -146,10 +151,6 @@ export function Header() {
           <Button variant="outline" onClick={handleOpenQrCodeModal}>
             <QrCode size={16} />
             Gerar QRCode
-          </Button>
-          <Button variant="outline" onClick={handleGenerateExcel}>
-            <FileBarChart size={16} />
-            Excel
           </Button>
         </div>
       </PageHeader>
