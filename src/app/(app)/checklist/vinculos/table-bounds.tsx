@@ -1,7 +1,7 @@
 'use client'
 
 import { DataTable } from '@/components/data-table'
-import { useBoundStore } from '@/store/smartlist/smartlist-bound'
+import { BoundData, useBoundStore } from '@/store/smartlist/smartlist-bound'
 import { ColumnDef } from '@tanstack/react-table'
 import { useState } from 'react'
 
@@ -23,17 +23,6 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { SheetEditBound } from './sheet-edit-bound'
 
-export type BoundData = {
-  id: number
-  family: string
-  description: string
-  automatic: boolean
-  periodic: string
-  periodicDate: string
-  interval: number
-  timer: string
-}
-
 export function TableBounds() {
   const { loadBounds } = useBoundStore(({ loadBounds }) => ({
     loadBounds,
@@ -50,7 +39,7 @@ export function TableBounds() {
     queryFn: () => loadBounds({ filterText }),
   })
 
-  const columnsBound: ColumnDef<BoundData>[] = [
+  const columns: ColumnDef<BoundData>[] = [
     {
       accessorKey: 'id',
       header: '',
@@ -159,7 +148,8 @@ export function TableBounds() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <DataTable columns={columnsBound} data={data || []} isLoading={!data} />
+      <DataTable columns={columns} data={data || []} isLoading={!data} />
     </>
   )
 }
+
