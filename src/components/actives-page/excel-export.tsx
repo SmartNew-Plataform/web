@@ -1,3 +1,21 @@
+const headers = `[
+  {
+    "blocks":[
+      {
+        "message":"Equipamentos Ativos",
+        "colBegin":"A1",
+        "colEnd":"E1",
+       "format":{
+        "bold":1,
+        "align":"center",
+        "font_size": 13
+       }
+      }
+    ]
+  }
+]
+`
+
 const recordHeader = `[
     {
       "nameHeader":"Id",
@@ -133,6 +151,7 @@ function bodyBefore(sheets:any):any{
 export function createBody(sheets:any):any{
     const before = bodyBefore(sheets)
     return JSON.stringify(before)
+        .replaceAll('"###headers###"',headers)
         .replaceAll('"###recordHeader###"',recordHeader)
         .replaceAll('"###recordsFormat###"',recordsFormat)
 }

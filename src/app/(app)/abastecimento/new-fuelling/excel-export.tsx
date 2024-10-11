@@ -1,3 +1,21 @@
+const headers = `[
+  {
+    "blocks":[
+      {
+        "message":"Registro de Abastecimentos",
+        "colBegin":"A1",
+        "colEnd":"E1",
+       "format":{
+        "bold":1,
+        "align":"center",
+        "font_size": 13
+       }
+      }
+    ]
+  }
+]
+`
+
 const recordHeader = `[
     {
       "nameHeader":"Id",
@@ -65,21 +83,21 @@ const recordHeader = `[
     {
       "nameHeader":"Consumo realizado",
       "formatHeader":{
-         "border":1,
+        "border":1,
         "bold": true
       }
     },
     {
     "nameHeader":"Valor unitário",
       "formatHeader":{
-         "border":1,
+        "border":1,
         "bold": true
       }
     },
     {
     "nameHeader":"Valor total",
       "formatHeader":{
-         "border":1,
+        "border":1,
         "bold": true
       }
     }
@@ -92,13 +110,13 @@ const recordsFormat = `[
     {},
     {},
     {},
+    {"num_format": 2},
+    {"num_format": 2},
     {},
-    {},
-    {},
-    {},
-    {},
-    {},
-    {}
+    {"num_format": 2},
+    {"num_format": 2},
+    {"num_format": 2},
+    {"num_format": 2}
   ]
 `
 
@@ -112,6 +130,7 @@ function bodyBefore(sheets:any):any{
 export function createBody(sheets:any):any{
     const before = bodyBefore(sheets)
     return JSON.stringify(before)
+        .replaceAll('"###headers###"',headers)
         .replaceAll('"###recordHeader###"',recordHeader)
         .replaceAll('"###recordsFormat###"',recordsFormat)
 }

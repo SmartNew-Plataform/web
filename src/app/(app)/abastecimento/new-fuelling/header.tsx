@@ -103,22 +103,23 @@ export function Header() {
 
     const sheets = {
       sheetName: 'Abastecimentos',
-        recordHeader:"###recordHeader###",
-        recordsFormat:"###recordsFormat###",
-        records: data.rows.map((item) => (
+      headers: '###headers###',
+      recordHeader:"###recordHeader###",
+      recordsFormat:"###recordsFormat###",
+      records: data.rows.map((item) => (
           [
             item.id, // id
             item.fuelStation, // posto
-            dayjs(item.date).format('DD-MM-YYYY-HH-mm-ss'), // Data de abertura
+            dayjs(item.date).format('DD/MM/YYYY'), // Data de abertura
             item.equipment, // equipamento
             item.type, // Tipo de Consumo
-            Number(item.counter).toFixed(2).replace('.', ','), // Contador Atual
-            Number(item.counterLast).toFixed(2).replace('.', ','), // Contador Anterior
-            item.compartment, // Combustível
-            Number(item.quantidade).toFixed(2).replace('.', ','), // Quantidade
-            Number(item.consumption).toFixed(2).replace('.', ','), // Consumo Realizado
-            Number(item.value).toFixed(2).replace('.', ','), // Valor Unitário
-            Number(item.total).toFixed(2).replace('.', ',') // Valor total
+            item.counter, // Contador Atual
+            item.counterLast, // Contador Anterior
+            item.compartment, // Combust,ível
+            Number(item.quantidade), // Quantidade
+            Number(item.consumption), // Consumo Realizado
+            Number(item.value), // Valor Unitário
+            Number(item.total) // Valor total
           ]
         ))
     }

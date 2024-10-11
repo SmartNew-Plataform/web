@@ -50,17 +50,18 @@ export function Header() {
     if (!data) return
     const sheets = {
       sheetName: 'Tanques',
-        recordHeader:"###recordHeader###",
-        recordsFormat:"###recordsFormat###",
-        records: data.map((item) => (
-          [
-            item.model, // TAG
-            item.tank, //Descrição
-            item.capacity, // Capacidade máxima
-            item.branch.label, // Filial
-            item.compartment // Comustível
-          ]
-        ))
+      headers: '###headers###',
+      recordHeader:"###recordHeader###",
+      recordsFormat:"###recordsFormat###",
+      records: data.map((item) => (
+        [
+          item.model, // TAG
+          item.tank, //Descrição
+          item.capacity, // Capacidade máxima
+          item.branch.label, // Filial
+          item.compartment // Comustível
+        ]
+      ))
     }
 
     loading.show()
