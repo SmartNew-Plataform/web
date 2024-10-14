@@ -12,7 +12,7 @@ import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { BoundData } from './table-bounds'
+import { BoundData } from '@/store/smartlist/smartlist-bound'
 
 interface SheetEditBoundProps extends ComponentProps<typeof Sheet> {
   defaultValues?: BoundData
