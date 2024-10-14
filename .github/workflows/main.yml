@@ -19,6 +19,7 @@ jobs:
       - name: 🔨 Build & Prisma & Combine
         run: |
           npm i -f
+          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL_HOMOLOG }}" > .env.local
           npm run build
           mkdir combined
           mv build combined
