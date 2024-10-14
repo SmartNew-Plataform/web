@@ -85,7 +85,7 @@ export function Header() {
         )),
       }
     }) 
-     await fetch('https://excel.smartnewservices.com.br/export', {
+     await fetch('https://excel.smartnewservices.com.br/export-unified', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),
