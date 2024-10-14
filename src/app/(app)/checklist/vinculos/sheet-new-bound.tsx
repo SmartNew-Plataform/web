@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/sheet'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
-import { validateMultipleOptions } from '@/lib/validate-multiple-options'
 import { useBoundStore } from '@/store/smartlist/smartlist-bound'
 import { useUserStore } from '@/store/user-store'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,40 +19,19 @@ import { useSearchParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const newBoundSchema = z
-  .object({
-    type: z.enum(['family', 'diverse'], { required_error: 'Escolha um tipo!' }),
-    family: z
-      .array(
-        z.string({
-          invalid_type_error: 'Selecione uma familia!',
-        }),
-      )
-      .optional(),
-    diverse: z
-      .array(
-        z.string({
-          required_error: 'A família é obrigatória!',
-        }),
-      )
-      .optional(),
-    description: z
-      .string({ required_error: 'A descrição é obrigatória!' })
-      .nonempty({ message: 'Preencha a descrição' }),
-    task: z.array(
-      z.string({
-        required_error: 'Escolha uma tarefa!',
-        invalid_type_error: 'Você não selecionou nada!',
-      }),
-    ),
-    control: z.string({
-      required_error: 'Escolha um tipo de controle!',
-      invalid_type_error: 'Você não selecionou nada!',
-    }),
-  })
-  .superRefine((data, ctx) =>
-    validateMultipleOptions<typeof data>(data, ctx, data.type),
-  )
+const newBoundSchema = z.object({
+  type: z.enum(['family', 'diverse'], { required_error: 'Escolha um tipo!' }),
+  family: z.array(z.string()).optional(),
+  diverse: z.array(z.string()).optional(),
+  description: z.string().nonempty('Preencha a descrição'),
+  task: z.array(z.string().nonempty('Escolha uma tarefa!')),
+  control: z.string().nonempty('Escolha um tipo de controle!'),
+  automatic: z.enum(['ATIVADO', 'DESATIVADO']),
+  periodic: z.string().optional(),
+  periodicDate: z.string().optional(),
+  interval: z.number().optional(),
+  timer: z.string().optional(),
+})
 
 type NewBoundData = z.infer<typeof newBoundSchema>
 
@@ -67,6 +45,7 @@ export function SheetNewBound() {
     resolver: zodResolver(newBoundSchema),
     defaultValues: {
       type: 'family',
+      automatic: 'DESATIVADO',
     },
   })
 
@@ -84,6 +63,9 @@ export function SheetNewBound() {
   const searchParams = useSearchParams()
   const filterText = searchParams.get('s') || ''
 
+  const automatic = watch('automatic')
+  const periodic = watch('periodic')
+
   async function handleCreateNewBound(data: NewBoundData) {
     try {
       const response = await api.post('/smart-list/bound', {
@@ -92,7 +74,9 @@ export function SheetNewBound() {
         task: data.task.map(Number),
         familyId: data.family,
         diverseId: data.diverse,
+        automatic: data.automatic === 'ATIVADO',
       })
+
       console.log(response.data)
 
       toast({
@@ -107,6 +91,7 @@ export function SheetNewBound() {
         type: 'family',
         control: '',
         task: [],
+        automatic: 'DESATIVADO',
       })
       queryClient.refetchQueries(['checklist/bounds', filterText])
     } catch (error) {
@@ -114,32 +99,10 @@ export function SheetNewBound() {
     }
   }
 
-  // async function handleNewTask(data: NewTaskData) {
-  //   if (!boundId) return
-
-  //   try {
-  //     await api.post(`/smart-list/bound/${boundId}/item`, {
-  //       controlId: Number(data.control),
-  //       task: data.task,
-  //       filterText,
-  //     })
-
-  //     toast({
-  //       title: 'Tarefa vinculada com sucesso!',
-  //       variant: 'success',
-  //     })
-
-  //     resetTask({ control: '', task: [] })
-  //     queryClient.refetchQueries(['checklist/bound/task', boundId])
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
   const { data } = useQuery({
     queryKey: ['checklist/bounds/selects', user?.login],
     queryFn: async () => {
-      const [family, diverse, task, control] = await Promise.all([
+      const [family, diverse, task, control, periodicity] = await Promise.all([
         loadFamily(),
         loadDiverse(),
         api
@@ -148,6 +111,11 @@ export function SheetNewBound() {
         api
           .get<{ control: SelectResponse[] }>('/smart-list/bound/list-control')
           .then((res) => res.data.control),
+        api
+          .get<{
+            data: { value: string; label: string }[]
+          }>('system/choices/periodicity-bound')
+          .then((res) => res.data.data),
       ])
 
       return {
@@ -164,6 +132,7 @@ export function SheetNewBound() {
           label: description,
           value: id.toString(),
         })),
+        periodicity,
       }
     },
     retry: true,
@@ -226,6 +195,100 @@ export function SheetNewBound() {
               <Form.Label>Controle:</Form.Label>
               <Form.Select name="control" options={data?.control || []} />
             </Form.Field>
+
+            <Form.Field>
+              <Form.Label>Lançamentos automáticos:</Form.Label>
+              <Form.Select
+                name="automatic"
+                options={[
+                  { label: 'ATIVADO', value: 'ATIVADO' },
+                  { label: 'DESATIVADO', value: 'DESATIVADO' },
+                ]}
+              />
+            </Form.Field>
+
+            {automatic === 'ATIVADO' && (
+              <Form.Field>
+                <Form.Label>Periodicidade:</Form.Label>
+                <Form.Select
+                  name="periodic"
+                  options={data?.periodicity || []}
+                />
+              </Form.Field>
+            )}
+
+            {automatic === 'ATIVADO' && periodic === '1' && (
+              <Form.Field>
+                <Form.Label>Intervalo em horas:</Form.Label>
+                <Form.Input
+                  name="interval"
+                  type="number"
+                  placeholder="Informe o intervalo em horas"
+                />
+              </Form.Field>
+            )}
+
+            {automatic === 'ATIVADO' && periodic === '2' && (
+              <>
+                <Form.Field>
+                  <Form.Label>Dia da semana:</Form.Label>
+                  <Form.Select
+                    name="periodicDate"
+                    options={[
+                      { label: 'Segunda-feira', value: 'MONDAY' },
+                      { label: 'Terça-feira', value: 'TUESDAY' },
+                      { label: 'Quarta-feira', value: 'WEDNESDAY' },
+                      { label: 'Quinta-feira', value: 'THURSDAY' },
+                      { label: 'Sexta-feira', value: 'FRIDAY' },
+                      { label: 'Sábado', value: 'SATURDAY' },
+                      { label: 'Domingo', value: 'SUNDAY' },
+                    ]}
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <Form.Label>Horário:</Form.Label>
+                  <Form.Input
+                    name="time"
+                    type="time"
+                    placeholder="Informe o horário"
+                  />
+                </Form.Field>
+              </>
+            )}
+
+            {automatic === 'ATIVADO' && periodic === '3' && (
+              <>
+                <Form.Field>
+                  <Form.Label>Data inicial do lançamento:</Form.Label>
+                  <Form.Input name="timer" type="date" />
+                </Form.Field>
+                <Form.Field>
+                  <Form.Label>Horário:</Form.Label>
+                  <Form.Input
+                    name="time"
+                    type="time"
+                    placeholder="Informe o horário"
+                  />
+                </Form.Field>
+              </>
+            )}
+
+            {automatic === 'ATIVADO' && periodic === '4' && (
+              <>
+                <Form.Field>
+                  <Form.Label>Data inicial do lançamento:</Form.Label>
+                  <Form.Input name="timer" type="date" />
+                </Form.Field>
+                <Form.Field>
+                  <Form.Label>Horário:</Form.Label>
+                  <Form.Input
+                    name="time"
+                    type="time"
+                    placeholder="Informe o horário"
+                  />
+                </Form.Field>
+              </>
+            )}
 
             <Button disabled={isSubmitting} loading={isSubmitting}>
               <Plus className="h-4 w-4" />

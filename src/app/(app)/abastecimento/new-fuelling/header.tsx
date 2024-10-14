@@ -20,6 +20,7 @@ import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { FuelForm, SupplyFormData } from './fuelForm'
+import { createBody } from './excel-export'
 
 const filterFormSchema = z.object({
   equipment: z.string().optional(),
@@ -99,33 +100,34 @@ export function Header() {
 
     if (!data) return
     loading.show()
-    await fetch('https://excel-api.smartnewservices.com.br/exportDefault', {
+
+    const sheets = {
+      sheetName: 'Abastecimentos',
+      headers: '###headers###',
+      recordHeader:"###recordHeader###",
+      recordsFormat:"###recordsFormat###",
+      records: data.rows.map((item) => (
+          [
+            item.id, // id
+            item.fuelStation, // posto
+            dayjs(item.date).format('DD/MM/YYYY'), // Data de abertura
+            item.equipment, // equipamento
+            item.type, // Tipo de Consumo
+            item.counter, // Contador Atual
+            item.counterLast, // Contador Anterior
+            item.compartment, // Combust,ível
+            Number(item.quantidade), // Quantidade
+            Number(item.consumption), // Consumo Realizado
+            Number(item.value), // Valor Unitário
+            Number(item.total) // Valor total
+          ]
+        ))
+    }
+
+    await fetch('https://excel.smartnewservices.com.br/export', {
       method: 'POST',
       mode: 'cors',
-      body: JSON.stringify({
-        currencyFormat: [],
-        title: 'Abastecimentos',
-        data: data.rows.map((item) => ({
-          Id: item.id,
-          Posto: item.fuelStation,
-          'Data de abertura': dayjs(item.date).format('DD-MM-YYYY-HH-mm-ss'),
-          Equipamento: item.equipment,
-          'Tipo de consumo': Number(item.consumption)
-            .toFixed(2)
-            .replace('.', ','),
-          'Contador atual': Number(item.counter).toFixed(2).replace('.', ','),
-          'Contador anterior': Number(item.counterLast)
-            .toFixed(2)
-            .replace('.', ','),
-          Combustível: item.compartment,
-          Quantidade: Number(item.quantidade).toFixed(2).replace('.', ','),
-          'Consumo realizado': Number(item.consumption)
-            .toFixed(2)
-            .replace('.', ','),
-          'Valor unitário': Number(item.value).toFixed(2).replace('.', ','),
-          'Valor total': Number(item.total).toFixed(2).replace('.', ','),
-        })),
-      }),
+      body: createBody(sheets),
       headers: {
         'Content-Type': 'application/json',
       },

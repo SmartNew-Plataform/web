@@ -19,12 +19,14 @@ jobs:
       - name: 🔨 Build & Prisma & Combine
         run: |
           npm i -f
+          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL_HOMOLOG }}" > .env.local
           npm run build
           mkdir combined
           mv build combined
           mv next.config.js combined
           mv package.json combined
           mv package-lock.json combined
+          mv ecosystem.config.js combined
       
       - name: List output files
         run: find combined/ -print

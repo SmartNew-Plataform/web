@@ -2,7 +2,8 @@
 
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 
 type FuelConfig = {
   fuelType: string
@@ -36,9 +37,10 @@ export function Table() {
     }
   }
 
-  useEffect(() => {
-    fetchControlData()
-  }, [])
+  useQuery({
+    queryKey: ['fuelling/config-fuelling/data'],
+    queryFn: fetchControlData,
+  })
 
   const handleOptionChange = (index: number, newOption: string | number) => {
     if (configData) {

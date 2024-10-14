@@ -22,6 +22,7 @@ import dayjs from 'dayjs'
 import { Eraser, FileBarChart, Info, ListFilter, Search } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { createBody } from './excel-export'
 
 const filterFormSchema = z.object({
   equipmentId: z.string().optional(),
@@ -74,25 +75,20 @@ export function Header() {
     if (!dataExcel) return
     console.log(dataExcel)
     loading.show()
-    const body = dataExcel.map(({ family, fuelling }) => {
+    const sheets = dataExcel.map(({ family, fuelling }) => {
       return {
-        currencyFormat: [],
-        title: family.replaceAll('/', '-'),
-        data: fuelling.map((item) => ({
-          Equipamento: item.equipment,
-          'Tipo de consumo': item.typeConsumption,
-          'Quantidade de Litros': item.quantity,
-          'Valor total': item.total,
-          'Consumo previsto': item.expectedConsumption,
-          'Consumo realizado': item.consumptionMade,
-          'Diferença %': item.difference,
-        })),
+        sheetName:family.replaceAll('/', '-'),
+        recordHeader:"###recordHeader###",
+        recordsFormat:"###recordsFormat###",
+        records: fuelling.map((item) => (
+          [ item.equipment, item.typeConsumption, item.quantity, item.total, item.expectedConsumption, item.consumptionMade, item.difference ]
+        )),
       }
-    })
-    await fetch('https://excel-api.smartnewservices.com.br/exportTabs', {
+    }) 
+     await fetch('https://excel.smartnewservices.com.br/export', {
       method: 'POST',
       mode: 'cors',
-      body: JSON.stringify(body),
+      body: createBody(sheets),
       headers: {
         'Content-Type': 'application/json',
       },

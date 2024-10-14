@@ -19,6 +19,7 @@ import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { TankModal } from './tank-modal'
+import { createBody } from './excel-export'
 
 const filterTankSchema = z.object({
   tag: z.string().optional(),
@@ -47,21 +48,27 @@ export function Header() {
     console.log(data)
     loading.hide()
     if (!data) return
+    const sheets = {
+      sheetName: 'Tanques',
+      headers: '###headers###',
+      recordHeader:"###recordHeader###",
+      recordsFormat:"###recordsFormat###",
+      records: data.map((item) => (
+        [
+          item.model, // TAG
+          item.tank, //Descrição
+          item.capacity, // Capacidade máxima
+          item.branch.label, // Filial
+          item.compartment // Comustível
+        ]
+      ))
+    }
+
     loading.show()
-    await fetch('https://excel-api.smartnewservices.com.br/exportDefault', {
+    await fetch('https://excel.smartnewservices.com.br/export', {
       method: 'POST',
       mode: 'cors',
-      body: JSON.stringify({
-        currencyFormat: [],
-        title: 'Tanques',
-        data: data.map((item) => ({
-          TAG: item.model,
-          Descrição: item.tank,
-          'Capacidade máxima': item.capacity,
-          Filial: item.branch.label,
-          Combustível: item.compartment,
-        })),
-      }),
+      body: createBody(sheets),
       headers: {
         'Content-Type': 'application/json',
       },

@@ -2,14 +2,19 @@ import { api } from '@/lib/api'
 import { AxiosError } from 'axios'
 import { create } from 'zustand'
 
-interface BoundType {
+export type BoundData = {
   id: number
   family: string
   description: string
+  automatic: boolean
+  periodic: string
+  periodicDate: string
+  interval: number
+  timer: string
 }
 
 interface SmartListBoundStoreData {
-  bounds: BoundType[] | undefined
+  bounds: BoundData[] | undefined
   diverse:
     | Array<{
         value: string
@@ -28,7 +33,7 @@ interface SmartListBoundStoreData {
   filterText: string | undefined
 
   setFilterText: (param: string) => void
-  loadBounds: (p: { filterText: string | undefined }) => Promise<BoundType[]>
+  loadBounds: (p: { filterText: string | undefined }) => Promise<BoundData[]>
   loadFamily: () => Promise<SmartListBoundStoreData['family']>
   loadDiverse: () => Promise<SmartListBoundStoreData['diverse']>
 }
@@ -50,7 +55,7 @@ export const useBoundStore = create<SmartListBoundStoreData>((set) => {
       set({ bounds: undefined })
       const response = await api
         .get<{
-          bound: BoundType[]
+          bound: BoundData[]
         }>('/smart-list/bound', { params: { filterText } })
         .then((res) => res.data)
 

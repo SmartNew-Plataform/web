@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useUserStore } from '@/store/user-store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { BoundData } from './table-bounds'
+import { BoundData } from '@/store/smartlist/smartlist-bound'
 
 interface SheetEditBoundProps extends ComponentProps<typeof Sheet> {
   defaultValues?: BoundData
@@ -21,6 +22,11 @@ const editBoundSchema = z.object({
   description: z
     .string({ required_error: 'A descrição e obrigatória!' })
     .nonempty({ message: 'Preencha a descrição' }),
+  automatic: z.enum(['ATIVADO', 'DESATIVADO']),
+  periodicDate: z.string().optional(),
+  periodic: z.string().optional(),
+  interval: z.number().optional(),
+  timer: z.string().optional(),
 
   // task: z.array(
   //   z.string({
@@ -50,18 +56,46 @@ export function SheetEditBound({
   })
   const {
     handleSubmit,
+    watch,
     formState: { isSubmitting },
     setValue,
   } = newBoundForm
 
+  const { user } = useUserStore()
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
+  const automatic = watch('automatic')
+  const periodic = watch('periodic')
+
   useEffect(() => {
     setValue('description', defaultValues?.description || '')
+    setValue('automatic', defaultValues?.automatic ? 'ATIVADO' : 'DESATIVADO')
+    setValue('periodic', defaultValues?.periodic)
+    setValue('periodicDate', defaultValues?.periodicDate)
+    setValue('interval', defaultValues?.interval)
+    setValue('timer', defaultValues?.timer)
     // setValue('task', defaultValues.|| '')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultValues])
+
+  const { data } = useQuery({
+    queryKey: ['checklist/bounds/selects', user?.login],
+    queryFn: async () => {
+      const [periodicity] = await Promise.all([
+        api
+          .get<{
+            data: { value: string; label: string }[]
+          }>('system/choices/periodicity-bound')
+          .then((res) => res.data.data),
+      ])
+
+      return {
+        periodicity,
+      }
+    },
+    retry: true,
+  })
 
   async function handleEditNewBound(data: EditBoundData) {
     const response = await api
@@ -117,6 +151,100 @@ export function SheetEditBound({
               <Form.Input name="description" />
               <Form.ErrorMessage field="description" />
             </Form.Field>
+
+            <Form.Field>
+              <Form.Label>Lançamentos automáticos:</Form.Label>
+              <Form.Select
+                name="automatic"
+                options={[
+                  { label: 'ATIVADO', value: 'ATIVADO' },
+                  { label: 'DESATIVADO', value: 'DESATIVADO' },
+                ]}
+              />
+            </Form.Field>
+
+            {automatic === 'ATIVADO' && (
+              <Form.Field>
+                <Form.Label>Periodicidade:</Form.Label>
+                <Form.Select
+                  name="periodic"
+                  options={data?.periodicity || []}
+                />
+              </Form.Field>
+            )}
+
+            {automatic === 'ATIVADO' && periodic === '1' && (
+              <Form.Field>
+                <Form.Label>Intervalo em horas:</Form.Label>
+                <Form.Input
+                  name="timer"
+                  type="number"
+                  placeholder="Informe o intervalo em horas"
+                />
+              </Form.Field>
+            )}
+
+            {automatic === 'ATIVADO' && periodic === '2' && (
+              <>
+                <Form.Field>
+                  <Form.Label>Dia da semana:</Form.Label>
+                  <Form.Select
+                    name="timer"
+                    options={[
+                      { label: 'Segunda-feira', value: 'MONDAY' },
+                      { label: 'Terça-feira', value: 'TUESDAY' },
+                      { label: 'Quarta-feira', value: 'WEDNESDAY' },
+                      { label: 'Quinta-feira', value: 'THURSDAY' },
+                      { label: 'Sexta-feira', value: 'FRIDAY' },
+                      { label: 'Sábado', value: 'SATURDAY' },
+                      { label: 'Domingo', value: 'SUNDAY' },
+                    ]}
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <Form.Label>Horário:</Form.Label>
+                  <Form.Input
+                    name="time"
+                    type="time"
+                    placeholder="Informe o horário"
+                  />
+                </Form.Field>
+              </>
+            )}
+
+            {automatic === 'ATIVADO' && periodic === '3' && (
+              <>
+                <Form.Field>
+                  <Form.Label>Data inicial do lançamento:</Form.Label>
+                  <Form.Input name="timer" type="date" />
+                </Form.Field>
+                <Form.Field>
+                  <Form.Label>Horário:</Form.Label>
+                  <Form.Input
+                    name="time"
+                    type="time"
+                    placeholder="Informe o horário"
+                  />
+                </Form.Field>
+              </>
+            )}
+
+            {automatic === 'ATIVADO' && periodic === '4' && (
+              <>
+                <Form.Field>
+                  <Form.Label>Data inicial do lançamento:</Form.Label>
+                  <Form.Input name="timer" type="date" />
+                </Form.Field>
+                <Form.Field>
+                  <Form.Label>Horário:</Form.Label>
+                  <Form.Input
+                    name="time"
+                    type="time"
+                    placeholder="Informe o horário"
+                  />
+                </Form.Field>
+              </>
+            )}
 
             {/* <Form.Field>
               <Form.Label>Tarefas:</Form.Label>
