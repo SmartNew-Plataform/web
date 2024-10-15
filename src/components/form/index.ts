@@ -1,6 +1,7 @@
 import { Label } from '../ui/label'
 import { AttachDragDrop } from './attach-drag-drop'
 import { Checkbox } from './checkbox'
+import { Checklist } from './checklist'
 import { ColorPicker } from './color-picker'
 import { CostCenterPicker } from './cost-center-picker'
 import { DatePicker } from './date-picker'
@@ -38,4 +39,5 @@ export const Form = {
   RadioGroup,
   AttachDragDrop,
   Rater,
+  Checklist,
 }

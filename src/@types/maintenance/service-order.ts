@@ -47,7 +47,12 @@ export type ServiceOrderData = {
     label: string
     code: string
     description: string
-    numberSerie: string
+    numberSerie?: number
+    hasPeriod: boolean
+    hasMileage: boolean
+    hasHourMeter: boolean
+    mileage?: number
+    hourMeter?: number
   }
   typeMaintenance: {
     id: number
