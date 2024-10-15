@@ -66,6 +66,17 @@ export function Header() {
     },
   })
 
+
+  function calculeDifference(item:any){
+    const { expectedConsumption, consumptionMade, typeConsumption } = item
+
+    const difference = ((consumptionMade - expectedConsumption) / expectedConsumption)
+    
+    const result = difference === Infinity ? 1 : difference
+
+    return result
+  }
+
   async function handleGenerateExcel() {
     loading.show()
     const dataExcel: ConsuptionData[] | undefined =
@@ -73,7 +84,6 @@ export function Header() {
 
     loading.hide()
     if (!dataExcel) return
-    console.log(dataExcel)
     loading.show()
     const sheets = dataExcel.map(({ family, fuelling }) => {
       return {
@@ -81,11 +91,20 @@ export function Header() {
         recordHeader:"###recordHeader###",
         recordsFormat:"###recordsFormat###",
         records: fuelling.map((item) => (
-          [ item.equipment, item.typeConsumption, item.quantity, item.total, item.expectedConsumption, item.consumptionMade, item.difference ]
+          [
+            item.equipment,
+            item.typeConsumption,
+            Number(item.quantity),
+            Number(item.total),
+            Number(item.sumConsumption),
+            Number(item.expectedConsumption),
+            Number(item.consumptionMade),
+            calculeDifference(item)
+          ]
         )),
       }
     }) 
-     await fetch('https://excel.smartnewservices.com.br/export', {
+     await fetch('https://excel.smartnewservices.com.br/export-unified', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),
@@ -98,7 +117,7 @@ export function Header() {
         const url = window.URL.createObjectURL(new Blob([blob]))
         const a = document.createElement('a')
         a.href = url
-        a.download = `tanques_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+        a.download = `analise_de_consumo_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
         document.body.appendChild(a)
         a.click()
         a.remove()

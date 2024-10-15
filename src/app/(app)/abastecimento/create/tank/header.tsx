@@ -45,7 +45,6 @@ export function Header() {
     const data: TankResponse[] | undefined = queryClient.getQueryData([
       'fuelling/create/data',
     ])
-    console.log(data)
     loading.hide()
     if (!data) return
     const sheets = {
@@ -78,7 +77,7 @@ export function Header() {
         const url = window.URL.createObjectURL(new Blob([blob]))
         const a = document.createElement('a')
         a.href = url
-        a.download = `tanques_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+        a.download = `cadastro_de_tanques_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
         document.body.appendChild(a)
         a.click()
         a.remove()
