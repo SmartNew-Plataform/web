@@ -38,7 +38,7 @@ export function Header() {
     }
     
     const sheets = {
-      sheetName: 'Equipamentos Ativos',
+      sheetName: 'Cadastro de comboio',
       headers: '###headers###',
       recordHeader: "###recordHeader###",
       recordsFormat: "###recordsFormat###",
@@ -58,7 +58,7 @@ export function Header() {
             const url = window.URL.createObjectURL(new Blob([blob]))
             const a = document.createElement('a')
             a.href = url
-            a.download = `abastecimentos_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+            a.download = `cadastro_de_comboio_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
             document.body.appendChild(a)
             a.click()
             a.remove()
