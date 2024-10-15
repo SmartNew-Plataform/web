@@ -1,48 +1,55 @@
 const recordHeader = `[
     {
-      "nameHeader":"Equipamento",
+      "nameHeader":"EQUIPAMENTO",
       "formatHeader":{
         "border":1,
         "bold": true
       }
     },
     {
-      "nameHeader":"Tipo de consumo",
+      "nameHeader":"TIPO CONSUMO",
       "formatHeader":{
         "border":1,
         "bold": true
       }
     },
     {
-      "nameHeader":"Quantidade de Litros",
+      "nameHeader":"QTD LITROS",
       "formatHeader":{
         "border":1,
         "bold": true
       }
     },
     {
-      "nameHeader":"Valor Total",
+      "nameHeader":"VLR TOTAL",
       "formatHeader":{
         "border":1,
         "bold": true
       }
     },
     {
-      "nameHeader":"Consumo previsto",
+      "nameHeader":"TOTAL CONTADOR",
       "formatHeader":{
         "border":1,
         "bold": true
       }
     },
     {
-      "nameHeader":"Consumo realizado",
+      "nameHeader":"CONS. PREVISTO",
+      "formatHeader":{
+        "border":1,
+        "bold": true
+      }
+    },
+    {
+      "nameHeader":"CONS. REALIZADO",
       "formatHeader":{
          "border":1,
         "bold": true
       }
     },
     {
-      "nameHeader":"Diferença %",
+      "nameHeader":"DIFERENÇA %",
       "formatHeader":{
          "border":1,
         "bold": true
@@ -54,11 +61,12 @@ const recordHeader = `[
 const recordsFormat = `[
     {},
     {},
-    {"num_format": "#,##0.00"},
-    {"num_format": "#,##0.00"},
-    {"num_format": "#,##0.00"},
     {},
-    {"num_format" : 10}
+    {},
+    {},
+    {},
+    {},
+    {}
   ]
 `
 

@@ -66,6 +66,18 @@ export function Header() {
     },
   })
 
+
+  function calculeDifference(item:any){
+    const { expectedConsumption, consumptionMade, typeConsumption } = item
+
+    const difference = ((consumptionMade - expectedConsumption) / expectedConsumption)
+    
+    console.log('difference ', typeof difference, ' - ', difference, difference.toString(), difference === Infinity, difference == Infinity)
+    const result = difference === Infinity ? 1 : difference
+
+    return result
+  }
+
   async function handleGenerateExcel() {
     loading.show()
     const dataExcel: ConsuptionData[] | undefined =
@@ -81,7 +93,16 @@ export function Header() {
         recordHeader:"###recordHeader###",
         recordsFormat:"###recordsFormat###",
         records: fuelling.map((item) => (
-          [ item.equipment, item.typeConsumption, item.quantity, item.total, item.expectedConsumption, item.consumptionMade, item.difference ]
+          [
+            item.equipment,
+            item.typeConsumption,
+            Number(item.quantity),
+            Number(item.total),
+            Number(item.sumConsumption),
+            Number(item.expectedConsumption),
+            Number(item.consumptionMade),
+            calculeDifference(item)
+          ]
         )),
       }
     }) 
