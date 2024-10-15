@@ -72,7 +72,6 @@ export function Header() {
 
     const difference = ((consumptionMade - expectedConsumption) / expectedConsumption)
     
-    console.log('difference ', typeof difference, ' - ', difference, difference.toString(), difference === Infinity, difference == Infinity)
     const result = difference === Infinity ? 1 : difference
 
     return result
@@ -85,7 +84,6 @@ export function Header() {
 
     loading.hide()
     if (!dataExcel) return
-    console.log(dataExcel)
     loading.show()
     const sheets = dataExcel.map(({ family, fuelling }) => {
       return {

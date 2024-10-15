@@ -25,8 +25,6 @@ export function Header() {
     const filterText = searchParams.get('s') || ''
     const data = queryClient.getQueryData(['fuelling/train/data'])
     
-    console.log(data)
-
     let records: any = []
     
     if (Array.isArray(data)) {

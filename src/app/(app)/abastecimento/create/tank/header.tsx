@@ -45,7 +45,6 @@ export function Header() {
     const data: TankResponse[] | undefined = queryClient.getQueryData([
       'fuelling/create/data',
     ])
-    console.log(data)
     loading.hide()
     if (!data) return
     const sheets = {
