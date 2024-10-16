@@ -7,10 +7,16 @@ export type BoundData = {
   family: string
   description: string
   automatic: boolean
+  typePeriodicity: {
+    value: number
+    text: string
+  }
+  periodicity?: number
   periodic: string
   periodicDate: string
   interval: number
-  timer: string
+  horaBase: string
+  timer: number
 }
 
 interface SmartListBoundStoreData {
