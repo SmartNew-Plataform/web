@@ -40,7 +40,11 @@ export function Table() {
   useQuery({
     queryKey: ['fuelling/config-fuelling/data'],
     queryFn: fetchControlData,
+    // retryDelay: 1000,
+    // refetchInterval: 1000,
     retryDelay: 1000,
+    refetchInterval: 3000,
+    retry: true,
   })
 
   const handleOptionChange = (index: number, newOption: string | number) => {
