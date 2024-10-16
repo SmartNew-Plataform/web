@@ -7,7 +7,9 @@ import { DataTableServerPagination } from '@/components/data-table-server-pagina
 import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useCoreScreensStore } from '@/store/core-screens-store'
+import { useLoading } from '@/store/loading-store'
 import { useGridStore } from '@/store/smartlist/grid'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 
@@ -15,6 +17,8 @@ export function Table() {
   const { infoScreen } = useCoreScreensStore()
   const paramsRoute = useParams()
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null)
+  const queryClient = useQueryClient()
+  const loading = useLoading()
 
   const { setChecklistId } = useGridStore()
 
@@ -47,12 +51,17 @@ export function Table() {
   async function handleDelete() {
     if (selectedItemId !== null) {
       try {
-        await api.delete(`/smart-list/check-list/${selectedItemId}`)
+        loading.show()
+        await api
+          .delete(`/smart-list/check-list/${selectedItemId}`)
+          .finally(() => loading.hide())
+
         toast({
           title: 'Deletado com sucesso!',
           description: 'Checklist foi deletado com sucesso.',
           variant: 'success',
         })
+        queryClient.refetchQueries(['maintenance-checklist-table'])
       } catch (error) {
         console.error('Failed to delete:', error)
       }

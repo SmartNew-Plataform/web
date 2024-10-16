@@ -14,6 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useLoading } from '@/store/loading-store'
 import { useServiceOrderChecklist } from '@/store/maintenance/service-order-checklist'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -51,6 +52,7 @@ export function CreateChecklistSheet({
   const [tab, setTab] = useState<'details' | 'responses'>('details')
   const { sheetChecklistOpen, setSheetChecklistOpen } =
     useServiceOrderChecklist()
+  const loading = useLoading()
 
   const { data: details } = useQuery({
     queryKey: ['details-checklist', params.serviceOrderId],
@@ -85,7 +87,6 @@ export function CreateChecklistSheet({
 
   async function handleSubmitChecklist(data: ChecklistForm) {
     const equipment = details?.equipment
-    console.log(data)
 
     if (equipment?.hasPeriod && !data.period)
       return setError('period', { message: 'Este campo e obrigatório!' })
@@ -94,7 +95,7 @@ export function CreateChecklistSheet({
     if (equipment?.hasHourMeter && !data.hourMeter?.toString())
       return setError('hourMeter', { message: 'Este campo e obrigatório!' })
 
-    console.log(data)
+    loading.show()
     const response = await api.post(
       `maintenance/service-order/${params.serviceOrderId}/check-list`,
       {
@@ -105,6 +106,7 @@ export function CreateChecklistSheet({
         modelId: Number(data.checklist),
       },
     )
+    loading.hide()
 
     if (response.status !== 201) return
 
@@ -127,7 +129,7 @@ export function CreateChecklistSheet({
       mileage: 0,
       period: '',
     })
-  }, [])
+  }, [sheetChecklistOpen])
 
   return (
     <Sheet

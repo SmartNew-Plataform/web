@@ -9,6 +9,7 @@ import { WizardForm } from '@/components/wizard-form'
 import { WizardFormStep } from '@/components/wizard-form/wizard-form-step'
 import { useWizardForm } from '@/hooks/use-wizard-form'
 import { api } from '@/lib/api'
+import { useLoading } from '@/store/loading-store'
 import { useServiceOrderChecklist } from '@/store/maintenance/service-order-checklist'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -86,10 +87,12 @@ export function Responses({ checklistId }: ResponsesProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const { setSheetChecklistOpen } = useServiceOrderChecklist()
+  const loading = useLoading()
 
   async function handleSubmitResponses(data: ResponsesData) {
     console.log(data)
 
+    loading.show()
     for await (const { id, attach } of data.checklist) {
       if (!attach) return
       await Promise.all(
@@ -114,6 +117,7 @@ export function Responses({ checklistId }: ResponsesProps) {
         ),
       },
     )
+    loading.hide()
 
     if (response.status !== 200) return
 
