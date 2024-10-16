@@ -72,7 +72,11 @@ export function SheetEditBound({
         defaultValues.typePeriodicity?.value || undefined,
       )
       setValue('periodicity', defaultValues.periodicity?.toString())
-      setValue('dateBase', defaultValues.periodicDate || '')
+
+      const formattedDateBase = defaultValues.periodicDate
+        ? new Date(defaultValues.periodicDate).toISOString().split('T')[0]
+        : ''
+      setValue('dateBase', formattedDateBase)
 
       const formattedTime = defaultValues.timer
         ? convertMillisecondsToTime(defaultValues.timer)
