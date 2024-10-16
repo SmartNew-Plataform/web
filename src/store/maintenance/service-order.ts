@@ -31,6 +31,9 @@ interface ServiceOrderStoreData {
 
   setSelects: (data: ServiceOrderStoreData['selects']) => void
   fetchSelects: () => Promise<ServiceOrderStoreData['selects']>
+
+  viewMode: 'kanban' | 'grid'
+  setViewMode: (viewMode: 'kanban' | 'grid') => void
 }
 
 export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
@@ -46,6 +49,7 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
     },
     statusFilterValue: undefined,
     statusFilterData: undefined,
+    viewMode: 'grid',
 
     setStatusFilterValue(data) {
       set({ statusFilterValue: data })
@@ -113,6 +117,10 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
       set({ selects: result })
 
       return result
+    },
+
+    setViewMode(viewMode) {
+      set({ viewMode })
     },
   }
 })

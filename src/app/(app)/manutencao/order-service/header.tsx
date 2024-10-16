@@ -1,9 +1,10 @@
 'use client'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useServiceOrder } from '@/store/maintenance/service-order'
 import { useQuery } from '@tanstack/react-query'
-import { Plus } from 'lucide-react'
+import { Columns3, Plus, Sheet } from 'lucide-react'
 import { ServiceOrderForm } from './service-order-form'
 import { StatusFilter } from './status-filter'
 
@@ -13,6 +14,8 @@ export function Header() {
     statusFilterValue,
     setStatusFilterValue,
     statusFilterData,
+    setViewMode,
+    viewMode,
   } = useServiceOrder()
 
   useQuery({
@@ -34,6 +37,19 @@ export function Header() {
         />
 
         <div className="flex gap-4">
+          <Tabs
+            onValueChange={(value) => setViewMode(value as 'kanban' | 'grid')}
+            value={viewMode}
+          >
+            <TabsList>
+              <TabsTrigger value="kanban">
+                <Columns3 size={14} />
+              </TabsTrigger>
+              <TabsTrigger value="grid">
+                <Sheet size={14} />
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           <ServiceOrderForm data={[]}>
             <Button>
               <Plus size={16} />

@@ -1,5 +1,11 @@
-import { Wrapper } from './wrapper'
+import { Header } from './header'
+import { Table } from './table'
 
 export default function Checklist() {
-  return <Wrapper />
+  return (
+    <>
+      <Header />
+      <Table />
+    </>
+  )
 }

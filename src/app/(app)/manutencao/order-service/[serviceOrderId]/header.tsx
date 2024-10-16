@@ -40,12 +40,8 @@ export function Header({ children }: { children: ReactNode }) {
         <TabsList>
           <TabsTrigger value="details">Detalhes O.S.</TabsTrigger>
           <TabsTrigger value="technical-details">Parecer Técnico</TabsTrigger>
-          <TabsTrigger value="plan-task" disabled>
-            Tarefas Planos
-          </TabsTrigger>
-          <TabsTrigger value="checklist" disabled>
-            Checklist
-          </TabsTrigger>
+          <TabsTrigger value="plan-task">Tarefas Planos</TabsTrigger>
+          <TabsTrigger value="checklist">Checklist</TabsTrigger>
           <TabsTrigger value="timekeeping">Apontamento de horas</TabsTrigger>
           <TabsTrigger value="stop-recording">Registro de paradas</TabsTrigger>
           <TabsTrigger value="material">Materiais</TabsTrigger>
