@@ -70,9 +70,9 @@ export function Header() {
     const { expectedConsumption, consumptionMade } = item
 
     const difference =
-      (consumptionMade - expectedConsumption) / expectedConsumption
+      ((consumptionMade - expectedConsumption) / expectedConsumption) * 100
 
-    const result = difference === Infinity ? 1 : difference
+    const result = difference === Infinity ? 100 : difference
 
     return result
   }
