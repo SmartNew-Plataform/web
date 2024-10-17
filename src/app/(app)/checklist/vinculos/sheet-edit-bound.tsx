@@ -20,9 +20,9 @@ interface SheetEditBoundProps extends ComponentProps<typeof Sheet> {
 
 const editBoundSchema = z.object({
   description: z.string().nonempty('Preencha a descrição'),
-  task: z.array(z.string().nonempty('Escolha uma tarefa!')),
-  control: z.string().nonempty('Escolha um tipo de controle!'),
-  automatic: z.enum(['ATIVADO', 'DESATIVADO']),
+  // task: z.array(z.string().nonempty('Escolha uma tarefa!')),
+  // control: z.string().nonempty('Escolha um tipo de controle!'),
+  automatic: z.enum(['ATIVADO', 'DESATIVADO']).optional(),
   typePeriodicity: z.coerce.number().optional(),
   periodicityDate: z.string().optional(),
   periodicity: z.string().optional(),
@@ -63,6 +63,11 @@ export function SheetEditBound({
     return `${formattedHours}:${formattedMinutes}`
   }
 
+  function convertTimeToSeconds(time: string) {
+    const [hours, minutes] = time.split(':').map(Number)
+    return hours * 3600 + minutes * 60
+  }
+
   useEffect(() => {
     if (defaultValues) {
       setValue('description', defaultValues.description || '')
@@ -101,17 +106,33 @@ export function SheetEditBound({
   })
 
   async function handleEditNewBound(data: EditBoundData) {
-    const response = await api
-      .put(`/smart-list/bound/${defaultValues?.id}`, data)
-      .then((res) => res.data)
+    console.log('função foi chamada')
 
-    if (response?.error) return
+    const payload = {
+      ...data,
+      automatic: data.automatic === 'ATIVADO',
+      periodicity: Number(data.periodicity),
+      dateBase: data.dateBase
+        ? new Date(data.dateBase).toISOString().split('T')[0]
+        : undefined,
+      horaBase: data.horaBase ? convertTimeToSeconds(data.horaBase) : undefined,
+    }
 
-    toast({
-      title: 'Vinculo atualizado com sucesso!',
-      variant: 'success',
-    })
-    queryClient.refetchQueries(['checklist/bounds'])
+    try {
+      const response = await api
+        .put(`/smart-list/bound/${defaultValues?.id}`, payload)
+        .then((res) => res.data)
+
+      if (response?.error) return
+
+      toast({
+        title: 'Vinculo atualizado com sucesso!',
+        variant: 'success',
+      })
+      queryClient.refetchQueries(['checklist/bounds'])
+    } catch (error) {
+      console.error('Erro ao atualizar o vínculo:', error)
+    }
   }
 
   return (
