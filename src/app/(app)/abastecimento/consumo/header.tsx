@@ -70,9 +70,9 @@ export function Header() {
   function calculeDifference(item:any){
     const { expectedConsumption, consumptionMade, typeConsumption } = item
 
-    const difference = ((consumptionMade - expectedConsumption) / expectedConsumption)
+    const difference = ((consumptionMade - expectedConsumption) / expectedConsumption) * 100
     
-    const result = difference === Infinity ? 1 : difference
+    const result = difference === Infinity ? 100 : difference
 
     return result
   }
@@ -99,7 +99,7 @@ export function Header() {
             Number(item.sumConsumption),
             Number(item.expectedConsumption),
             Number(item.consumptionMade),
-            calculeDifference(item)
+            Number(calculeDifference(item)/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2})
           ]
         )),
       }
