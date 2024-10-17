@@ -34,7 +34,7 @@ const filterFormSchema = z.object({
 export type FilterFormData = z.infer<typeof filterFormSchema>
 
 export function Header() {
-  const { setFilter } = useFilterConsuption()
+  const { filters, setFilter } = useFilterConsuption()
   const loading = useLoading()
   const queryClient = useQueryClient()
 
@@ -66,12 +66,12 @@ export function Header() {
     },
   })
 
+  function calculeDifference(item: any) {
+    const { expectedConsumption, consumptionMade } = item
 
-  function calculeDifference(item:any){
-    const { expectedConsumption, consumptionMade, typeConsumption } = item
+    const difference =
+      (consumptionMade - expectedConsumption) / expectedConsumption
 
-    const difference = ((consumptionMade - expectedConsumption) / expectedConsumption)
-    
     const result = difference === Infinity ? 1 : difference
 
     return result
@@ -80,31 +80,32 @@ export function Header() {
   async function handleGenerateExcel() {
     loading.show()
     const dataExcel: ConsuptionData[] | undefined =
-      await queryClient.getQueryData(['fuelling/report/family-consumption'])
+      await queryClient.getQueryData([
+        'fuelling/report/family-consumption',
+        ...Object.values(filters || {}),
+      ])
 
     loading.hide()
     if (!dataExcel) return
     loading.show()
     const sheets = dataExcel.map(({ family, fuelling }) => {
       return {
-        sheetName:family.replaceAll('/', '-'),
-        recordHeader:"###recordHeader###",
-        recordsFormat:"###recordsFormat###",
-        records: fuelling.map((item) => (
-          [
-            item.equipment,
-            item.typeConsumption,
-            Number(item.quantity),
-            Number(item.total),
-            Number(item.sumConsumption),
-            Number(item.expectedConsumption),
-            Number(item.consumptionMade),
-            calculeDifference(item)
-          ]
-        )),
+        sheetName: family.replaceAll('/', '-'),
+        recordHeader: '###recordHeader###',
+        recordsFormat: '###recordsFormat###',
+        records: fuelling.map((item) => [
+          item.equipment,
+          item.typeConsumption,
+          Number(item.quantity),
+          Number(item.total),
+          Number(item.sumConsumption),
+          Number(item.expectedConsumption),
+          Number(item.consumptionMade),
+          calculeDifference(item),
+        ]),
       }
-    }) 
-     await fetch('https://excel.smartnewservices.com.br/export-unified', {
+    })
+    await fetch('https://excel.smartnewservices.com.br/export-unified', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),

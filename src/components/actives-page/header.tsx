@@ -4,16 +4,16 @@ import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useLoading } from '@/store/loading-store'
 import { useActives } from '@/store/smartlist/actives'
 import { useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { FileBarChart, Plus, QrCode } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
-import { QRCodeModal } from './qrcode-modal'
-import dayjs from 'dayjs'
-import { useLoading } from '@/store/loading-store'
-import { useSearchParams } from 'next/navigation'
 import { createBody } from './excel-export'
+import { QRCodeModal } from './qrcode-modal'
 
 export function Header() {
   const { toast } = useToast()
@@ -21,7 +21,7 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [isOpenQrCode, setIsOpenQrCode] = useState(false)
   const { selects, setQrCodeEquipments } = useActives()
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()
   const loading = useLoading()
 
   async function handleCreateActive(data: ActiveFormData) {
@@ -78,55 +78,58 @@ export function Header() {
     loading.show()
 
     const filterText = searchParams.get('s') || ''
-    const data = queryClient.getQueryData(['checklist-list-actives', filterText])
-    
+    const data = await queryClient.getQueryData([
+      'checklist-list-actives',
+      filterText,
+    ])
+
     let records: any = []
-    
+
     if (Array.isArray(data)) {
-      records = data.map(item => [
-        item.id || '',                             // id
-        item.branch?.label || '',                  // cliente
-        item.costCenter?.label || '',              // centro de custo
-        item.equipmentCode || '',                  // código do equipamento
-        item.description || '',                    // descrição tag
-        item.family?.label || '',                  // família
-        item.typeEquipment?.label || '',           // tipo de equipamento
-        item.inGuarantee || '',                    // em garantia
-        item.plate || '',                          // placa
-        item.chassi || '',                         // chassi
-        item.serie || '',                          // nº série
-        item.status || '',                         // status
-        item.observation || ''                     // observação
-      ]);
+      records = data.map((item) => [
+        item.id || '', // id
+        item.branch?.label || '', // cliente
+        item.costCenter?.label || '', // centro de custo
+        item.equipmentCode || '', // código do equipamento
+        item.description || '', // descrição tag
+        item.family?.label || '', // família
+        item.typeEquipment?.label || '', // tipo de equipamento
+        item.inGuarantee || '', // em garantia
+        item.plate || '', // placa
+        item.chassi || '', // chassi
+        item.serie || '', // nº série
+        item.status || '', // status
+        item.observation || '', // observação
+      ])
     }
-    
+
     const sheets = {
       sheetName: 'Equipamentos Ativos',
       headers: '###headers###',
-      recordHeader: "###recordHeader###",
-      recordsFormat: "###recordsFormat###",
-      records
+      recordHeader: '###recordHeader###',
+      recordsFormat: '###recordsFormat###',
+      records,
     }
 
     await fetch('https://excel.smartnewservices.com.br/export', {
-          method: 'POST',
-          mode: 'cors',
-          body: createBody(sheets),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-          .then((response) => response.blob())
-          .then((blob) => {
-            const url = window.URL.createObjectURL(new Blob([blob]))
-            const a = document.createElement('a')
-            a.href = url
-            a.download = `cadastro_equipamentos_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
-            document.body.appendChild(a)
-            a.click()
-            a.remove()
-          })
-          .catch((error) => console.error(error))
+      method: 'POST',
+      mode: 'cors',
+      body: createBody(sheets),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob]))
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `cadastro_equipamentos_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+      })
+      .catch((error) => console.error(error))
 
     loading.hide()
   }

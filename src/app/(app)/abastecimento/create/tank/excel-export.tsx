@@ -1,4 +1,3 @@
-
 const headers = `[
         {
           "blocks":[
@@ -69,17 +68,17 @@ const recordsFormat = `[
   ]
 `
 
-function bodyBefore(sheets:any):any{
-    return {
-        filename:"Planilha.xlsx",
-        sheets: [sheets]
-    }
+function bodyBefore(sheets: any): any {
+  return {
+    filename: 'Planilha.xlsx',
+    sheets: [sheets],
+  }
 }
 
-export function createBody(sheets:any):any{
-    const before = bodyBefore(sheets)
-    return JSON.stringify(before)
-        .replaceAll('"###headers###"',headers)
-        .replaceAll('"###recordHeader###"',recordHeader)
-        .replaceAll('"###recordsFormat###"',recordsFormat)
+export function createBody(sheets: any): any {
+  const before = bodyBefore(sheets)
+  return JSON.stringify(before)
+    .replaceAll('"###headers###"', headers)
+    .replaceAll('"###recordHeader###"', recordHeader)
+    .replaceAll('"###recordsFormat###"', recordsFormat)
 }
