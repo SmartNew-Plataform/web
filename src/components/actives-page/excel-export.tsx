@@ -12,7 +12,7 @@ const headers = `[
        }
       }
     ]
-  }
+  }###filterDate###
 ]
 `
 
@@ -148,10 +148,33 @@ function bodyBefore(sheets:any):any{
     }
 }
 
-export function createBody(sheets:any):any{
+function createFilterDate(startDate:string, endDate:string){
+  if ( startDate == null || endDate == null ) return '';
+//"message":"PERÍODO: ${startDate} Á ${endDate}",
+  return `,
+  {
+  "blocks":[
+    {
+      "message":"PERÍODO: ${startDate} Á ${endDate}",
+      "colBegin":"A2",
+      "colEnd":"E2",
+     "format":{
+      
+     }
+    }
+  ]
+}
+  `
+}
+
+export function createBody(sheets:any, startDate:string, endDate: string):any{
+
+  const filterDate = createFilterDate(startDate,endDate)
+  const headersWithFilterDate = headers.replace("###filterDate###",filterDate)
+
     const before = bodyBefore(sheets)
     return JSON.stringify(before)
-        .replaceAll('"###headers###"',headers)
+        .replaceAll('"###headers###"',headersWithFilterDate)
         .replaceAll('"###recordHeader###"',recordHeader)
         .replaceAll('"###recordsFormat###"',recordsFormat)
 }

@@ -46,10 +46,15 @@ export function Header() {
       records,
     }
 
+    //const startDate = null
+    //const endDate = null
+    const startDate = "01/06/2024"
+    const endDate = "06/09/2024"
+
     await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
-      body: createBody(sheets),
+      body: createBody(sheets,startDate, endDate),
       headers: {
         'Content-Type': 'application/json',
       },
