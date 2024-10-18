@@ -87,6 +87,7 @@ export function Header() {
 
     if (Array.isArray(data)) {
       records = data.map((item) => [
+        null, // campo para formatacao da row, sem dado
         item.id || '', // id
         item.branch?.label || '', // cliente
         item.costCenter?.label || '', // centro de custo
@@ -111,7 +112,7 @@ export function Header() {
       records,
     }
 
-    await fetch('https://excel.smartnewservices.com.br/export', {
+    await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),

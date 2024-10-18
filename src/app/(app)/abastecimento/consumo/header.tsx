@@ -94,6 +94,7 @@ export function Header() {
         recordHeader: '###recordHeader###',
         recordsFormat: '###recordsFormat###',
         records: fuelling.map((item) => [
+          null, // campo para formatacao da row, sem dado
           item.equipment,
           item.typeConsumption,
           Number(item.quantity),
@@ -105,7 +106,7 @@ export function Header() {
         ]),
       }
     })
-    await fetch('https://excel.smartnewservices.com.br/export-unified', {
+    await fetch('https://excel.smartnewservices.com.br/api/v1/export-unified', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),

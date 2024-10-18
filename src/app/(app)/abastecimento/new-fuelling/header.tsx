@@ -110,6 +110,7 @@ export function Header() {
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
       records: data.rows.map((item) => [
+        null, // campo para formatacao da row, sem dado
         item.id, // id
         item.fuelStation, // posto
         dayjs(item.date).format('DD/MM/YYYY'), // Data de abertura
@@ -125,7 +126,7 @@ export function Header() {
       ]),
     }
 
-    await fetch('https://excel.smartnewservices.com.br/export', {
+    await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),

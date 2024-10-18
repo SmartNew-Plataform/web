@@ -54,6 +54,7 @@ export function Header() {
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
       records: data.map((item) => [
+        null, // campo para formatacao da row, sem dado
         item.model, // TAG
         item.tank, // Descrição
         item.capacity, // Capacidade máxima
@@ -63,7 +64,7 @@ export function Header() {
     }
 
     loading.show()
-    await fetch('https://excel.smartnewservices.com.br/export', {
+    await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),
