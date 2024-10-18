@@ -112,6 +112,7 @@ export function Header() {
       records,
     }
 
+
     await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
