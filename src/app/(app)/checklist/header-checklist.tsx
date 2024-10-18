@@ -24,6 +24,8 @@ export function HeaderChecklist() {
   }))
 
   if (!modules) return
+
+  if (searchParams.get('h') === 'hidden') return <div />
   return (
     <Header className="sticky top-0 z-30">
       <div className="flex gap-6">

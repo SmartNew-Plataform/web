@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Pencil, Trash2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { ProductModal } from './Primary-modal'
 
@@ -35,15 +36,21 @@ export interface User {
   }
 }
 
-async function fetchUsers(): Promise<User[]> {
-  const response = await api.get('fuelling/control-user')
-  return response.data.data || []
-}
-
 export function UserList() {
   const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
+
+  async function fetchUsers(): Promise<User[]> {
+    const response = await api.get('fuelling/control-user', {
+      params: {
+        s: searchParams.get('s'),
+      },
+    })
+    return response.data.data || []
+  }
+
   const { data: usersData = [] } = useQuery({
-    queryKey: ['fuelling/control-user'],
+    queryKey: ['fuelling/control-user', searchParams.get('s')],
     queryFn: fetchUsers,
     refetchInterval: 20 * 1000,
   })

@@ -18,8 +18,8 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { TankModal } from './tank-modal'
 import { createBody } from './excel-export'
+import { TankModal } from './tank-modal'
 
 const filterTankSchema = z.object({
   tag: z.string().optional(),
@@ -32,7 +32,7 @@ export function Header() {
   const [open, setOpen] = useState(false)
   const loading = useLoading()
   const queryClient = useQueryClient()
-  const { setFilter } = useFilterCreateTank()
+  const { filters, setFilter } = useFilterCreateTank()
 
   const formFilter = useForm<FilterTankData>({
     resolver: zodResolver(filterTankSchema),
@@ -42,30 +42,29 @@ export function Header() {
 
   async function handleGenerateExcel() {
     loading.show()
-    const data: TankResponse[] | undefined = queryClient.getQueryData([
+    const data: TankResponse[] | undefined = await queryClient.getQueryData([
       'fuelling/create/data',
+      ...Object.values(filters || {}),
     ])
-    console.log(data)
     loading.hide()
     if (!data) return
     const sheets = {
       sheetName: 'Tanques',
       headers: '###headers###',
-      recordHeader:"###recordHeader###",
-      recordsFormat:"###recordsFormat###",
-      records: data.map((item) => (
-        [
-          item.model, // TAG
-          item.tank, //Descrição
-          item.capacity, // Capacidade máxima
-          item.branch.label, // Filial
-          item.compartment // Comustível
-        ]
-      ))
+      recordHeader: '###recordHeader###',
+      recordsFormat: '###recordsFormat###',
+      records: data.map((item) => [
+        null, // campo para formatacao da row, sem dado
+        item.model, // TAG
+        item.tank, // Descrição
+        item.capacity, // Capacidade máxima
+        item.branch.label, // Filial
+        item.compartment, // Comustível
+      ]),
     }
 
     loading.show()
-    await fetch('https://excel.smartnewservices.com.br/export', {
+    await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),
@@ -78,7 +77,7 @@ export function Header() {
         const url = window.URL.createObjectURL(new Blob([blob]))
         const a = document.createElement('a')
         a.href = url
-        a.download = `cadastro_tanques_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+        a.download = `cadastro_de_tanques_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
         document.body.appendChild(a)
         a.click()
         a.remove()

@@ -44,9 +44,9 @@ export const columns: (
             />
             <Button variant="secondary" size="icon-xs" asChild>
               <Link
-                href={`/checklist/grid/${infoData.id}?token=${new URLSearchParams(
+                href={`/checklist/grid/${infoData.id}?${new URLSearchParams(
                   window.location.search,
-                ).get('token')}`}
+                ).toString()}`}
               >
                 <ExternalLink className="h-3 w-3" />
               </Link>

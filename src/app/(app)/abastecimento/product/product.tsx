@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Pencil, Trash2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { ProductModal } from './Primary-modal'
 
@@ -20,15 +21,20 @@ export interface Product {
   unity: string
 }
 
-async function fetchProduct(): Promise<Product[]> {
-  const response = await api.get('fuelling/product')
-  return response.data.data || []
-}
-
 export function FuelList() {
+  const searchParams = useSearchParams()
+
   const queryClient = useQueryClient()
+
+  async function fetchProduct(): Promise<Product[]> {
+    const response = await api.get('fuelling/product', {
+      params: { s: searchParams.get('s') },
+    })
+    return response.data.data || []
+  }
+
   const { data: fuelData = [] } = useQuery({
-    queryKey: ['fuelling/product'],
+    queryKey: ['fuelling/product', searchParams.get('s')],
     queryFn: fetchProduct,
     refetchInterval: 20 * 1000,
   })

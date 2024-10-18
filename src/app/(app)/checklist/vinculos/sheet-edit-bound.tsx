@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { BoundData } from '@/store/smartlist/smartlist-bound'
 import { useUserStore } from '@/store/user-store'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -12,40 +13,25 @@ import { Save } from 'lucide-react'
 import { ComponentProps, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { BoundData } from '@/store/smartlist/smartlist-bound'
 
 interface SheetEditBoundProps extends ComponentProps<typeof Sheet> {
   defaultValues?: BoundData
 }
 
 const editBoundSchema = z.object({
-  description: z
-    .string({ required_error: 'A descrição e obrigatória!' })
-    .nonempty({ message: 'Preencha a descrição' }),
-  automatic: z.enum(['ATIVADO', 'DESATIVADO']),
-  periodicDate: z.string().optional(),
-  periodic: z.string().optional(),
-  interval: z.number().optional(),
-  timer: z.string().optional(),
-
-  // task: z.array(
-  //   z.string({
-  //     required_error: 'Escolha uma tarefa!',
-  //     invalid_type_error: 'Você não selecionou nada!',
-  //   }),
-  // ),
-  // control: z.string({
-  //   required_error: 'Escolha um tipo de controle!',
-  //   invalid_type_error: 'Você não selecionou nada!',
-  // }),
+  description: z.string().nonempty('Preencha a descrição'),
+  // task: z.array(z.string().nonempty('Escolha uma tarefa!')),
+  // control: z.string().nonempty('Escolha um tipo de controle!'),
+  automatic: z.enum(['ATIVADO', 'DESATIVADO']).optional(),
+  typePeriodicity: z.coerce.number().optional(),
+  periodicityDate: z.string().optional(),
+  periodicity: z.string().optional(),
+  periodic: z.coerce.number().optional(),
+  horaBase: z.string().optional(),
+  dateBase: z.string().optional(),
 })
 
 type EditBoundData = z.infer<typeof editBoundSchema>
-
-// type SelectResponse = {
-//   id: number
-//   description: string
-// }
 
 export function SheetEditBound({
   defaultValues,
@@ -66,18 +52,43 @@ export function SheetEditBound({
   const queryClient = useQueryClient()
 
   const automatic = watch('automatic')
-  const periodic = watch('periodic')
+  const typePeriodic = watch('typePeriodicity')
+
+  function convertMillisecondsToTime(milliseconds: number) {
+    const totalMinutes = Math.floor(milliseconds / 60000)
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    const formattedHours = String(hours).padStart(2, '0')
+    const formattedMinutes = String(minutes).padStart(2, '0')
+    return `${formattedHours}:${formattedMinutes}`
+  }
+
+  function convertTimeToSeconds(time: string) {
+    const [hours, minutes] = time.split(':').map(Number)
+    return hours * 3600 + minutes * 60
+  }
 
   useEffect(() => {
-    setValue('description', defaultValues?.description || '')
-    setValue('automatic', defaultValues?.automatic ? 'ATIVADO' : 'DESATIVADO')
-    setValue('periodic', defaultValues?.periodic)
-    setValue('periodicDate', defaultValues?.periodicDate)
-    setValue('interval', defaultValues?.interval)
-    setValue('timer', defaultValues?.timer)
-    // setValue('task', defaultValues.|| '')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultValues])
+    if (defaultValues) {
+      setValue('description', defaultValues.description || '')
+      setValue('automatic', defaultValues.automatic ? 'ATIVADO' : 'DESATIVADO')
+      setValue(
+        'typePeriodicity',
+        defaultValues.typePeriodicity?.value || undefined,
+      )
+      setValue('periodicity', defaultValues.periodicity?.toString())
+
+      const formattedDateBase = defaultValues.periodicDate
+        ? new Date(defaultValues.periodicDate).toISOString().split('T')[0]
+        : ''
+      setValue('dateBase', formattedDateBase)
+
+      const formattedTime = defaultValues.timer
+        ? convertMillisecondsToTime(defaultValues.timer)
+        : undefined
+      setValue('horaBase', formattedTime || '')
+    }
+  }, [defaultValues, setValue])
 
   const { data } = useQuery({
     queryKey: ['checklist/bounds/selects', user?.login],
@@ -89,53 +100,40 @@ export function SheetEditBound({
           }>('system/choices/periodicity-bound')
           .then((res) => res.data.data),
       ])
-
-      return {
-        periodicity,
-      }
+      return { periodicity }
     },
     retry: true,
   })
 
   async function handleEditNewBound(data: EditBoundData) {
-    const response = await api
-      .put(`/smart-list/bound/${defaultValues?.id}`, data)
-      .then((res) => res.data)
+    console.log('função foi chamada')
 
-    if (response?.error) return
+    const payload = {
+      ...data,
+      automatic: data.automatic === 'ATIVADO',
+      periodicity: Number(data.periodicity),
+      dateBase: data.dateBase
+        ? new Date(data.dateBase).toISOString().split('T')[0]
+        : undefined,
+      horaBase: data.horaBase ? convertTimeToSeconds(data.horaBase) : undefined,
+    }
 
-    toast({
-      title: 'Vinculo atualizado com sucesso!',
-      variant: 'success',
-    })
-    queryClient.refetchQueries(['checklist/bounds'])
+    try {
+      const response = await api
+        .put(`/smart-list/bound/${defaultValues?.id}`, payload)
+        .then((res) => res.data)
+
+      if (response?.error) return
+
+      toast({
+        title: 'Vinculo atualizado com sucesso!',
+        variant: 'success',
+      })
+      queryClient.refetchQueries(['checklist/bounds'])
+    } catch (error) {
+      console.error('Erro ao atualizar o vínculo:', error)
+    }
   }
-
-  // const { data } = useQuery({
-  //   queryKey: ['checklist/bounds/selects'],
-  //   queryFn: async () => {
-  //     const [task, control] = await Promise.all([
-  //       api
-  //         .get<{ task: SelectResponse[] }>('/smart-list/task')
-  //         .then((res) => res.data.task),
-  //       api
-  //         .get<{ control: SelectResponse[] }>('/smart-list/bound/list-control')
-  //         .then((res) => res.data.control),
-  //     ])
-
-  //     return {
-  //       task: task.map(({ id, description }) => ({
-  //         label: description,
-  //         value: id.toString(),
-  //       })),
-  //       control: control.map(({ id, description }) => ({
-  //         label: description,
-  //         value: id.toString(),
-  //       })),
-  //     }
-  //   },
-  //   retry: true,
-  // })
 
   return (
     <Sheet {...props}>
@@ -167,94 +165,86 @@ export function SheetEditBound({
               <Form.Field>
                 <Form.Label>Periodicidade:</Form.Label>
                 <Form.Select
-                  name="periodic"
+                  name="typePeriodicity"
                   options={data?.periodicity || []}
                 />
+                <Form.ErrorMessage field="typePeriodicity" />
               </Form.Field>
             )}
 
-            {automatic === 'ATIVADO' && periodic === '1' && (
+            {automatic === 'ATIVADO' && typePeriodic?.toString() === '1' && (
               <Form.Field>
                 <Form.Label>Intervalo em horas:</Form.Label>
                 <Form.Input
-                  name="timer"
+                  name="periodicity"
                   type="number"
                   placeholder="Informe o intervalo em horas"
                 />
+                <Form.ErrorMessage field="periodicity" />
               </Form.Field>
             )}
 
-            {automatic === 'ATIVADO' && periodic === '2' && (
+            {automatic === 'ATIVADO' && typePeriodic?.toString() === '2' && (
+              <>
+                <Form.Field>
+                  <Form.Label>Horário:</Form.Label>
+                  <Form.Input
+                    name="horaBase"
+                    type="time"
+                    placeholder="Informe o horário"
+                  />
+                  <Form.ErrorMessage field="horaBase" />
+                </Form.Field>
+              </>
+            )}
+
+            {automatic === 'ATIVADO' && typePeriodic?.toString() === '3' && (
               <>
                 <Form.Field>
                   <Form.Label>Dia da semana:</Form.Label>
                   <Form.Select
-                    name="timer"
+                    name="periodicity"
                     options={[
-                      { label: 'Segunda-feira', value: 'MONDAY' },
-                      { label: 'Terça-feira', value: 'TUESDAY' },
-                      { label: 'Quarta-feira', value: 'WEDNESDAY' },
-                      { label: 'Quinta-feira', value: 'THURSDAY' },
-                      { label: 'Sexta-feira', value: 'FRIDAY' },
-                      { label: 'Sábado', value: 'SATURDAY' },
-                      { label: 'Domingo', value: 'SUNDAY' },
+                      { label: 'Segunda-feira', value: '1' },
+                      { label: 'Terça-feira', value: '2' },
+                      { label: 'Quarta-feira', value: '3' },
+                      { label: 'Quinta-feira', value: '4' },
+                      { label: 'Sexta-feira', value: '5' },
+                      { label: 'Sábado', value: '6' },
+                      { label: 'Domingo', value: '7' },
                     ]}
                   />
+                  <Form.ErrorMessage field="periodicity" />
                 </Form.Field>
                 <Form.Field>
                   <Form.Label>Horário:</Form.Label>
                   <Form.Input
-                    name="time"
+                    name="horaBase"
                     type="time"
                     placeholder="Informe o horário"
                   />
+                  <Form.ErrorMessage field="horaBase" />
                 </Form.Field>
               </>
             )}
 
-            {automatic === 'ATIVADO' && periodic === '3' && (
+            {automatic === 'ATIVADO' && typePeriodic?.toString() === '4' && (
               <>
                 <Form.Field>
                   <Form.Label>Data inicial do lançamento:</Form.Label>
-                  <Form.Input name="timer" type="date" />
+                  <Form.Input name="dateBase" type="date" />
                 </Form.Field>
                 <Form.Field>
                   <Form.Label>Horário:</Form.Label>
                   <Form.Input
-                    name="time"
+                    name="horaBase"
                     type="time"
                     placeholder="Informe o horário"
                   />
+                  <Form.ErrorMessage field="horaBase" />
                 </Form.Field>
               </>
             )}
-
-            {automatic === 'ATIVADO' && periodic === '4' && (
-              <>
-                <Form.Field>
-                  <Form.Label>Data inicial do lançamento:</Form.Label>
-                  <Form.Input name="timer" type="date" />
-                </Form.Field>
-                <Form.Field>
-                  <Form.Label>Horário:</Form.Label>
-                  <Form.Input
-                    name="time"
-                    type="time"
-                    placeholder="Informe o horário"
-                  />
-                </Form.Field>
-              </>
-            )}
-
-            {/* <Form.Field>
-              <Form.Label>Tarefas:</Form.Label>
-              <Form.MultiSelect name="task" options={data?.task || []} />
-            </Form.Field>
-
-            <Form.Field>
-              <Form.Label>Controle:</Form.Label>
-              <Form.Select name="control" options={data?.control || []} />
-            </Form.Field> */}
 
             <Button disabled={isSubmitting} loading={isSubmitting}>
               <Save className="h-4 w-4" />

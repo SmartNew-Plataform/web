@@ -27,10 +27,12 @@ const newBoundSchema = z.object({
   task: z.array(z.string().nonempty('Escolha uma tarefa!')),
   control: z.string().nonempty('Escolha um tipo de controle!'),
   automatic: z.enum(['ATIVADO', 'DESATIVADO']),
-  periodic: z.string().optional(),
-  periodicDate: z.string().optional(),
-  interval: z.number().optional(),
-  timer: z.string().optional(),
+  typePeriodicity: z.coerce.number().optional(),
+  periodicityDate: z.string().optional(),
+  periodicity: z.coerce.number().optional(),
+  periodic: z.coerce.number().optional(),
+  horaBase: z.string().optional(),
+  dateBase: z.string().optional(),
 })
 
 type NewBoundData = z.infer<typeof newBoundSchema>
@@ -64,9 +66,17 @@ export function SheetNewBound() {
   const filterText = searchParams.get('s') || ''
 
   const automatic = watch('automatic')
-  const periodic = watch('periodic')
+  const typePeriodic = watch('typePeriodicity')
 
   async function handleCreateNewBound(data: NewBoundData) {
+    console.log('função foi chamada')
+
+    let horaBaseInMillis
+    if (data.horaBase) {
+      const [hours, minutes] = data.horaBase.split(':').map(Number)
+      horaBaseInMillis = (hours * 60 + minutes) * 60 * 1000
+    }
+
     try {
       const response = await api.post('/smart-list/bound', {
         ...data,
@@ -75,6 +85,7 @@ export function SheetNewBound() {
         familyId: data.family,
         diverseId: data.diverse,
         automatic: data.automatic === 'ATIVADO',
+        horaBase: horaBaseInMillis,
       })
 
       console.log(response.data)
@@ -211,81 +222,83 @@ export function SheetNewBound() {
               <Form.Field>
                 <Form.Label>Periodicidade:</Form.Label>
                 <Form.Select
-                  name="periodic"
+                  name="typePeriodicity"
                   options={data?.periodicity || []}
                 />
+                <Form.ErrorMessage field="typePeriodicity" />
               </Form.Field>
             )}
 
-            {automatic === 'ATIVADO' && periodic === '1' && (
+            {automatic === 'ATIVADO' && typePeriodic?.toString() === '1' && (
               <Form.Field>
                 <Form.Label>Intervalo em horas:</Form.Label>
                 <Form.Input
-                  name="interval"
+                  name="periodicity"
                   type="number"
                   placeholder="Informe o intervalo em horas"
                 />
+                <Form.ErrorMessage field="periodicity" />
               </Form.Field>
             )}
 
-            {automatic === 'ATIVADO' && periodic === '2' && (
+            {automatic === 'ATIVADO' && typePeriodic?.toString() === '2' && (
+              <>
+                <Form.Field>
+                  <Form.Label>Horário:</Form.Label>
+                  <Form.Input
+                    name="horaBase"
+                    type="time"
+                    placeholder="Informe o horário"
+                  />
+                  <Form.ErrorMessage field="horaBase" />
+                </Form.Field>
+              </>
+            )}
+
+            {automatic === 'ATIVADO' && typePeriodic?.toString() === '3' && (
               <>
                 <Form.Field>
                   <Form.Label>Dia da semana:</Form.Label>
                   <Form.Select
-                    name="periodicDate"
+                    name="periodicity"
                     options={[
-                      { label: 'Segunda-feira', value: 'MONDAY' },
-                      { label: 'Terça-feira', value: 'TUESDAY' },
-                      { label: 'Quarta-feira', value: 'WEDNESDAY' },
-                      { label: 'Quinta-feira', value: 'THURSDAY' },
-                      { label: 'Sexta-feira', value: 'FRIDAY' },
-                      { label: 'Sábado', value: 'SATURDAY' },
-                      { label: 'Domingo', value: 'SUNDAY' },
+                      { label: 'Segunda-feira', value: '1' },
+                      { label: 'Terça-feira', value: '2' },
+                      { label: 'Quarta-feira', value: '3' },
+                      { label: 'Quinta-feira', value: '4' },
+                      { label: 'Sexta-feira', value: '5' },
+                      { label: 'Sábado', value: '6' },
+                      { label: 'Domingo', value: '7' },
                     ]}
                   />
+                  <Form.ErrorMessage field="periodicity" />
                 </Form.Field>
                 <Form.Field>
                   <Form.Label>Horário:</Form.Label>
                   <Form.Input
-                    name="time"
+                    name="horaBase"
                     type="time"
                     placeholder="Informe o horário"
                   />
+                  <Form.ErrorMessage field="horaBase" />
                 </Form.Field>
               </>
             )}
 
-            {automatic === 'ATIVADO' && periodic === '3' && (
+            {automatic === 'ATIVADO' && typePeriodic?.toString() === '4' && (
               <>
                 <Form.Field>
                   <Form.Label>Data inicial do lançamento:</Form.Label>
-                  <Form.Input name="timer" type="date" />
+                  <Form.Input name="dateBase" type="date" />
                 </Form.Field>
                 <Form.Field>
                   <Form.Label>Horário:</Form.Label>
                   <Form.Input
-                    name="time"
+                    name="horaBase"
                     type="time"
                     placeholder="Informe o horário"
                   />
-                </Form.Field>
-              </>
-            )}
-
-            {automatic === 'ATIVADO' && periodic === '4' && (
-              <>
-                <Form.Field>
-                  <Form.Label>Data inicial do lançamento:</Form.Label>
-                  <Form.Input name="timer" type="date" />
-                </Form.Field>
-                <Form.Field>
-                  <Form.Label>Horário:</Form.Label>
-                  <Form.Input
-                    name="time"
-                    type="time"
-                    placeholder="Informe o horário"
-                  />
+                  <Form.ErrorMessage field="horaBase" />
                 </Form.Field>
               </>
             )}

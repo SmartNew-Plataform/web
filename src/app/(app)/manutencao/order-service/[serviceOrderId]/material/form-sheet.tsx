@@ -135,7 +135,7 @@ export function FormSheet({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label required htmlFor="serialNumberOld">
+              <Form.Label htmlFor="serialNumberOld">
                 N° série antigo:
               </Form.Label>
               <Form.Input
@@ -148,7 +148,7 @@ export function FormSheet({
             </Form.Field>
 
             <Form.Field>
-              <Form.Label required htmlFor="serialNumberNewer">
+              <Form.Label htmlFor="serialNumberNewer">
                 N° série novo:
               </Form.Label>
               <Form.Input

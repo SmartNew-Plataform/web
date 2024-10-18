@@ -19,8 +19,8 @@ import { Eraser, FileBarChart, ListFilter, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { FuelForm, SupplyFormData } from './fuelForm'
 import { createBody } from './excel-export'
+import { FuelForm, SupplyFormData } from './fuelForm'
 
 const filterFormSchema = z.object({
   equipment: z.string().optional(),
@@ -34,7 +34,7 @@ export type FuellingFilteFormData = z.infer<typeof filterFormSchema>
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
-  const { setFilter } = useFilterFuelling()
+  const { filters, setFilter } = useFilterFuelling()
   const loading = useLoading()
   const queryClient = useQueryClient()
 
@@ -95,7 +95,10 @@ export function Header() {
   async function handleGenerateExcel() {
     loading.show()
     const data: { rows: FuellingResponse[] } | undefined =
-      queryClient.getQueryData(['fuelling/data'])
+      await queryClient.getQueryData([
+        'fuelling/data',
+        ...Object.values(filters || {}),
+      ])
     loading.hide()
 
     if (!data) return
@@ -104,27 +107,26 @@ export function Header() {
     const sheets = {
       sheetName: 'Abastecimentos',
       headers: '###headers###',
-      recordHeader:"###recordHeader###",
-      recordsFormat:"###recordsFormat###",
-      records: data.rows.map((item) => (
-          [
-            item.id, // id
-            item.fuelStation, // posto
-            dayjs(item.date).format('DD/MM/YYYY'), // Data de abertura
-            item.equipment, // equipamento
-            item.type, // Tipo de Consumo
-            item.counter, // Contador Atual
-            item.counterLast, // Contador Anterior
-            item.compartment, // Combust,ível
-            Number(item.quantidade), // Quantidade
-            Number(item.consumption), // Consumo Realizado
-            Number(item.value), // Valor Unitário
-            Number(item.total) // Valor total
-          ]
-        ))
+      recordHeader: '###recordHeader###',
+      recordsFormat: '###recordsFormat###',
+      records: data.rows.map((item) => [
+        null, // campo para formatacao da row, sem dado
+        item.id, // id
+        item.fuelStation, // posto
+        dayjs(item.date).format('DD/MM/YYYY'), // Data de abertura
+        item.equipment, // equipamento
+        item.type, // Tipo de Consumo
+        item.counter, // Contador Atual
+        item.counterLast, // Contador Anterior
+        item.compartment, // Combust,ível
+        Number(item.quantidade), // Quantidade
+        Number(item.consumption), // Consumo Realizado
+        Number(item.value), // Valor Unitário
+        Number(item.total), // Valor total
+      ]),
     }
 
-    await fetch('https://excel.smartnewservices.com.br/export', {
+    await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),
@@ -137,7 +139,7 @@ export function Header() {
         const url = window.URL.createObjectURL(new Blob([blob]))
         const a = document.createElement('a')
         a.href = url
-        a.download = `abastecimentos_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+        a.download = `registrar_abastecimento_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
         document.body.appendChild(a)
         a.click()
         a.remove()

@@ -34,7 +34,7 @@ const filterFormSchema = z.object({
 export type FilterFormData = z.infer<typeof filterFormSchema>
 
 export function Header() {
-  const { setFilter } = useFilterConsuption()
+  const { filters, setFilter } = useFilterConsuption()
   const loading = useLoading()
   const queryClient = useQueryClient()
 
@@ -66,26 +66,47 @@ export function Header() {
     },
   })
 
+  function calculeDifference(item: any) {
+    const { expectedConsumption, consumptionMade } = item
+
+    const difference =
+      ((consumptionMade - expectedConsumption) / expectedConsumption) * 100
+
+    const result = difference === Infinity ? 100 : difference
+
+    return result
+  }
+
   async function handleGenerateExcel() {
     loading.show()
     const dataExcel: ConsuptionData[] | undefined =
-      await queryClient.getQueryData(['fuelling/report/family-consumption'])
+      await queryClient.getQueryData([
+        'fuelling/report/family-consumption',
+        ...Object.values(filters || {}),
+      ])
 
     loading.hide()
     if (!dataExcel) return
-    console.log(dataExcel)
     loading.show()
     const sheets = dataExcel.map(({ family, fuelling }) => {
       return {
-        sheetName:family.replaceAll('/', '-'),
-        recordHeader:"###recordHeader###",
-        recordsFormat:"###recordsFormat###",
-        records: fuelling.map((item) => (
-          [ item.equipment, item.typeConsumption, item.quantity, item.total, item.expectedConsumption, item.consumptionMade, item.difference ]
-        )),
+        sheetName: family.replaceAll('/', '-'),
+        recordHeader: '###recordHeader###',
+        recordsFormat: '###recordsFormat###',
+        records: fuelling.map((item) => [
+          null, // campo para formatacao da row, sem dado
+          item.equipment,
+          item.typeConsumption,
+          Number(item.quantity),
+          Number(item.total),
+          Number(item.sumConsumption),
+          Number(item.expectedConsumption),
+          Number(item.consumptionMade),
+          calculeDifference(item),
+        ]),
       }
-    }) 
-     await fetch('https://excel.smartnewservices.com.br/export', {
+    })
+    await fetch('https://excel.smartnewservices.com.br/api/v1/export-unified', {
       method: 'POST',
       mode: 'cors',
       body: createBody(sheets),
@@ -98,7 +119,7 @@ export function Header() {
         const url = window.URL.createObjectURL(new Blob([blob]))
         const a = document.createElement('a')
         a.href = url
-        a.download = `analise_consumo_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
+        a.download = `analise_de_consumo_${dayjs().format('DD-MM-YYYY-HH-mm-ss')}.xlsx`
         document.body.appendChild(a)
         a.click()
         a.remove()

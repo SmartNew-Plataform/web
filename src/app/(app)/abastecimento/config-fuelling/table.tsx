@@ -2,6 +2,7 @@
 
 import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
+import { useUserStore } from '@/store/user-store'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
@@ -13,6 +14,7 @@ type FuelConfig = {
 export function Table() {
   const [configData, setConfigData] = useState<FuelConfig[] | null>(null)
   const { toast } = useToast()
+  const { user } = useUserStore()
 
   async function fetchControlData() {
     try {
@@ -38,8 +40,13 @@ export function Table() {
   }
 
   useQuery({
-    queryKey: ['fuelling/config-fuelling/data'],
+    queryKey: ['fuelling/config-fuelling/data', user?.login],
     queryFn: fetchControlData,
+    // retryDelay: 1000,
+    // refetchInterval: 1000,
+    // retryDelay: 1000,
+    // refetchInterval: 3000,
+    // retry: true,
   })
 
   const handleOptionChange = (index: number, newOption: string | number) => {
