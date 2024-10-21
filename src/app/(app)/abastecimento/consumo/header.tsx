@@ -70,12 +70,17 @@ export function Header() {
     const { expectedConsumption, consumptionMade } = item
 
     const difference =
-      ((consumptionMade - expectedConsumption) / expectedConsumption) * 100
+      ((consumptionMade - expectedConsumption) / expectedConsumption)
 
-    const result = difference === Infinity ? 100 : difference
+    const result = difference === Infinity ? 1 : difference
 
     return result
   }
+
+  //const startDate = null
+  //const endDate = null
+  const startDate = "01/06/2024"
+  const endDate = "06/09/2024"
 
   async function handleGenerateExcel() {
     loading.show()
@@ -102,14 +107,15 @@ export function Header() {
           Number(item.sumConsumption),
           Number(item.expectedConsumption),
           Number(item.consumptionMade),
-          calculeDifference(item),
+          calculeDifference(item)
         ]),
       }
     })
+    
     await fetch('https://excel.smartnewservices.com.br/api/v1/export-unified', {
       method: 'POST',
       mode: 'cors',
-      body: createBody(sheets),
+      body: createBody(sheets, startDate, endDate),
       headers: {
         'Content-Type': 'application/json',
       },
