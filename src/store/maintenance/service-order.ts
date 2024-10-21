@@ -6,6 +6,34 @@ type EquipmentData = {
   branch: SelectData
 } & SelectData
 
+
+export type ServiceOrder ={ 
+  id: number;
+  codeServiceOrder: string
+  equipment: string;
+  requester: string;
+  dateTimeRequest: string
+  dateEmission: string;
+  requestDate: string;
+  datePrev: string;
+  branch: {
+    id: number,
+    branchNumber: string,
+    companyName: string
+  }
+  statusOrderService: {
+    id: number;
+    status: string;
+    color: string;
+  };
+  typeMaintenance: {
+    id: number;
+    label: string;
+    typeMaintenance: string
+  }
+}
+
+
 export type StatusFilterData = {
   id: string
   name: string
@@ -26,8 +54,12 @@ interface ServiceOrderStoreData {
   statusFilterValue: string | undefined
   setStatusFilterValue: (data: string | undefined) => void
 
+  serviceOrders: ServiceOrder[] | undefined;
+  fetchServiceOrders: () => Promise<void>; 
+  
   statusFilterData: StatusFilterData[] | undefined
   setStatusFilterData: (data: StatusFilterData[] | undefined) => void
+  updateServiceOrderStatus: (orderId: number, newStatusId: number) => Promise<void>;
 
   setSelects: (data: ServiceOrderStoreData['selects']) => void
   fetchSelects: () => Promise<ServiceOrderStoreData['selects']>
@@ -48,8 +80,9 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
       maintainers: undefined,
     },
     statusFilterValue: undefined,
+    serviceOrders: undefined,
     statusFilterData: undefined,
-    viewMode: 'grid',
+    viewMode: 'kanban',
 
     setStatusFilterValue(data) {
       set({ statusFilterValue: data })
@@ -89,7 +122,6 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
           .get('/system/choices/maintainers')
           .then((res) => res.data.data),
       ])
-      // console.log('branch => ', branch)
 
       const result = {
         branch,
@@ -118,6 +150,49 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
 
       return result
     },
+
+    async fetchServiceOrders() {
+      const response = await api.get('/maintenance/service-order/list-table');
+      const serviceOrders = response.data.rows;
+      set({serviceOrders});
+    },
+
+    async updateServiceOrderStatus(orderId: number, newStatusId: number) {
+      try {
+        const updatedOrderData: any = {
+          idStatusServiceOrder: newStatusId,
+        };
+    
+        // Exemplo: Se o novo status for "Encerrado" ou "Finalizado", incluir o campo 'dateEnd'
+        //if (newStatusId === 706) {
+          //updatedOrderData.dateEnd = new Date().toISOString();
+        //}
+
+        const response = await api.put(`/maintenance/service-order/${orderId}/status`, updatedOrderData);
+    
+        console.log('Status atualizado com sucesso:', response.data);
+    
+        set((state) => {
+          const updatedOrders = state.serviceOrders?.map((order) => {
+            if (order.id === orderId) {
+              return {
+                ...order,
+                statusOrderService: {
+                  ...order.statusOrderService,
+                  id: newStatusId,
+                },
+              };
+            }
+            return order;
+          });
+          return { serviceOrders: updatedOrders };
+        });
+    
+      } catch (error) {
+        console.error("Erro ao atualizar o status da ordem de serviço:", error);
+      }
+    },
+    
 
     setViewMode(viewMode) {
       set({ viewMode })

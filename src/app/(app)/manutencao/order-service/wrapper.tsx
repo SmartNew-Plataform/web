@@ -1,7 +1,7 @@
 'use client'
 
 import { useServiceOrder } from '@/store/maintenance/service-order'
-import { KanbanView } from './kanban-view'
+import  KanbanView  from './kanban-view'
 import { TableServiceOrder } from './table-service-order'
 
 export function Wrapper() {

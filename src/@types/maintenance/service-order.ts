@@ -69,3 +69,16 @@ export type ServiceOrderData = {
     nome: string
   }
 }
+
+export type ServiceOrder ={ 
+  id: number;
+  equipament: string;
+  dateEmisson: string;
+  dateTimeRequest: string;
+  statusOrderService: {
+    id: number;
+    status: string;
+    color: string;
+  };
+}
+
