@@ -1,97 +1,50 @@
 const recordHeader = `[
   {
-    "nameHeader":"EQUIPAMENTO",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"EQUIPAMENTO"
   },
   {
-    "nameHeader":"TIPO CONSUMO",
-    "formatHeader":{
-      "text_wrap": true,
-      "border":1,
-      "bold": true,
-      "text_wrap": true,
-      "valign":"center",
-      "align":"center"
-      
-    }
+    "nameHeader":"TIPO CONSUMO"
   },
   {
-    "nameHeader":"QTD LITROS",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"QTD LITROS"
   },
   {
-    "nameHeader":"VLR TOTAL",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"VLR TOTAL"
   },
   {
-    "nameHeader":"TOTAL CONTADOR",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"TOTAL CONTADOR"
   },
   {
-    "nameHeader":"CONS. PREVISTO",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"CONS. PREVISTO"
   },
   {
-    "nameHeader":"CONS. REALIZADO",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"CONS. REALIZADO"
   },
   {
-    "nameHeader":"DIFERENÇA %",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"DIFERENÇA %"
   }
 ]
 `
 
+const formatTableTop = `{
+   "text_wrap": true,
+      "bold": true,
+      "text_wrap": true,
+      "valign":"center",
+      "align":"center",
+      "bg_color": "#e2e8f0",
+      "font_color": "#64748b"
+}`
+
 const recordsFormat = `[
-  {"border": 1},
-  {"border": 1},
-  {"border": 1, "num_format": 4},
-  {"border": 1, "num_format": 4},
-  {"border": 1, "num_format": 4},
-  {"border": 1, "num_format": 4},
-  {"border": 1, "num_format": 4},
-  {"border": 1, "num_format": 10}
+  {},
+  {},
+  {"num_format": 4},
+  {"num_format": 4},
+  {"num_format": 4},
+  {"num_format": 4},
+  {"num_format": 4},
+  {"num_format": 10}
 ]
 `
 
@@ -131,4 +84,5 @@ export function createBody(sheets:any, startDate:string, endDate: string):any{
   return JSON.stringify(before)
       .replaceAll('"###recordHeader###"',recordHeader)
       .replaceAll('"###recordsFormat###"',recordsFormat)
+      .replaceAll('"###formatTableTop###"',formatTableTop)
 }

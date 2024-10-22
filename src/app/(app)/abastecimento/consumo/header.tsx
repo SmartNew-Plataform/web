@@ -82,6 +82,17 @@ export function Header() {
   const startDate = "01/06/2024"
   const endDate = "06/09/2024"
 
+  function getColor(value:any, typeConsumption:any){
+    if(typeConsumption == 'L/HR' && value != 0){
+      value *= -1
+    }
+
+    const green500 = '#22c55e'
+    const red500 = '#ef4444'
+
+    return value > 0 ? green500 : red500
+
+  }
   async function handleGenerateExcel() {
     loading.show()
     const dataExcel: ConsuptionData[] | undefined =
@@ -98,8 +109,23 @@ export function Header() {
         sheetName: family.replaceAll('/', '-'),
         recordHeader: '###recordHeader###',
         recordsFormat: '###recordsFormat###',
-        records: fuelling.map((item) => [
-          null, // campo para formatacao da row, sem dado
+        formatTableTop: '###formatTableTop###',
+        records: fuelling.map((item, index) => [
+          index % 2 === 0 ? 
+          {
+            "format":{
+              "bottom": 4,
+              "left": 4,
+              "right": 4
+            }
+          } : {
+            "format":{
+              "bottom": 4,
+              "left": 4,
+              "right": 4,
+              "bg_color":"#F1F5F9"
+            }
+          }, // campo para formatacao da row, sem dado
           item.equipment,
           item.typeConsumption,
           Number(item.quantity),
@@ -107,7 +133,13 @@ export function Header() {
           Number(item.sumConsumption),
           Number(item.expectedConsumption),
           Number(item.consumptionMade),
-          calculeDifference(item)
+          {
+            "value": calculeDifference(item),
+            "format":{
+              "font_color": getColor(calculeDifference(item),item.typeConsumption)
+            }
+          }
+          
         ]),
       }
     })
