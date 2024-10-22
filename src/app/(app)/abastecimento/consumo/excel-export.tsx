@@ -48,41 +48,37 @@ const recordsFormat = `[
 ]
 `
 
-function bodyBefore(sheets:any):any{
+function bodyBefore(sheets: unknown): unknown {
   return {
-      filename:"Análise de consumo.xlsx",
-      sheets: sheets 
+    filename: 'Análise de consumo.xlsx',
+    sheets,
   }
 }
 
-function createFilterDate(sheets:any, startDate:string, endDate:string){
-  if ( startDate == null || endDate == null ) 
-    return sheets
+function createFilterDate(sheets: unknown, startDate: string, endDate: string) {
+  if (startDate == null || endDate == null) return sheets
 
-  console.log(Array.isArray(sheets))
-  console.log(sheets)
-  console.log(typeof(sheets))
-  let filterDate = "PERÍODO "+String(startDate)+" Á "+String(endDate)
-  const filterDate2 = "Relatório de Composições"
+  let filterDate = `PERÍODO ${startDate} Á ${endDate}`
 
-  filterDate = filterDate.replaceAll('/','-')
-  console.log(typeof(filterDate)) // string
-  console.log(typeof(filterDate2)) // string
-  const newFirstSheet = { "sheetName": filterDate }
-  console.log(typeof(sheets))
-  //`PERÍODO: ${startDate} Á ${endDate}`
-  sheets.unshift(newFirstSheet); 
+  filterDate = filterDate.replaceAll('/', '-')
+  const newFirstSheet = { sheetName: filterDate }
+
+  if (Array.isArray(sheets)) {
+    sheets.unshift(newFirstSheet)
+  }
   return sheets
 }
 
-
-export function createBody(sheets:any, startDate:string, endDate: string):any{
-
+export function createBody(
+  sheets: unknown,
+  startDate: string,
+  endDate: string,
+): string {
   const sheetsWhitfilterDate = createFilterDate(sheets, startDate, endDate)
-  
+
   const before = bodyBefore(sheetsWhitfilterDate)
   return JSON.stringify(before)
-      .replaceAll('"###recordHeader###"',recordHeader)
-      .replaceAll('"###recordsFormat###"',recordsFormat)
-      .replaceAll('"###formatTableTop###"',formatTableTop)
+    .replaceAll('"###recordHeader###"', recordHeader)
+    .replaceAll('"###recordsFormat###"', recordsFormat)
+    .replaceAll('"###formatTableTop###"', formatTableTop)
 }

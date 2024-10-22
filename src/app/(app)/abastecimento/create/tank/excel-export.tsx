@@ -68,16 +68,16 @@ const recordsFormat = `[
   ]
 `
 
-function bodyBefore(sheets: any): any {
+function bodyBefore(sheets: unknown): unknown {
   return {
     filename: 'Planilha.xlsx',
     sheets: [sheets],
   }
 }
 
-function createFilterDate(startDate:string, endDate:string){
-  if ( startDate == null || endDate == null ) return '';
-//"message":"PERÍODO: ${startDate} Á ${endDate}",
+function createFilterDate(startDate: string, endDate: string) {
+  if (startDate == null || endDate == null) return ''
+
   return `,
   {
   "blocks":[
@@ -94,10 +94,13 @@ function createFilterDate(startDate:string, endDate:string){
   `
 }
 
-export function createBody(sheets:any, startDate:string, endDate: string):any{
-
-  const filterDate = createFilterDate(startDate,endDate)
-  const headersWithFilterDate = headers.replace("###filterDate###",filterDate)
+export function createBody(
+  sheets: unknown,
+  startDate: string,
+  endDate: string,
+): string {
+  const filterDate = createFilterDate(startDate, endDate)
+  const headersWithFilterDate = headers.replace('###filterDate###', filterDate)
 
   const before = bodyBefore(sheets)
   return JSON.stringify(before)

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { useLoading } from '@/store/loading-store'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { createBody } from './excel-export'
 import { TrainModal } from './train-modal'
@@ -15,17 +14,15 @@ import { TrainModal } from './train-modal'
 export function Header() {
   const [open, setOpen] = useState(false)
 
-  const searchParams = useSearchParams()
   const loading = useLoading()
   const queryClient = useQueryClient()
 
   async function handleGenerateExcel() {
     loading.show()
 
-    const filterText = searchParams.get('s') || ''
     const data = queryClient.getQueryData(['fuelling/train/data'])
 
-    let records: any = []
+    let records: unknown = []
 
     if (Array.isArray(data)) {
       records = data.map((item) => [
@@ -46,15 +43,13 @@ export function Header() {
       records,
     }
 
-    //const startDate = null
-    //const endDate = null
-    const startDate = "01/06/2024"
-    const endDate = "06/09/2024"
+    const startDate = '01/06/2024'
+    const endDate = '06/09/2024'
 
     await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
-      body: createBody(sheets,startDate, endDate),
+      body: createBody(sheets, startDate, endDate),
       headers: {
         'Content-Type': 'application/json',
       },

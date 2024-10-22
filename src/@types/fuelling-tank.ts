@@ -33,10 +33,17 @@ export interface TankAndTrainResponse {
 
 export interface FuelInlet {
   id: number
-  bound: SelectData
-  provider: SelectData
+  bound: {
+    text: string
+    value: string
+  }
+  provider: {
+    text: string
+    value: string
+  }
   date: string
   typeSupplier: SelectData
   type: SelectData
   fiscalNumber: string
+  total: number
 }

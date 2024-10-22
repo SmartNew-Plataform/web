@@ -141,16 +141,16 @@ const recordsFormat = `[
   ]
 `
 
-function bodyBefore(sheets:any):any{
-    return {
-        filename:"Planilha.xlsx",
-        sheets: [sheets]
-    }
+function bodyBefore(sheets: unknown): unknown {
+  return {
+    filename: 'Planilha.xlsx',
+    sheets: [sheets],
+  }
 }
 
-function createFilterDate(startDate:string, endDate:string){
-  if ( startDate == null || endDate == null ) return '';
-//"message":"PERÍODO: ${startDate} Á ${endDate}",
+function createFilterDate(startDate: string, endDate: string) {
+  if (startDate == null || endDate == null) return ''
+
   return `,
   {
   "blocks":[
@@ -167,14 +167,17 @@ function createFilterDate(startDate:string, endDate:string){
   `
 }
 
-export function createBody(sheets:any, startDate:string, endDate: string):any{
+export function createBody(
+  sheets: unknown,
+  startDate: string,
+  endDate: string,
+): string {
+  const filterDate = createFilterDate(startDate, endDate)
+  const headersWithFilterDate = headers.replace('###filterDate###', filterDate)
 
-  const filterDate = createFilterDate(startDate,endDate)
-  const headersWithFilterDate = headers.replace("###filterDate###",filterDate)
-
-    const before = bodyBefore(sheets)
-    return JSON.stringify(before)
-        .replaceAll('"###headers###"',headersWithFilterDate)
-        .replaceAll('"###recordHeader###"',recordHeader)
-        .replaceAll('"###recordsFormat###"',recordsFormat)
+  const before = bodyBefore(sheets)
+  return JSON.stringify(before)
+    .replaceAll('"###headers###"', headersWithFilterDate)
+    .replaceAll('"###recordHeader###"', recordHeader)
+    .replaceAll('"###recordsFormat###"', recordsFormat)
 }
