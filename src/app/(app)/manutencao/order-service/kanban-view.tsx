@@ -7,6 +7,7 @@ import {
   StatusFilterData,
   useServiceOrder,
 } from '@/store/maintenance/service-order'
+import { AdvancedFilter } from '@/components/advanced-filter'
 import { Label } from '@radix-ui/react-label'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -30,7 +31,7 @@ import {
   FiPlus,
   FiSettings,
 } from 'react-icons/fi'
-
+import { useFilters } from '@/hooks/use-filters'
 
 const statusColors: { [key: string]: string } = {
   'EM ABERTO': 'border-red-500',
@@ -64,18 +65,63 @@ const KanbanView = () => {
   const queryClient = useQueryClient()
   const router = useRouter()
   const searchParams = useSearchParams()
-
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentOrderId, setCurrentOrderId] = useState<number | null>(null)
   const [newStatusId, setNewStatusId] = useState<number | null>(null)
   const [justify, setJustify] = useState<string>('')
   const [dateEnd, setDateEnd] = useState<string | null>(null)
-  const [draggedOrderData, setDraggedOrderData] = useState<StatusFilterData | null>(null);
+  const [draggedOrderData, setDraggedOrderData] = useState<StatusFilterData | null>(null)
 
+  // Novo hook para gerenciar filtros
+  const filterServiceOrder = useFilters({
+    defaultValues: { status: selects.status ? [selects.status[0].value] : [] },
+    options: [
+      {
+        label: 'Ordem',
+        value: 'codeServiceOrder',
+        type: 'text',
+      },
+      {
+        label: 'Cliente',
+        value: 'branch.companyName',
+        type: 'text',
+      },
+      {
+        label: 'Equipamento',
+        value: 'equipment',
+        type: 'select',
+        options: selects.equipment,
+      },
+      {
+        label: 'Solicitante',
+        value: 'requester',
+        type: 'select',
+        options: selects.requester,
+      },
+      {
+        label: 'Status',
+        value: 'status',
+        type: 'select',
+        options: selects?.status?.map(({id, name}) => {
+          return {
+            label: name,
+            value: id
+          }
+        })
+      },
+    ],
+  })
+
+  const { filterData } = filterServiceOrder
 
   useEffect(() => {
-    fetchServiceOrders()
-  }, [fetchServiceOrders])
+    // Verifica se há filtros antes de chamar a função
+    if (Object.keys(filterData).length > 0) {
+      fetchServiceOrders(filterData)
+    } else {
+      fetchServiceOrders()
+    }
+  }, [fetchServiceOrders, filterData])
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result
@@ -90,7 +136,7 @@ const KanbanView = () => {
       )
 
       if (draggedOrder) {
-        setDraggedOrderData(draggedOrder);
+        setDraggedOrderData(draggedOrder)
       }
 
       console.log(draggedOrder?.hasJustify, draggedOrder?.hasFinished)
@@ -117,24 +163,23 @@ const KanbanView = () => {
 
   const handleModalSubmit = () => {
     if (currentOrderId && newStatusId !== null) {
-      const formattedDateEnd = dateEnd ? new Date(dateEnd).toISOString() : undefined;
+      const formattedDateEnd = dateEnd ? new Date(dateEnd).toISOString() : undefined
   
       const additionalData = {
         justify: draggedOrderData?.hasJustify ? justify : undefined,
         dateEnd: draggedOrderData?.hasFinished ? formattedDateEnd : undefined,
-      };
+      }
   
       updateServiceOrderStatus(currentOrderId, newStatusId, additionalData)
         .then(() => {
-          queryClient.refetchQueries(['maintenance-service-order-table']);
-          closeModal();
+          queryClient.refetchQueries(['maintenance-service-order-table'])
+          closeModal()
         })
         .catch(error => {
-          console.error('Erro ao atualizar o status da ordem de serviço:', error);
-        });
+          console.error('Erro ao atualizar o status da ordem de serviço:', error)
+        })
     }
-  };
-  
+  }
 
   const closeModal = () => {
     setIsModalOpen(false)
@@ -166,6 +211,7 @@ const KanbanView = () => {
       hasFinished: status.hasFinished,
       hasJustify: status.hasJustify,
       count: 0,
+      value: status.id
     }))
   }
 
@@ -177,113 +223,111 @@ const KanbanView = () => {
 
   return (
     <>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex gap-6 overflow-auto rounded-lg bg-white bg-opacity-90 p-5 border border-gray-400 h-full">
-          {statusList.map((status: StatusFilterData) =>
-            status.id ? (
-              <Droppable key={status.id} droppableId={status.id.toString()}>
-                {(provided: DroppableProvided) => (
-                  <div
-                    className="relative overflow-auto flex min-w-[300px] flex-col gap-5 bg-transparent border-r border-gray-300 min-h-full"
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    <div className="p-3 flex items-center justify-between sticky top-0 bg-white">
-                      <div className="text-md flex items-center gap-2 font-bold text-gray-900 ">
-                        {statusIcons[status.name] || (
-                          <FiCheckCircle className="text-gray-500" />
-                        )}
-                        {status.name}
+      <div className="flex flex-col gap-4">
+        {/* Filtro adicionado acima do Kanban */}
+        <AdvancedFilter {...filterServiceOrder} />
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="flex gap-6 overflow-auto rounded-lg bg-white bg-opacity-90 p-5 border border-gray-400 h-full">
+            {statusList.map((status: StatusFilterData) =>
+              status.id ? (
+                <Droppable key={status.id} droppableId={status.id.toString()}>
+                  {(provided: DroppableProvided) => (
+                    <div
+                      className="relative overflow-auto flex min-w-[300px] flex-col gap-5 bg-transparent border-r border-gray-300 min-h-full"
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                    >
+                      <div className="p-3 flex items-center justify-between sticky top-0 bg-white">
+                        <div className="text-md flex items-center gap-2 font-bold text-gray-900 ">
+                          {statusIcons[status.name] || (
+                            <FiCheckCircle className="text-gray-500" />
+                          )}
+                          {status.name}
+                        </div>
+                        <FiPlus className="cursor-pointer text-black hover:text-gray-600" />
                       </div>
-                      <FiPlus className="cursor-pointer text-black hover:text-gray-600" />
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      {groupedOrders[status.id] &&
-                        groupedOrders[status.id].map((order, index) => (
-                          <Draggable
-                            key={order.id.toString()}
-                            draggableId={order.id.toString()}
-                            index={index}
-                          >
-                            {(provided: DraggableProvided) => (
-                              <div
-                                className={`flex cursor-grab flex-col gap-3 rounded-lg border-l-4 bg-white p-3 shadow-md ${statusColors[status.name]}`}
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <p className="text-xs text-gray-700">
-                                    <strong>OS:</strong>{' '}
-                                    {order.codeServiceOrder}
-                                  </p>
-                                  <div className="text-right">
-                                    <FiInfo
-                                      className="cursor-pointer text-blue-500 hover:text-blue-700"
-                                      onClick={() => openOrderDetails(order.id)}
-                                    />
+                      <div className="flex flex-col gap-4">
+                        {groupedOrders[status.id] &&
+                          groupedOrders[status.id].map((order, index) => (
+                            <Draggable
+                              key={order.id.toString()}
+                              draggableId={order.id.toString()}
+                              index={index}
+                            >
+                              {(provided: DraggableProvided) => (
+                                <div
+                                  className={`flex cursor-grab flex-col gap-3 rounded-lg border-l-4 bg-white p-3 shadow-md ${statusColors[status.name]}`}
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <p className="text-xs text-gray-700">
+                                      <strong>OS:</strong>{' '}
+                                      {order.codeServiceOrder}
+                                    </p>
+                                    <div className="text-right">
+                                      <FiInfo
+                                        className="cursor-pointer text-blue-500 hover:text-blue-700"
+                                        onClick={() => openOrderDetails(order.id)}
+                                      />
+                                    </div>
                                   </div>
+                                  <p className="text-xs text-gray-700">
+                                    <strong>Cliente:</strong>{' '}
+                                    {order.branch.companyName}
+                                  </p>
+                                  <p className="text-xs text-gray-700">
+                                    <strong>Equipamento:</strong>{' '}
+                                    {order.equipment}
+                                  </p>
+                                  <p className="text-xs text-gray-700">
+                                    <strong>Data Programada:</strong>{' '}
+                                    {order.datePrev}
+                                  </p>
+                                  <p className="text-xs text-gray-700">
+                                    <strong>Data de Emissão:</strong>{' '}
+                                    {order.dateEmission}
+                                  </p>
                                 </div>
-                                <p className="text-xs text-gray-700">
-                                  <strong>Cliente:</strong>{' '}
-                                  {order.branch.companyName}
-                                </p>
-                                <p className="text-xs text-gray-700">
-                                  <strong>Equipamento:</strong>{' '}
-                                  {order.equipment}
-                                </p>
-                                <p className="text-xs text-gray-700">
-                                  <strong>Data Programada:</strong>{' '}
-                                  {order.datePrev}
-                                </p>
-                                <p className="text-xs text-gray-700">
-                                  <strong>Data de Emissao:</strong>{' '}
-                                  {order.dateEmission}
-                                </p>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                      {provided.placeholder}
+                              )}
+                            </Draggable>
+                          ))}
+                        {provided.placeholder}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </Droppable>
-            ) : null,
-          )}
-        </div>
-      </DragDropContext>
+                  )}
+                </Droppable>
+              ) : null,
+            )}
+          </div>
+        </DragDropContext>
+      </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <h2>Preencha os detalhes</h2>
           {draggedOrderData?.hasJustify &&(
-          <Field>
-            <Label>
-            Justificativa:
-              
-            </Label>
-            <Input
-              type="text"
-              value={justify}
-              onChange={(e) => setJustify(e.target.value)}
-              className="input-class"
-            />
-          </Field>
+            <Field>
+              <Label>Justificativa:</Label>
+              <Input
+                type="text"
+                value={justify}
+                onChange={(e) => setJustify(e.target.value)}
+                className="input-class"
+              />
+            </Field>
           )}
           {draggedOrderData?.hasFinished && (
-          <Field>
-            <Label>
-            Data de Encerramento:
-
-            </Label>
-            <Input
-              type="date"
-              value={dateEnd || ''}
-              onChange={(e) => setDateEnd(e.target.value)}
-              className="input-class"
-            />
-          </Field>
+            <Field>
+              <Label>Data de Encerramento:</Label>
+              <Input
+                type="date"
+                value={dateEnd || ''}
+                onChange={(e) => setDateEnd(e.target.value)}
+                className="input-class"
+              />
+            </Field>
           )}
           <Button onClick={handleModalSubmit}>Enviar</Button>
         </DialogContent>

@@ -43,6 +43,7 @@ export type ServiceOrder = {
 }
 
 export type StatusFilterData = {
+  value: any
   id: string
   name: string
   color: string
@@ -165,11 +166,12 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
       return result
     },
 
-    async fetchServiceOrders() {
+    async fetchServiceOrders(filters?: object ) {
       const response = await api.get('/maintenance/service-order/list-table', {
         params: {
-          index: null,
-          perPage: false, // enviar false
+          index: 0,
+          perPage: 500,
+          ...filters // enviar false
         },
       })
       const serviceOrders = response.data.rows
