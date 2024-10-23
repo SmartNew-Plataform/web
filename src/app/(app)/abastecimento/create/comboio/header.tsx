@@ -11,6 +11,8 @@ import { useState } from 'react'
 import { createBody } from './excel-export'
 import { TrainModal } from './train-modal'
 
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
+
 export function Header() {
   const [open, setOpen] = useState(false)
 
@@ -25,8 +27,8 @@ export function Header() {
     let records: unknown = []
 
     if (Array.isArray(data)) {
-      records = data.map((item) => [
-        null, // campo para formatacao da row, sem dado
+      records = data.map((item, index) => [
+        setAlternateRowColors(index),
         item.tag || '',
         item.train || '',
         item.capacity || '',
@@ -40,6 +42,7 @@ export function Header() {
       headers: '###headers###',
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
+      formatTableTop: '###formatTableTop###',
       records,
     }
 

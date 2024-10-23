@@ -1,3 +1,5 @@
+import { formatTableTopStyle, formatHeaderStyle } from '@/lib/exportExcelStyles'
+
 const headers = `[
         {
           "blocks":[
@@ -5,25 +7,14 @@ const headers = `[
               "message":"Registro de Entradas",
               "colBegin":"A1",
               "colEnd":"F1",
-             "format":{
-              "bold":1,
-              "align":"center",
-              "font_size": 13
-             }
+              "format":{
+                ${formatHeaderStyle}
+              }
             }
           ]
         }
 ]
 `
-const formatTableTop = `{
-     "text_wrap": true,
-     "bold": true,
-     "text_wrap": true,
-     "valign":"center",
-     "align":"center",
-     "bg_color": "#e2e8f0",
-     "font_color": "#64748b"
-}`
 
 const recordHeader = `[
     {
@@ -71,5 +62,5 @@ export function createBody(sheets: unknown): string {
     .replaceAll('"###headers###"', headers)
     .replaceAll('"###recordHeader###"', recordHeader)
     .replaceAll('"###recordsFormat###"', recordsFormat)
-    .replaceAll('"###formatTableTop###"', formatTableTop)
+    .replaceAll('"###formatTableTop###"', formatTableTopStyle)
 }

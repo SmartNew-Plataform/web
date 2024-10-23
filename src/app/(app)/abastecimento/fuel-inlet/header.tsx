@@ -14,6 +14,8 @@ import { createBody } from './excel-export'
 import { FuelInlet } from '@/@types/fuelling-tank'
 import dayjs from 'dayjs'
 
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
+
 function getTypeValue(typeValue: string) {
   console.log(typeValue)
 
@@ -50,8 +52,8 @@ export function Header() {
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
       formatTableTop: '###formatTableTop###',
-      records: data.map((item) => [
-        null,
+      records: data.map((item, index) => [
+        setAlternateRowColors(index),
         formatDate(item.date),
         getTypeValue(item.type.value),
         item.fiscalNumber,

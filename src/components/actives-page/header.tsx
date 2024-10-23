@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
 import { createBody } from './excel-export'
 import { QRCodeModal } from './qrcode-modal'
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
 
 export function Header() {
   const { toast } = useToast()
@@ -86,8 +87,8 @@ export function Header() {
     let records: unknown = []
 
     if (Array.isArray(data)) {
-      records = data.map((item) => [
-        null, // campo para formatacao da row, sem dado
+      records = data.map((item, index) => [
+        setAlternateRowColors(index), // campo para formatacao da row, sem dado
         item.id || '', // id
         item.branch?.label || '', // cliente
         item.costCenter?.label || '', // centro de custo
@@ -109,6 +110,7 @@ export function Header() {
       headers: '###headers###',
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
+      formatTableTop: '###formatTableTop###',
       records,
     }
 

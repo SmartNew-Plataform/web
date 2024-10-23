@@ -1,3 +1,5 @@
+import { formatTableTopStyle, formatHeaderStyle } from '@/lib/exportExcelStyles'
+
 const headers = `[
   {
     "blocks":[
@@ -5,11 +7,9 @@ const headers = `[
         "message":"Cadastro de comboio",
         "colBegin":"A1",
         "colEnd":"E1",
-       "format":{
-        "bold":1,
-        "align":"center",
-        "font_size": 13
-       }
+        "format":{
+         ${formatHeaderStyle}
+        }
       }
     ]
   }###filterDate###
@@ -18,44 +18,19 @@ const headers = `[
 
 const recordHeader = `[
     {
-      "nameHeader":"Tag",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Tag"
     },
     {
-      "nameHeader":"Descrição",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Descrição"
     }, 
     {
-      "nameHeader":"Capacidade Máxima",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Capacidade Máxima"
     },
     {
-      "nameHeader":"Filial",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Filial"
     },
     {
-      "nameHeader":"Combustível",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Combustível"
     }
   ]
 `
@@ -108,4 +83,5 @@ export function createBody(
     .replaceAll('"###headers###"', headersWithFilterDate)
     .replaceAll('"###recordHeader###"', recordHeader)
     .replaceAll('"###recordsFormat###"', recordsFormat)
+    .replaceAll('"###formatTableTop###"', formatTableTopStyle)
 }

@@ -24,6 +24,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { createBody } from './excel-export'
 import { FuellingItem } from './table'
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
 
 const filterFormSchema = z.object({
   equipmentId: z.string().optional(),
@@ -110,22 +111,7 @@ export function Header() {
         recordsFormat: '###recordsFormat###',
         formatTableTop: '###formatTableTop###',
         records: fuelling.map((item, index) => [
-          index % 2 === 0
-            ? {
-                format: {
-                  bottom: 4,
-                  left: 4,
-                  right: 4,
-                },
-              }
-            : {
-                format: {
-                  bottom: 4,
-                  left: 4,
-                  right: 4,
-                  bg_color: '#F1F5F9',
-                },
-              }, // campo para formatacao da row, sem dado
+          setAlternateRowColors(index), // campo para formatacao da row, sem dado
           item.equipment,
           item.typeConsumption,
           Number(item.quantity),

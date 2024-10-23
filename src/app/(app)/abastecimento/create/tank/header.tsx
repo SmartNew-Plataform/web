@@ -20,6 +20,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { createBody } from './excel-export'
 import { TankModal } from './tank-modal'
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
 
 const filterTankSchema = z.object({
   tag: z.string().optional(),
@@ -53,8 +54,9 @@ export function Header() {
       headers: '###headers###',
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
-      records: data.map((item) => [
-        null, // campo para formatacao da row, sem dado
+      formatTableTop: '###formatTableTop###',
+      records: data.map((item, index) => [
+        setAlternateRowColors(index), // campo para formatacao da row, sem dado
         item.model, // TAG
         item.tank, // Descrição
         item.capacity, // Capacidade máxima

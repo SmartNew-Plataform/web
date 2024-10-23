@@ -21,6 +21,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { createBody } from './excel-export'
 import { FuelForm, SupplyFormData } from './fuelForm'
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
 
 const filterFormSchema = z.object({
   equipment: z.string().optional(),
@@ -112,9 +113,10 @@ export function Header() {
       headers: '###headers###',
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
+      formatTableTop: '###formatTableTop###',
 
-      records: data.rows.map((item) => [
-        null, // campo para formatacao da row, sem dado
+      records: data.rows.map((item, index) => [
+        setAlternateRowColors(index), // campo para formatacao da row, sem dado
         item.id, // id
         item.fuelStation, // posto
         dayjs(item.date).format('DD/MM/YYYY'), // Data de abertura
