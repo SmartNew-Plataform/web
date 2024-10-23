@@ -169,7 +169,7 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
       const response = await api.get('/maintenance/service-order/list-table', {
         params: {
           index: null,
-          perPage: null, // enviar false
+          perPage: false, // enviar false
         },
       })
       const serviceOrders = response.data.rows

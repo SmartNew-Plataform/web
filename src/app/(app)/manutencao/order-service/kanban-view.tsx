@@ -1,10 +1,13 @@
+import { Field } from '@/components/form/field'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import {
   ServiceOrder,
   StatusFilterData,
   useServiceOrder,
 } from '@/store/maintenance/service-order'
+import { Label } from '@radix-ui/react-label'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -160,18 +163,18 @@ const KanbanView = () => {
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex gap-6 overflow-x-auto rounded-lg bg-white bg-opacity-90 p-5">
+        <div className="flex gap-6 overflow-auto rounded-lg bg-white bg-opacity-90 p-5 border border-gray-400 h-full">
           {statusList.map((status: StatusFilterData) =>
             status.id ? (
               <Droppable key={status.id} droppableId={status.id.toString()}>
                 {(provided: DroppableProvided) => (
                   <div
-                    className="flex min-w-[280px] flex-col gap-2 bg-transparent"
+                    className="relative overflow-auto flex min-w-[300px] flex-col gap-5 bg-transparent border-r border-gray-300 min-h-full"
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                   >
-                    <div className="mb-2 flex items-center justify-between">
-                      <div className="text-md flex items-center gap-2 font-bold text-gray-900">
+                    <div className="p-3 flex items-center justify-between sticky top-0 bg-white">
+                      <div className="text-md flex items-center gap-2 font-bold text-gray-900 ">
                         {statusIcons[status.name] || (
                           <FiCheckCircle className="text-gray-500" />
                         )}
@@ -200,7 +203,6 @@ const KanbanView = () => {
                                     {order.codeServiceOrder}
                                   </p>
                                   <div className="text-right">
-                                    <FiCheck className="cursor-pointer text-green-500 hover:text-green-700" />
                                     <FiInfo
                                       className="cursor-pointer text-blue-500 hover:text-blue-700"
                                       onClick={() => openOrderDetails(order.id)}
@@ -240,24 +242,30 @@ const KanbanView = () => {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <h2>Preencha os detalhes</h2>
-          <label>
+          <Field>
+            <Label>
             Justificativa:
-            <input
+              
+            </Label>
+            <Input
               type="text"
               value={justify}
               onChange={(e) => setJustify(e.target.value)}
               className="input-class"
             />
-          </label>
-          <label>
+          </Field>
+          <Field>
+            <Label>
             Data de Encerramento:
-            <input
+
+            </Label>
+            <Input
               type="datetime-local"
               value={dateEnd || ''}
               onChange={(e) => setDateEnd(e.target.value)}
               className="input-class"
             />
-          </label>
+          </Field>
           <Button onClick={handleModalSubmit}>Enviar</Button>
         </DialogContent>
       </Dialog>
