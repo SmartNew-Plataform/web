@@ -21,7 +21,6 @@ import {
 } from 'react-beautiful-dnd'
 import {
   FiAlertCircle,
-  FiCheck,
   FiCheckCircle,
   FiHelpCircle,
   FiInfo,
@@ -31,7 +30,7 @@ import {
   FiPlus,
   FiSettings,
 } from 'react-icons/fi'
-// import Modal from 'react-modal'
+
 
 const statusColors: { [key: string]: string } = {
   'EM ABERTO': 'border-red-500',
@@ -71,6 +70,8 @@ const KanbanView = () => {
   const [newStatusId, setNewStatusId] = useState<number | null>(null)
   const [justify, setJustify] = useState<string>('')
   const [dateEnd, setDateEnd] = useState<string | null>(null)
+  const [draggedOrderData, setDraggedOrderData] = useState<StatusFilterData | null>(null);
+
 
   useEffect(() => {
     fetchServiceOrders()
@@ -87,6 +88,11 @@ const KanbanView = () => {
       const draggedOrder = statusList?.find(
         ({ id }) => id === destination.droppableId,
       )
+
+      if (draggedOrder) {
+        setDraggedOrderData(draggedOrder);
+      }
+
       console.log(draggedOrder?.hasJustify, draggedOrder?.hasFinished)
 
       if (draggedOrder?.hasJustify || draggedOrder?.hasFinished) {
@@ -111,15 +117,24 @@ const KanbanView = () => {
 
   const handleModalSubmit = () => {
     if (currentOrderId && newStatusId !== null) {
-      updateServiceOrderStatus(currentOrderId, newStatusId, {
-        justify,
-        dateEnd,
-      }).then(() => {
-        queryClient.refetchQueries(['maintenance-service-order-table'])
-        closeModal()
-      })
+      const formattedDateEnd = dateEnd ? new Date(dateEnd).toISOString() : undefined;
+  
+      const additionalData = {
+        justify: draggedOrderData?.hasJustify ? justify : undefined,
+        dateEnd: draggedOrderData?.hasFinished ? formattedDateEnd : undefined,
+      };
+  
+      updateServiceOrderStatus(currentOrderId, newStatusId, additionalData)
+        .then(() => {
+          queryClient.refetchQueries(['maintenance-service-order-table']);
+          closeModal();
+        })
+        .catch(error => {
+          console.error('Erro ao atualizar o status da ordem de serviço:', error);
+        });
     }
-  }
+  };
+  
 
   const closeModal = () => {
     setIsModalOpen(false)
@@ -242,6 +257,7 @@ const KanbanView = () => {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <h2>Preencha os detalhes</h2>
+          {draggedOrderData?.hasJustify &&(
           <Field>
             <Label>
             Justificativa:
@@ -254,29 +270,24 @@ const KanbanView = () => {
               className="input-class"
             />
           </Field>
+          )}
+          {draggedOrderData?.hasFinished && (
           <Field>
             <Label>
             Data de Encerramento:
 
             </Label>
             <Input
-              type="datetime-local"
+              type="date"
               value={dateEnd || ''}
               onChange={(e) => setDateEnd(e.target.value)}
               className="input-class"
             />
           </Field>
+          )}
           <Button onClick={handleModalSubmit}>Enviar</Button>
         </DialogContent>
       </Dialog>
-      {/* <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        contentLabel="Justificativa e Data de Encerramento"
-        className="modal-class"
-        overlayClassName="overlay-class"
-      >
-      </Modal> */}
     </>
   )
 }
