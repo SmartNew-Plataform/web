@@ -6,7 +6,6 @@ export default function OrderServicePage() {
   return (
     <PageWrapper>
       <Header />
-
       <Wrapper />
     </PageWrapper>
   )
