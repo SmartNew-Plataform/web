@@ -21,6 +21,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { createBody } from './excel-export'
 import { FuelForm, SupplyFormData } from './fuelForm'
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
 
 const filterFormSchema = z.object({
   equipment: z.string().optional(),
@@ -104,13 +105,18 @@ export function Header() {
     if (!data) return
     loading.show()
 
+    const startDate = '01/06/2024'
+    const endDate = '06/09/2024'
+
     const sheets = {
       sheetName: 'Abastecimentos',
       headers: '###headers###',
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
-      records: data.rows.map((item) => [
-        null, // campo para formatacao da row, sem dado
+      formatTableTop: '###formatTableTop###',
+
+      records: data.rows.map((item, index) => [
+        setAlternateRowColors(index), // campo para formatacao da row, sem dado
         item.id, // id
         item.fuelStation, // posto
         dayjs(item.date).format('DD/MM/YYYY'), // Data de abertura
@@ -129,7 +135,7 @@ export function Header() {
     await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
-      body: createBody(sheets),
+      body: createBody(sheets, startDate, endDate),
       headers: {
         'Content-Type': 'application/json',
       },

@@ -6,10 +6,49 @@ type EquipmentData = {
   branch: SelectData
 } & SelectData
 
+export type ServiceOrder = {
+  id: number
+  codeServiceOrder: string
+  equipment: string
+  requester: string
+  dateTimeRequest: string
+  dateEmission: string
+  requestDate: string
+  datePrev: string
+  branch: {
+    id: number
+    branchNumber: string
+    companyName: string
+  }
+  status: {
+    value: number
+    label: string
+    color: string
+    hasFinished: boolean
+    hasJustify: boolean
+  }
+
+  statusOrderService: {
+    id: number
+    status: string
+    color: string
+    hasFinished: boolean
+    hasJustify: boolean
+  }
+  typeMaintenance: {
+    id: number
+    label: string
+    typeMaintenance: string
+  }
+}
+
 export type StatusFilterData = {
+  value: any
   id: string
   name: string
   color: string
+  hasFinished?: boolean
+  hasJustify?: boolean
   count: number
 }
 
@@ -20,14 +59,22 @@ interface ServiceOrderStoreData {
     typeMaintenance?: SelectData[] | undefined
     maintenanceSector: SelectData[] | undefined
     requester: SelectData[] | undefined
-    status: SelectData[] | undefined
+    status: StatusFilterData[] | undefined // Atualizado
     maintainers: SelectData[] | undefined
   }
   statusFilterValue: string | undefined
   setStatusFilterValue: (data: string | undefined) => void
 
+  serviceOrders: ServiceOrder[] | undefined
+  fetchServiceOrders: (args: { index?: number; perPage?: number; filters?: object }) => Promise<{ rows: ServiceOrder[]; pageCount: number }>
+
   statusFilterData: StatusFilterData[] | undefined
   setStatusFilterData: (data: StatusFilterData[] | undefined) => void
+  updateServiceOrderStatus: (
+    orderId: number,
+    newStatusId: number,
+    additionalData?: { justify?: string; dateEnd?: string | null },
+  ) => Promise<void>
 
   setSelects: (data: ServiceOrderStoreData['selects']) => void
   fetchSelects: () => Promise<ServiceOrderStoreData['selects']>
@@ -48,8 +95,9 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
       maintainers: undefined,
     },
     statusFilterValue: undefined,
+    serviceOrders: undefined,
     statusFilterData: undefined,
-    viewMode: 'grid',
+    viewMode: 'kanban',
 
     setStatusFilterValue(data) {
       set({ statusFilterValue: data })
@@ -89,7 +137,6 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
           .get('/system/choices/maintainers')
           .then((res) => res.data.data),
       ])
-      // console.log('branch => ', branch)
 
       const result = {
         branch,
@@ -109,7 +156,7 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
         ),
         typeMaintenance: allTypeMaintenance,
         maintenanceSector: allMaintenanceSector,
-        status: allStatus,
+        status: allStatus, // Atualizado
         requester: allListRequester,
         maintainers: allMaintainers,
       }
@@ -117,6 +164,65 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
       set({ selects: result })
 
       return result
+    },
+
+    async fetchServiceOrders({
+      index = 0,
+      perPage = 500,
+      filters = {},
+    }: {
+      index?: number
+      perPage?: number
+      filters?: object
+    }): Promise<{ rows: ServiceOrder[]; pageCount: number }> {
+      const response = await api.get('/maintenance/service-order/list-table', {
+        params: {
+          index,
+          perPage,
+          ...filters,
+        },
+      })
+      const serviceOrders = response.data.rows
+      set({ serviceOrders })
+      return { rows: serviceOrders, pageCount: response.data.pageCount }
+    },
+
+    async updateServiceOrderStatus(
+      orderId: number,
+      newStatusId: number,
+      additionalData?: { justify?: string; dateEnd?: string | null },
+    ) {
+      try {
+        const updatedOrderData: any = {
+          idStatusServiceOrder: newStatusId,
+          ...additionalData,
+        }
+
+        const response = await api.put(
+          `/maintenance/service-order/${orderId}/status`,
+          updatedOrderData,
+        )
+
+        console.log('Status atualizado com sucesso:', response.data)
+
+        set((state) => {
+          const updatedOrders = state.serviceOrders?.map((order) => {
+            if (order.id === orderId) {
+              return {
+                ...order,
+                statusOrderService: {
+                  ...order.statusOrderService,
+                  id: newStatusId,
+                },
+              }
+            }
+            return order
+          })
+          return { serviceOrders: updatedOrders }
+        })
+      } catch (error) {
+        console.error('Erro ao atualizar o status da ordem de serviço:', error)
+      }
     },
 
     setViewMode(viewMode) {

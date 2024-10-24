@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { ActiveForm, ActiveFormData } from './active-form'
 import { createBody } from './excel-export'
 import { QRCodeModal } from './qrcode-modal'
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
 
 export function Header() {
   const { toast } = useToast()
@@ -83,11 +84,11 @@ export function Header() {
       filterText,
     ])
 
-    let records: any = []
+    let records: unknown = []
 
     if (Array.isArray(data)) {
-      records = data.map((item) => [
-        null, // campo para formatacao da row, sem dado
+      records = data.map((item, index) => [
+        setAlternateRowColors(index), // campo para formatacao da row, sem dado
         item.id || '', // id
         item.branch?.label || '', // cliente
         item.costCenter?.label || '', // centro de custo
@@ -109,14 +110,17 @@ export function Header() {
       headers: '###headers###',
       recordHeader: '###recordHeader###',
       recordsFormat: '###recordsFormat###',
+      formatTableTop: '###formatTableTop###',
       records,
     }
 
+    const startDate = '01/06/2024'
+    const endDate = '06/09/2024'
 
     await fetch('https://excel.smartnewservices.com.br/api/v1/export', {
       method: 'POST',
       mode: 'cors',
-      body: createBody(sheets),
+      body: createBody(sheets, startDate, endDate),
       headers: {
         'Content-Type': 'application/json',
       },

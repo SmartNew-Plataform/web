@@ -1,3 +1,5 @@
+import { formatTableTopStyle, formatHeaderStyle } from '@/lib/exportExcelStyles'
+
 const headers = `[
   {
     "blocks":[
@@ -5,101 +7,51 @@ const headers = `[
         "message":"Registro de Abastecimentos",
         "colBegin":"A1",
         "colEnd":"E1",
-       "format":{
-        "bold":1,
-        "align":"center",
-        "font_size": 13
+        "format":{
+         ${formatHeaderStyle}
        }
       }
     ]
-  }
+  }###filterDate###
 ]
 `
 
 const recordHeader = `[
-    {
-      "nameHeader":"Id",
-      "formatHeader":{
-        "border":1,
-        "bold": true
-      }
+    { 
+      "nameHeader":"Id"
     },
     {
-      "nameHeader":"Posto",
-      "formatHeader":{
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Posto"
     },
     {
-      "nameHeader":"Data de abertura",
-      "formatHeader":{
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Data de abertura"
     },
     {
-      "nameHeader":"Equipamento",
-      "formatHeader":{
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Equipamento"
     },
     {
-      "nameHeader":"Tipo consumo",
-      "formatHeader":{
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Tipo consumo"
     },
     {
-      "nameHeader":"Contador atual",
-      "formatHeader":{
-         "border":1,
-        "bold": true
-      }
+      "nameHeader":"Contador atual"
     },
     {
-      "nameHeader":"Contador anterior",
-      "formatHeader":{
-         "border":1,
-        "bold": true
-      }
+      "nameHeader":"Contador anterior"
     },
     {
-      "nameHeader":"Combustível",
-      "formatHeader":{
-         "border":1,
-        "bold": true
-      }
+      "nameHeader":"Combustível"
     },
     {
-      "nameHeader":"Quantidade",
-      "formatHeader":{
-         "border":1,
-        "bold": true
-      }
+      "nameHeader":"Quantidade"
     },
     {
-      "nameHeader":"Consumo realizado",
-      "formatHeader":{
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Consumo realizado"
     },
     {
-    "nameHeader":"Valor unitário",
-      "formatHeader":{
-        "border":1,
-        "bold": true
-      }
+    "nameHeader":"Valor unitário"
     },
     {
-    "nameHeader":"Valor total",
-      "formatHeader":{
-        "border":1,
-        "bold": true
-      }
+    "nameHeader":"Valor total"
     }
   ]
 `
@@ -120,17 +72,44 @@ const recordsFormat = `[
   ]
 `
 
-function bodyBefore(sheets:any):any{
-    return {
-        filename:"Planilha.xlsx",
-        sheets: [sheets]
-    }
+function bodyBefore(sheets: unknown): unknown {
+  return {
+    filename: 'Planilha.xlsx',
+    sheets: [sheets],
+  }
 }
 
-export function createBody(sheets:any):any{
-    const before = bodyBefore(sheets)
-    return JSON.stringify(before)
-        .replaceAll('"###headers###"',headers)
-        .replaceAll('"###recordHeader###"',recordHeader)
-        .replaceAll('"###recordsFormat###"',recordsFormat)
+function createFilterDate(startDate: string, endDate: string) {
+  if (startDate == null || endDate == null) return ''
+
+  return `,
+    {
+    "blocks":[
+      {
+        "message":"PERÍODO: ${startDate} Á ${endDate}",
+        "colBegin":"A2",
+        "colEnd":"E2",
+       "format":{
+        
+       }
+      }
+    ]
+  }
+    `
+}
+
+export function createBody(
+  sheets: unknown,
+  startDate: string,
+  endDate: string,
+): string {
+  const filterDate = createFilterDate(startDate, endDate)
+  const headersWithFilterDate = headers.replace('###filterDate###', filterDate)
+
+  const before = bodyBefore(sheets)
+  return JSON.stringify(before)
+    .replaceAll('"###headers###"', headersWithFilterDate)
+    .replaceAll('"###recordHeader###"', recordHeader)
+    .replaceAll('"###recordsFormat###"', recordsFormat)
+    .replaceAll('"###formatTableTop###"', formatTableTopStyle)
 }

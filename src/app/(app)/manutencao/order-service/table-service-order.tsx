@@ -88,7 +88,12 @@ export function TableServiceOrder() {
         label: 'Status',
         value: 'status',
         type: 'select',
-        options: selects.status,
+        options: selects?.status?.map(({id, name}) => {
+          return {
+            label: name,
+            value: id
+          }
+        })
       },
     ],
   })

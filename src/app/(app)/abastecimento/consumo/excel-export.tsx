@@ -1,110 +1,75 @@
+import { formatTableTopStyle } from '@/lib/exportExcelStyles'
+
 const recordHeader = `[
   {
-    "nameHeader":"EQUIPAMENTO",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"EQUIPAMENTO"
   },
   {
-    "nameHeader":"TIPO CONSUMO",
-    "formatHeader":{
-      "text_wrap": true,
-      "border":1,
-      "bold": true,
-      "text_wrap": true,
-      "valign":"center",
-      "align":"center"
-      
-    }
+    "nameHeader":"TIPO CONSUMO"
   },
   {
-    "nameHeader":"QTD LITROS",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"QTD LITROS"
   },
   {
-    "nameHeader":"VLR TOTAL",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"VLR TOTAL"
   },
   {
-    "nameHeader":"TOTAL CONTADOR",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"TOTAL CONTADOR"
   },
   {
-    "nameHeader":"CONS. PREVISTO",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"CONS. PREVISTO"
   },
   {
-    "nameHeader":"CONS. REALIZADO",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"CONS. REALIZADO"
   },
   {
-    "nameHeader":"DIFERENÇA %",
-    "formatHeader":{
-      "border":1,
-      "bold": true,
-      "align":"center",
-      "valign":"center",
-      "text_wrap": true
-    }
+    "nameHeader":"DIFERENÇA %"
   }
 ]
 `
-
 const recordsFormat = `[
-  {"border": 1},
-  {"border": 1},
-  {"border": 1},
-  {"border": 1},
-  {"border": 1},
-  {"border": 1},
-  {"border": 1},
-  {"border": 1}
+  {},
+  {},
+  {"num_format": 4},
+  {"num_format": 4},
+  {"num_format": 4},
+  {"num_format": 4},
+  {"num_format": 4},
+  {"num_format": 10}
 ]
 `
 
-function bodyBefore(sheets:any):any{
+function bodyBefore(sheets: unknown): unknown {
   return {
-      filename:"Planilha.xlsx",
-      sheets: sheets 
+    filename: 'Análise de consumo.xlsx',
+    sheets,
   }
 }
 
-export function createBody(sheets:any):any{
-  const before = bodyBefore(sheets)
+function createFilterDate(sheets: unknown, startDate: string, endDate: string) {
+  if (startDate == null || endDate == null) return sheets
+
+  let filterDate = `PERÍODO ${startDate} Á ${endDate}`
+
+  filterDate = filterDate.replaceAll('/', '-')
+  const newFirstSheet = { sheetName: filterDate }
+
+  if (Array.isArray(sheets)) {
+    sheets.unshift(newFirstSheet)
+  }
+  return sheets
+}
+
+export function createBody(
+  sheets: unknown,
+  startDate: string,
+  endDate: string,
+): string {
+  const sheetsWhitfilterDate = createFilterDate(sheets, startDate, endDate)
+
+  const before = bodyBefore(sheetsWhitfilterDate)
   return JSON.stringify(before)
-      .replaceAll('"###recordHeader###"',recordHeader)
-      .replaceAll('"###recordsFormat###"',recordsFormat)
+    .replaceAll('"###recordHeader###"', recordHeader)
+    .replaceAll('"###recordsFormat###"', recordsFormat)
+    .replaceAll('"###formatTableTop###"', formatTableTopStyle)
 }

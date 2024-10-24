@@ -1,3 +1,5 @@
+import { formatTableTopStyle, formatHeaderStyle } from '@/lib/exportExcelStyles'
+
 const headers = `[
   {
     "blocks":[
@@ -5,121 +7,54 @@ const headers = `[
         "message":"Equipamentos Ativos",
         "colBegin":"A1",
         "colEnd":"E1",
-       "format":{
-        "bold":1,
-        "align":"center",
-        "font_size": 13
-       }
+        "format":{
+          ${formatHeaderStyle}
+        }
       }
     ]
-  }
+  }###filterDate###
 ]
 `
 
 const recordHeader = `[
     {
-      "nameHeader":"Id",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Id"
     },
     {
-      "nameHeader":"Cliente",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Cliente"
     },
     {
-      "nameHeader":"Centro Custo",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Centro Custo"
     },
     {
-      "nameHeader":"Equipamento Código",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Equipamento Código"
     },
     {
-      "nameHeader":"Descrição TAG",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Descrição TAG"
     },
     {
-      "nameHeader":"Descrição TAG",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Descrição TAG"
     },
     {
-      "nameHeader":"Equipamento tipo",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Equipamento tipo"
     },
     {
-      "nameHeader":"Em garantia?",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Em garantia?"
     },
     {
-      "nameHeader":"Placa",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Placa"
     },
     {
-      "nameHeader":"Chassi",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Chassi"
     },
     {
-      "nameHeader":"Nº Serie",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+      "nameHeader":"Nº Serie"
     },
     {
-    "nameHeader":"Status Equipamento",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+    "nameHeader":"Status Equipamento"
     },
     {
-    "nameHeader":"Observação",
-      "formatHeader":{
-        "align":"center",
-        "border":1,
-        "bold": true
-      }
+    "nameHeader":"Observação"
     }
   ]
 `
@@ -141,17 +76,44 @@ const recordsFormat = `[
   ]
 `
 
-function bodyBefore(sheets:any):any{
-    return {
-        filename:"Planilha.xlsx",
-        sheets: [sheets]
-    }
+function bodyBefore(sheets: unknown): unknown {
+  return {
+    filename: 'Planilha.xlsx',
+    sheets: [sheets],
+  }
 }
 
-export function createBody(sheets:any):any{
-    const before = bodyBefore(sheets)
-    return JSON.stringify(before)
-        .replaceAll('"###headers###"',headers)
-        .replaceAll('"###recordHeader###"',recordHeader)
-        .replaceAll('"###recordsFormat###"',recordsFormat)
+function createFilterDate(startDate: string, endDate: string) {
+  if (startDate == null || endDate == null) return ''
+
+  return `,
+  {
+  "blocks":[
+    {
+      "message":"PERÍODO: ${startDate} Á ${endDate}",
+      "colBegin":"A2",
+      "colEnd":"E2",
+     "format":{
+      
+     }
+    }
+  ]
+}
+  `
+}
+
+export function createBody(
+  sheets: unknown,
+  startDate: string,
+  endDate: string,
+): string {
+  const filterDate = createFilterDate(startDate, endDate)
+  const headersWithFilterDate = headers.replace('###filterDate###', filterDate)
+
+  const before = bodyBefore(sheets)
+  return JSON.stringify(before)
+    .replaceAll('"###headers###"', headersWithFilterDate)
+    .replaceAll('"###recordHeader###"', recordHeader)
+    .replaceAll('"###recordsFormat###"', recordsFormat)
+    .replaceAll('"###formatTableTop###"', formatTableTopStyle)
 }

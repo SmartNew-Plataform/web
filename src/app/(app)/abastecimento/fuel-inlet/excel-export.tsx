@@ -4,32 +4,36 @@ const headers = `[
         {
           "blocks":[
             {
-              "message":"Cadastro de Tanques",
+              "message":"Registro de Entradas",
               "colBegin":"A1",
-              "colEnd":"E1",
+              "colEnd":"F1",
               "format":{
                 ${formatHeaderStyle}
               }
             }
           ]
-        }###filterDate###
+        }
 ]
 `
+
 const recordHeader = `[
     {
-      "nameHeader":"TAG"
+      "nameHeader":"DATA"
     },
     {
-      "nameHeader":"Descrição"
+      "nameHeader":"TIPO"
     },
     {
-      "nameHeader":"Capacidade máxima"
+      "nameHeader":"Nº DCTO"
     },
     {
-      "nameHeader":"Filial"
+      "nameHeader":"EQUIPAMENTO ABASTECIDO"
     },
     {
-      "nameHeader":"Combustível"
+      "nameHeader":"FORNECEDOR"
+    },
+    {
+      "nameHeader":"VALOR TOTAL"
     }
   ]
 `
@@ -39,7 +43,8 @@ const recordsFormat = `[
     {},
     {},
     {},
-    {}
+    {},
+    {"num_format":4}
   ]
 `
 
@@ -50,36 +55,11 @@ function bodyBefore(sheets: unknown): unknown {
   }
 }
 
-function createFilterDate(startDate: string, endDate: string) {
-  if (startDate == null || endDate == null) return ''
-
-  return `,
-  {
-  "blocks":[
-    {
-      "message":"PERÍODO: ${startDate} Á ${endDate}",
-      "colBegin":"A2",
-      "colEnd":"E2",
-     "format":{
-      
-     }
-    }
-  ]
-}
-  `
-}
-
-export function createBody(
-  sheets: unknown,
-  startDate: string,
-  endDate: string,
-): string {
-  const filterDate = createFilterDate(startDate, endDate)
-  const headersWithFilterDate = headers.replace('###filterDate###', filterDate)
-
+export function createBody(sheets: unknown): string {
   const before = bodyBefore(sheets)
+
   return JSON.stringify(before)
-    .replaceAll('"###headers###"', headersWithFilterDate)
+    .replaceAll('"###headers###"', headers)
     .replaceAll('"###recordHeader###"', recordHeader)
     .replaceAll('"###recordsFormat###"', recordsFormat)
     .replaceAll('"###formatTableTop###"', formatTableTopStyle)

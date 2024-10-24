@@ -23,6 +23,8 @@ import { Eraser, FileBarChart, Info, ListFilter, Search } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { createBody } from './excel-export'
+import { FuellingItem } from './table'
+import { setAlternateRowColors } from '@/lib/exportExcelStyles'
 
 const filterFormSchema = z.object({
   equipmentId: z.string().optional(),
@@ -66,17 +68,30 @@ export function Header() {
     },
   })
 
-  function calculeDifference(item: any) {
+  function calculeDifference(item: FuellingItem) {
     const { expectedConsumption, consumptionMade } = item
 
     const difference =
-      ((consumptionMade - expectedConsumption) / expectedConsumption) * 100
+      (consumptionMade - expectedConsumption) / expectedConsumption
 
-    const result = difference === Infinity ? 100 : difference
+    const result = difference === Infinity ? 1 : difference
 
     return result
   }
 
+  const startDate = '01/06/2024'
+  const endDate = '06/09/2024'
+
+  function getColor(value: number, typeConsumption: unknown) {
+    if (typeConsumption === 'L/HR' && value !== 0) {
+      value *= -1
+    }
+
+    const green500 = '#22c55e'
+    const red500 = '#ef4444'
+
+    return value > 0 ? green500 : red500
+  }
   async function handleGenerateExcel() {
     loading.show()
     const dataExcel: ConsuptionData[] | undefined =
@@ -88,13 +103,15 @@ export function Header() {
     loading.hide()
     if (!dataExcel) return
     loading.show()
+
     const sheets = dataExcel.map(({ family, fuelling }) => {
       return {
         sheetName: family.replaceAll('/', '-'),
         recordHeader: '###recordHeader###',
         recordsFormat: '###recordsFormat###',
-        records: fuelling.map((item) => [
-          null, // campo para formatacao da row, sem dado
+        formatTableTop: '###formatTableTop###',
+        records: fuelling.map((item, index) => [
+          setAlternateRowColors(index), // campo para formatacao da row, sem dado
           item.equipment,
           item.typeConsumption,
           Number(item.quantity),
@@ -102,14 +119,23 @@ export function Header() {
           Number(item.sumConsumption),
           Number(item.expectedConsumption),
           Number(item.consumptionMade),
-          calculeDifference(item),
+          {
+            value: calculeDifference(item),
+            format: {
+              font_color: getColor(
+                calculeDifference(item),
+                item.typeConsumption,
+              ),
+            },
+          },
         ]),
       }
     })
+
     await fetch('https://excel.smartnewservices.com.br/api/v1/export-unified', {
       method: 'POST',
       mode: 'cors',
-      body: createBody(sheets),
+      body: createBody(sheets, startDate, endDate),
       headers: {
         'Content-Type': 'application/json',
       },
