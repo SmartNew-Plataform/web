@@ -66,7 +66,7 @@ interface ServiceOrderStoreData {
   setStatusFilterValue: (data: string | undefined) => void
 
   serviceOrders: ServiceOrder[] | undefined
-  fetchServiceOrders: () => Promise<void>
+  fetchServiceOrders: (args: { index?: number; perPage?: number; filters?: object }) => Promise<{ rows: ServiceOrder[]; pageCount: number }>
 
   statusFilterData: StatusFilterData[] | undefined
   setStatusFilterData: (data: StatusFilterData[] | undefined) => void
@@ -166,16 +166,25 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
       return result
     },
 
-    async fetchServiceOrders(filters?: object ) {
+    async fetchServiceOrders({
+      index = 0,
+      perPage = 500,
+      filters = {},
+    }: {
+      index?: number
+      perPage?: number
+      filters?: object
+    }): Promise<{ rows: ServiceOrder[]; pageCount: number }> {
       const response = await api.get('/maintenance/service-order/list-table', {
         params: {
-          index: 0,
-          perPage: 500,
-          ...filters, // enviar false
+          index,
+          perPage,
+          ...filters,
         },
       })
       const serviceOrders = response.data.rows
       set({ serviceOrders })
+      return { rows: serviceOrders, pageCount: response.data.pageCount }
     },
 
     async updateServiceOrderStatus(

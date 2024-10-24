@@ -93,12 +93,6 @@ const KanbanView = () => {
         options: selects.equipment,
       },
       {
-        label: 'Solicitante',
-        value: 'requester',
-        type: 'select',
-        options: selects.requester,
-      },
-      {
         label: 'Status',
         value: 'status',
         type: 'select',
@@ -114,14 +108,15 @@ const KanbanView = () => {
 
   const { filterData } = filterServiceOrder
 
+  console.log('dados', filterData)
+
   useEffect(() => {
-  
     if (selects.status && selects.status.length > 0) {
-      if (Object.keys(filterData).length > 0) {
-        fetchServiceOrders(filterData);
-      } else {
-        fetchServiceOrders();
-      }
+      fetchServiceOrders({
+        index: 0,
+        perPage: 500,
+        filters: filterData,
+      });
     }
   }, [fetchServiceOrders, filterData, selects]);
   

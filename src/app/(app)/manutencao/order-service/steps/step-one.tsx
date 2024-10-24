@@ -136,7 +136,10 @@ export function StepOne() {
           <Form.Label required htmlFor="status">
             Status:
           </Form.Label>
-          <Form.Select name="status" id="status" options={selects.status} />
+          <Form.Select name="status" id="status" options={selects.status?.map(status => ({
+           label: status.name,
+           value: status.id
+          })) || []}  />
           <Form.ErrorMessage field="status" />
         </Form.Field>
       ) : (
