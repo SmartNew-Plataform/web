@@ -115,13 +115,16 @@ const KanbanView = () => {
   const { filterData } = filterServiceOrder
 
   useEffect(() => {
-    // Verifica se há filtros antes de chamar a função
-    if (Object.keys(filterData).length > 0) {
-      fetchServiceOrders(filterData)
-    } else {
-      fetchServiceOrders()
+  
+    if (selects.status && selects.status.length > 0) {
+      if (Object.keys(filterData).length > 0) {
+        fetchServiceOrders(filterData);
+      } else {
+        fetchServiceOrders();
+      }
     }
-  }, [fetchServiceOrders, filterData])
+  }, [fetchServiceOrders, filterData, selects]);
+  
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result
@@ -224,90 +227,87 @@ const KanbanView = () => {
   return (
     <>
       <div className="flex flex-col gap-4">
-        {/* Filtro adicionado acima do Kanban */}
         <AdvancedFilter {...filterServiceOrder} />
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div className="flex gap-6 overflow-auto rounded-lg bg-white bg-opacity-90 p-5 border border-gray-400 h-full">
-            {statusList.map((status: StatusFilterData) =>
-              status.id ? (
-                <Droppable key={status.id} droppableId={status.id.toString()}>
-                  {(provided: DroppableProvided) => (
-                    <div
-                      className="relative overflow-auto flex min-w-[300px] flex-col gap-5 bg-transparent border-r border-gray-300 min-h-full"
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                    >
-                      <div className="p-3 flex items-center justify-between sticky top-0 bg-white">
-                        <div className="text-md flex items-center gap-2 font-bold text-gray-900 ">
-                          {statusIcons[status.name] || (
-                            <FiCheckCircle className="text-gray-500" />
-                          )}
-                          {status.name}
-                        </div>
-                        <FiPlus className="cursor-pointer text-black hover:text-gray-600" />
-                      </div>
-                      <div className="flex flex-col gap-4">
-                        {groupedOrders[status.id] &&
-                          groupedOrders[status.id].map((order, index) => (
-                            <Draggable
-                              key={order.id.toString()}
-                              draggableId={order.id.toString()}
-                              index={index}
-                            >
-                              {(provided: DraggableProvided) => (
-                                <div
-                                  className={`flex cursor-grab flex-col gap-3 rounded-lg border-l-4 bg-white p-3 shadow-md ${statusColors[status.name]}`}
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <p className="text-xs text-gray-700">
-                                      <strong>OS:</strong>{' '}
-                                      {order.codeServiceOrder}
-                                    </p>
-                                    <div className="text-right">
-                                      <FiInfo
-                                        className="cursor-pointer text-blue-500 hover:text-blue-700"
-                                        onClick={() => openOrderDetails(order.id)}
-                                      />
-                                    </div>
-                                  </div>
-                                  <p className="text-xs text-gray-700">
-                                    <strong>Cliente:</strong>{' '}
-                                    {order.branch.companyName}
-                                  </p>
-                                  <p className="text-xs text-gray-700">
-                                    <strong>Equipamento:</strong>{' '}
-                                    {order.equipment}
-                                  </p>
-                                  <p className="text-xs text-gray-700">
-                                    <strong>Data Programada:</strong>{' '}
-                                    {order.datePrev}
-                                  </p>
-                                  <p className="text-xs text-gray-700">
-                                    <strong>Data de Emissão:</strong>{' '}
-                                    {order.dateEmission}
-                                  </p>
-                                </div>
-                              )}
-                            </Draggable>
-                          ))}
-                        {provided.placeholder}
-                      </div>
-                    </div>
-                  )}
-                </Droppable>
-              ) : null,
-            )}
-          </div>
-        </DragDropContext>
-      </div>
 
+        <div className="flex-1 overflow-auto">
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className="flex gap-6 overflow-x-auto overflow-y-hidden rounded-lg bg-white bg-opacity-90 p-5 border border-gray-400 h-full">
+              {statusList.map((status: StatusFilterData) =>
+                status.id ? (
+                  <Droppable key={status.id} droppableId={status.id.toString()}>
+                    {(provided: DroppableProvided) => (
+                      <div
+                        className="flex min-w-[280px] flex-col gap-2 bg-transparent"
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                      >
+                        <div className="mb-2 flex items-center justify-between">
+                          <div className="text-md flex items-center gap-2 font-bold text-gray-900">
+                            {statusIcons[status.name] || (
+                              <FiCheckCircle className="text-gray-500" />
+                            )}
+                            {status.name}
+                          </div>
+                          <FiPlus className="cursor-pointer text-black hover:text-gray-600" />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                          {groupedOrders[status.id] &&
+                            groupedOrders[status.id].map((order, index) => (
+                              <Draggable
+                                key={order.id.toString()}
+                                draggableId={order.id.toString()}
+                                index={index}
+                              >
+                                {(provided: DraggableProvided) => (
+                                  <div
+                                    className={`flex cursor-grab flex-col gap-3 rounded-lg border-l-4 bg-white p-3 shadow-md ${statusColors[status.name]}`}
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <p className="text-xs text-gray-700">
+                                        <strong>OS:</strong> {order.codeServiceOrder}
+                                      </p>
+                                      <div className="text-right">
+                                        <FiInfo
+                                          className="cursor-pointer text-blue-500 hover:text-blue-700"
+                                          onClick={() => openOrderDetails(order.id)}
+                                        />
+                                      </div>
+                                    </div>
+                                    <p className="text-xs text-gray-700">
+                                      <strong>Cliente:</strong>{' '} {order.branch.companyName}
+                                    </p>
+                                    <p className="text-xs text-gray-700">
+                                      <strong>Equipamento:</strong>{' '}  {order.equipment}
+                                    </p>
+                                    <p className="text-xs text-gray-700">
+                                      <strong>Data Programada:</strong>{' '}  {order.datePrev}
+                                    </p>
+                                    <p className="text-xs text-gray-700">
+                                      <strong>Data de Emissão:</strong>{' '}  {order.dateEmission}
+                                    </p>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                          {provided.placeholder}
+                        </div>
+                      </div>
+                    )}
+                  </Droppable>
+                ) : null,
+              )}
+            </div>
+          </DragDropContext>
+        </div>
+      </div>
+  
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <h2>Preencha os detalhes</h2>
-          {draggedOrderData?.hasJustify &&(
+          {draggedOrderData?.hasJustify && (
             <Field>
               <Label>Justificativa:</Label>
               <Input

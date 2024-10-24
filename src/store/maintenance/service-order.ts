@@ -171,7 +171,7 @@ export const useServiceOrder = create<ServiceOrderStoreData>((set) => {
         params: {
           index: 0,
           perPage: 500,
-          ...filters // enviar false
+          ...filters, // enviar false
         },
       })
       const serviceOrders = response.data.rows
